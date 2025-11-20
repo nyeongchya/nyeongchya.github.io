@@ -1,49 +1,291 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>첫 번째 웹페이지</title>
-    <style>
-        body {
-            font-family: '맑은 고딕', 'Malgun Gothic', Arial, sans-serif;
-            background: #000000;
-            text-align: center;
-            margin-top: 100px;
-        }
-        h1 { color: #654cf5; }
-        p { font-size: 1.2em; color: #ffffff; }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>사이버펑크 페이지 — 배경 테스트</title>
+  <style>
+    /* 기본 리셋 */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html,body { height: 100%; }
 
-        /* 네온 글로우 효과 */
-        .neon-glow {
-            color: #7a6fff;
-            font-weight: bold;
-            text-shadow:
-                0 0 5px #7a6fff,
-                0 0 10px #7a6fff,
-                0 0 15px #7a6fff,
-                0 0 20px #654cf5,
-                0 0 30px #654cf5;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
+    body {
+      font-family: '맑은 고딕','Malgun Gothic', Arial, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      /* 베이스 그라데이션 — 색상은 자유롭게 변경 가능 */
+      background: radial-gradient(1200px 600px at 10% 20%, rgba(138,103,255,0.12), transparent 10%),
+                  radial-gradient(900px 400px at 90% 80%, rgba(255,66,143,0.08), transparent 10%),
+                  linear-gradient(180deg, #020204 0%, #0b0220 40%, #070018 100%);
+      position: relative;
+    }
 
-        @keyframes glow {
-            from {
-                text-shadow:
-                    0 0 5px #7a6fff,
-                    0 0 10px #7a6fff;
-            }
-            to {
-                text-shadow:
-                    0 0 15px #7a6fff,
-                    0 0 30px #7a6fff,
-                    0 0 45px #654cf5;
-            }
-        }
-    </style>
+    /* ---- 네온 그리드 (격자) ---- */
+    .grid-layer {
+      position: absolute;
+      inset: 0; /* top:0; right:0; bottom:0; left:0; */
+      background-image:
+        /* 세로선 */
+        linear-gradient(90deg, rgba(122,111,255,0.10) 1px, transparent 1px),
+        /* 가로선 */
+        linear-gradient(180deg, rgba(122,111,255,0.06) 1px, transparent 1px);
+      background-size: 80px 80px, 80px 80px; /* 격자 간격 */
+      mix-blend-mode: screen;
+      opacity: 0.9;
+      animation: grid-move 12s linear infinite;
+      pointer-events: none;
+      transform-origin: center;
+      filter: blur(0.6px) contrast(1.05);
+    }
+
+    @keyframes grid-move {
+      from { background-position: 0 0, 0 0; transform: translateZ(0) rotateX(0deg); }
+      to   { background-position: -320px 180px, 120px -160px; }
+    }
+
+    /* ---- 스캔라인 (수평 라인) ---- */
+    .scanlines {
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        180deg,
+        rgba(255,255,255,0.02) 0px,
+        rgba(255,255,255,0.02) 1px,
+        transparent 1px,
+        transparent 4px
+      );
+      opacity: 0.35;
+      pointer-events: none;
+      mix-blend-mode: overlay;
+      animation: scan 6s linear infinite;
+      filter: hue-rotate(10deg);
+    }
+    @keyframes scan {
+      from { background-position-y: 0; }
+      to   { background-position-y: 1000px; }
+    }
+
+    /* ---- 캔버스 파티클 (js로 제어) ---- */
+    #particle-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      opacity: 0.95;
+    }
+
+    /* ---- 도시 실루엣 (하단) ---- */
+    .city {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 22vh;
+      pointer-events: none;
+      opacity: 0.45;
+      filter: blur(6px) saturate(1.2);
+      transform: translateY(6%);
+      background: linear-gradient(180deg, rgba(10,6,30,0) 0%, rgba(7,2,20,1) 100%);
+      background-blend-mode: multiply;
+    }
+    .city svg { width: 100%; height: 100%; display:block; }
+
+    /* ---- 콘텐츠 (중앙) ---- */
+    .content {
+      position: relative;
+      z-index: 5;
+      text-align: center;
+      padding: 24px;
+      max-width: 900px;
+      width: 100%;
+    }
+    h1 {
+      font-size: clamp(28px, 6vw, 64px);
+      margin-bottom: 12px;
+      color: #d9c9ff;
+      letter-spacing: 0.02em;
+      text-shadow:
+        0 0 6px rgba(122,111,255,0.7),
+        0 0 14px rgba(122,111,255,0.35),
+        0 6px 18px rgba(0,0,0,0.6);
+    }
+    p.lead {
+      font-size: clamp(14px, 1.8vw, 20px);
+      color: rgba(255,255,255,0.82);
+      margin-bottom: 18px;
+      text-shadow: 0 1px 0 rgba(0,0,0,0.6);
+    }
+
+    /* 네온 버튼 (예시) */
+    .neon-button {
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 10px;
+      background: linear-gradient(90deg, rgba(122,111,255,0.14), rgba(255,66,143,0.06));
+      border: 1px solid rgba(122,111,255,0.7);
+      box-shadow: 0 6px 20px rgba(122,111,255,0.08), 0 0 12px rgba(122,111,255,0.06) inset;
+      color: #e6e0ff;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease;
+      user-select: none;
+    }
+    .neon-button:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(122,111,255,0.18); }
+
+    /* 접근성: 애니메이션 축소 요청 시 정지 */
+    @media (prefers-reduced-motion: reduce) {
+      .grid-layer, .scanlines, #particle-canvas { animation: none; opacity: 0.6; }
+    }
+
+    /* 작은 화면용 조정 */
+    @media (max-width: 480px) {
+      .city { height: 30vh; transform: translateY(10%); opacity: 0.5; }
+      h1 { font-size: 28px; }
+    }
+  </style>
 </head>
 <body>
-    <h1>1차.</h1>
-    <p class="neon-glow">Hello, world!</p>
+  <!-- 배경 레이어들 -->
+  <div class="grid-layer" aria-hidden="true"></div>
+  <div class="scanlines" aria-hidden="true"></div>
+  <canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+  <!-- 중앙 컨텐츠 -->
+  <main class="content" role="main">
+    <h1 class="neon-glow">CYBERPUNK LAB</h1>
+    <p class="lead">네온과 전기, 어두운 도시의 숨소리 — 배경 이펙트 시연</p>
+    <a class="neon-button" href="#" role="button">시작하기</a>
+  </main>
+
+  <!-- 도시 실루엣 (SVG) -->
+  <div class="city" aria-hidden="true">
+    <!-- 간단한 실루엣: 필요하면 교체/확장 -->
+    <svg viewBox="0 0 1200 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stop-color="#35184a" stop-opacity="0.75"/>
+          <stop offset="100%" stop-color="#030014" stop-opacity="0.3"/>
+        </linearGradient>
+      </defs>
+      <rect width="1200" height="200" fill="url(#g)"/>
+      <g fill="#0b0220" opacity="0.85">
+        <path d="M0 120 L40 100 L80 110 L120 90 L160 110 L200 70 L240 90 L280 60 L320 100 L360 80 L400 120 L440 50 L480 110 L520 40 L560 100 L600 60 L640 110 L680 80 L720 130 L760 70 L800 120 L840 60 L880 110 L920 90 L960 140 L1000 80 L1040 120 L1080 70 L1120 120 L1160 85 L1200 120 L1200 200 L0 200 Z" />
+      </g>
+    </svg>
+  </div>
+
+  <!-- 입자 제어 스크립트 -->
+  <script>
+    (function() {
+      const canvas = document.getElementById('particle-canvas');
+      const ctx = canvas.getContext('2d');
+      let w = canvas.width = innerWidth;
+      let h = canvas.height = innerHeight;
+      const DPR = window.devicePixelRatio || 1;
+      canvas.width = w * DPR;
+      canvas.height = h * DPR;
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.scale(DPR, DPR);
+
+      const PARTICLE_COUNT = Math.round((w*h) / 60000 * 30); // 화면비례 입자수, 조정 가능
+      const particles = [];
+
+      // 입자 생성 함수
+      function rand(min, max) { return Math.random() * (max - min) + min; }
+
+      function createParticle() {
+        const size = rand(0.8, 3.2);
+        return {
+          x: rand(0, w),
+          y: rand(0, h),
+          vx: rand(-0.15, 0.15),
+          vy: rand(-0.02, 0.05),
+          size,
+          life: rand(50, 240),
+          hue: rand(260, 330), // 네온 색상 범위 (보라 ~ 핑크)
+          alpha: rand(0.05, 0.35)
+        };
+      }
+
+      for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(createParticle());
+
+      function draw() {
+        ctx.clearRect(0,0,w,h);
+
+        // 부드러운 블룸(복사로 밝은 부분 강조)
+        for (let p of particles) {
+          // 글로우 효과를 위해 여러 번 레이어
+          const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size*6);
+          grd.addColorStop(0, `hsla(${p.hue}, 90%, 65%, ${p.alpha})`);
+          grd.addColorStop(0.3, `hsla(${p.hue}, 90%, 55%, ${p.alpha*0.45})`);
+          grd.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = grd;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size*6, 0, Math.PI*2);
+          ctx.fill();
+
+          ctx.globalCompositeOperation = 'lighter';
+          ctx.fillStyle = `hsla(${p.hue}, 90%, 70%, ${Math.min(1, p.alpha*2)})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+          ctx.fill();
+          ctx.globalCompositeOperation = 'source-over';
+
+          // 이동
+          p.x += p.vx;
+          p.y += p.vy;
+          p.life -= 1;
+
+          // 바깥으로 나가면 반대편으로
+          if (p.x > w + 10) p.x = -10;
+          if (p.x < -10) p.x = w + 10;
+          if (p.y > h + 10) p.y = -10;
+          if (p.y < -10) p.y = h + 10;
+
+          if (p.life <= 0) {
+            Object.assign(p, createParticle());
+            p.x = rand(0, w);
+            p.y = h + rand(0, h*0.2) * -1; // 밑에서 재생성
+          }
+        }
+      }
+
+      let rafId;
+      function loop() {
+        draw();
+        rafId = requestAnimationFrame(loop);
+      }
+
+      // 반응형
+      function resize() {
+        w = canvas.width = innerWidth;
+        h = canvas.height = innerHeight;
+        canvas.width = w * DPR;
+        canvas.height = h * DPR;
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      }
+
+      // 성능: reduced-motion일 경우 애니 중지
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduced) loop();
+
+      addEventListener('resize', () => {
+        cancelAnimationFrame(rafId);
+        resize();
+        if (!reduced) loop();
+      });
+
+    })();
+  </script>
 </body>
 </html>
