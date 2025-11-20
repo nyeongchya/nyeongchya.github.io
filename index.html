@@ -2,15 +2,48 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>첫 번째 웹페이지</title>
     <style>
-        body { font-family: '맑은 고딕', sans-serif; background: #000000; text-align: center; margin-top: 100px; }
+        body {
+            font-family: '맑은 고딕', 'Malgun Gothic', Arial, sans-serif;
+            background: #000000;
+            text-align: center;
+            margin-top: 100px;
+        }
         h1 { color: #654cf5; }
         p { font-size: 1.2em; color: #ffffff; }
+
+        /* 네온 글로우 효과 */
+        .neon-glow {
+            color: #7a6fff;
+            font-weight: bold;
+            text-shadow:
+                0 0 5px #7a6fff,
+                0 0 10px #7a6fff,
+                0 0 15px #7a6fff,
+                0 0 20px #654cf5,
+                0 0 30px #654cf5;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow:
+                    0 0 5px #7a6fff,
+                    0 0 10px #7a6fff;
+            }
+            to {
+                text-shadow:
+                    0 0 15px #7a6fff,
+                    0 0 30px #7a6fff,
+                    0 0 45px #654cf5;
+            }
+        }
     </style>
 </head>
 <body>
     <h1>1차.</h1>
-    <p>Hello, world!</p>
+    <p class="neon-glow">Hello, world!</p>
 </body>
 </html>
