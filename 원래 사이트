@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadow Alley Agency</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Malgun Gothic', sans-serif;
+        background: #000;
+        color: #fff;
+        overflow-x: hidden;
+    }
+
+    section {
+        padding: 120px 40px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    /* 🔥 글로벌 네온 텍스트 */
+    .neon {
+        color: #ff00e6;
+        text-shadow: 0 0 10px #ff00e6, 0 0 25px #ff00e6;
+    }
+
+    /* 🔥 Hero 배경 */
+    #hero {
+        background: url('https://i.imgur.com/8eKQO5Z.jpeg') center/cover no-repeat;
+        position: relative;
+    }
+    #hero::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(3px);
+    }
+    #hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 800px;
+    }
+
+    h1 {
+        font-size: 3.5em;
+        margin-bottom: 20px;
+    }
+    p {
+        font-size: 1.2em;
+        color: #ccc;
+        max-width: 700px;
+        line-height: 1.7em;
+    }
+
+    /* 🔥 소개 섹션 배경 */
+    #about {
+        background: linear-gradient(#050010, #0a0018);
+    }
+
+    /* 🔥 의뢰창 스타일 */
+    #request {
+        background: linear-gradient(#0a0018, #140028);
+    }
+    .request-box {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid #ff00e6;
+        padding: 30px;
+        width: 80%;
+        max-width: 600px;
+        backdrop-filter: blur(4px);
+        box-shadow: 0 0 20px rgba(255,0,230,0.4);
+    }
+    input, textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: none;
+        background: rgba(0,0,0,0.4);
+        color: #fff;
+        border-bottom: 2px solid #ff00f2;
+    }
+    textarea {
+        height: 140px;
+        resize: none;
+    }
+    button {
+        padding: 12px 30px;
+        background: transparent;
+        border: 2px solid #ff00e6;
+        color: #ff00e6;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: 0.2s;
+        letter-spacing: 2px;
+        text-shadow: 0 0 8px #ff00e6;
+    }
+    button:hover {
+        background: rgba(255,0,230,0.1);
+        box-shadow: 0 0 20px #ff00e6;
+    }
+
+    /* 🔥 뒷골목 지도 */
+    #map {
+        background: linear-gradient(#140028, #000015);
+    }
+    .map-grid {
+        width: 80%;
+        max-width: 600px;
+        height: 350px;
+        background: rgba(255,255,255,0.07);
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        grid-template-rows: repeat(6, 1fr);
+        gap: 4px;
+        border: 2px solid #ff00ff;
+        box-shadow: 0 0 20px #ff00ff;
+    }
+    .grid-cell {
+        background: rgba(0,0,0,0.6);
+        transition: 0.2s;
+        cursor: pointer;
+    }
+    .grid-cell:hover {
+        background: #ff00e6;
+        box-shadow: 0 0 15px #ff00ff;
+    }
+    #map-info {
+        margin-top: 20px;
+        color: #ffbfff;
+    }
+
+</style>
+</head>
+<body>
+
+<!-- 🟣 HERO SECTION -->
+<section id="hero">
+    <div id="hero-content">
+        <h1 class="neon">Shadow Alley Agency</h1>
+        <p>
+            사이버펑크 도시의 뒷골목엔 법이 닿지 않는 그림자 구역이 있다.  
+            그곳에서 실종된 데이터, 빼앗긴 신분, 추적당하는 넷러너,  
+            그리고 지워져야 할 과거를 가진 자들이 나를 찾아온다.  
+            <br><br>
+            나는 이 도시의 어둠 속을 누비는 브로커,  
+            <strong>그림자 속 문제를 해결하는 유일한 사무소의 운영자다.</strong>
+        </p>
+    </div>
+</section>
+
+<!-- 🟣 ABOUT SECTION -->
+<section id="about">
+    <h1 class="neon">우리 사무소</h1>
+    <p>
+        “빛 아래 드러나지 않는 일이라면 뭐든 맡긴다.”  
+        그게 Shadow Alley Agency의 모토다.  
+        <br><br>
+        우린 기업 전쟁의 스파이 파일부터  
+        사이버 파츠 밀수업자 추적,  
+        블랙마켓 브로커의 배신 검증,  
+        감시 드론망을 피한 이동 루트 제작까지  
+        도시가 감추고 싶어 하는 일들을 처리한다.
+        <br><br>
+        여긴 정직한 이들만 오는 곳이 아니다.  
+        대신, **진실을 원하는 이들은 반드시 지나가는 문**이다.
+    </p>
+</section>
+
+<!-- 🟣 REQUEST SECTION -->
+<section id="request">
+    <h1 class="neon">의뢰 터미널</h1>
+    <p>의뢰 내용을 입력해라. 암호화를 거쳐 전용 라인으로 전송된다.</p>
+
+    <div class="request-box">
+        <input type="text" placeholder="코드네임">
+        <textarea placeholder="의뢰 내용을 입력하세요 (추적, 해킹 의혹, 데이터 회수 등)"></textarea>
+        <button onclick="alert('의뢰 수신. 검증 중…')">의뢰 전송</button>
+    </div>
+</section>
+
+<!-- 🟣 MAP SECTION -->
+<section id="map">
+    <h1 class="neon">뒷골목 지도 인터페이스</h1>
+    <p>아래 그리드 중 한 구역을 선택하면 정보가 표시된다.</p>
+
+    <div class="map-grid">
+        <!-- 36칸 자동 생성 -->
+        <script>
+            document.write(
+                Array(36).fill('<div class="grid-cell" onclick="selectArea(this)"></div>').join('')
+            );
+        </script>
+    </div>
+
+    <div id="map-info">선택된 구역 없음</div>
+</section>
+
+<script>
+    const infoText = [
+        "A1 구역: 사이버 파츠 암거래 시장",
+        "A2 구역: 불법 넷러너 은신처",
+        "A3 구역: 감시드론 죽은 구역",
+        "A4 구역: 블랙마켓 데이터 노드",
+        "A5 구역: 무기 밀수 루트",
+        "A6 구역: 기업 스파이 회수지점",
+        "B1 구역: 사이버 중독자 집결지",
+        "B2 구역: 강제 확장 파츠 공방",
+        "B3 구역: 익명 메모리 세탁소",
+        "B4 구역: 해커들 은닉 VPN 출구",
+        "B5 구역: 단기 계약 살수의 집합지",
+        "B6 구역: 고장난 신경망 보관고",
+        // 나머지는 랜덤 메시지
+    ];
+
+    function selectArea(cell) {
+        const index = [...cell.parentNode.children].indexOf(cell);
+        document.getElementById("map-info").innerText =
+            infoText[index] || `미확인 구역: 데이터 불충분`;
+    }
+</script>
+
+</body>
+</html>
+
