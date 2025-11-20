@@ -1,192 +1,156 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cyberpunk City</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
-
-    body {
-      font-family: 'Malgun Gothic','맑은 고딕', sans-serif;
-      background: linear-gradient(180deg, #030008 10%, #070018 40%, #000000 90%);
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: #000;
       overflow: hidden;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
+      font-family: 'Arial', sans-serif;
     }
 
-    /* 네온 격자 배경 */
-    .grid-layer {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(90deg, rgba(122,111,255,0.08) 1px, transparent 1px),
-        linear-gradient(180deg, rgba(122,111,255,0.05) 1px, transparent 1px);
-      background-size: 90px 90px;
-      mix-blend-mode: screen;
-      animation: grid-move 18s linear infinite;
-      pointer-events: none;
-    }
-    @keyframes grid-move {
-      from { background-position: 0 0, 0 0; }
-      to   { background-position: -200px 140px, 160px -100px; }
-    }
-
-    /* 마우스 따라다니는 네온 광원 효과 */
-    .glow {
-      position: absolute;
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(200,140,255,0.6), transparent 70%);
-      pointer-events: none;
-      mix-blend-mode: screen;
-      filter: blur(30px);
-      transform: translate(-50%, -50%);
-    }
-
-    /* 도시 실루엣 */
     .city {
       position: absolute;
       bottom: 0;
       width: 100%;
-      height: 40vh;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    .city svg { width: 100%; height: 100%; display: block; }
-
-    /* 중앙 콘텐츠 */
-    .content {
-      position: relative;
-      z-index: 5;
-      text-align: center;
+      height: 50%;
+      background: linear-gradient(to top, rgba(0,0,0,0.9), transparent),
+        url('https://i.imgur.com/7yUvePI.png');
+      background-size: cover;
+      filter: brightness(0.8) contrast(1.2);
     }
 
-    h1 {
-      font-size: clamp(40px, 6vw, 72px);
-      color: #d9c9ff;
+    .neon-sign {
+      position: absolute;
+      top: 20%;
+      left: 30%;
+      font-size: 48px;
+      color: #0ff;
       text-shadow:
-        0 0 8px rgba(150,100,255,0.7),
-        0 0 24px rgba(200,140,255,0.5),
-        0 0 48px rgba(122,111,255,0.4);
-      margin-bottom: 8px;
-      letter-spacing: 0.05em;
+        0 0 5px #0ff,
+        0 0 10px #0ff,
+        0 0 20px #0ff;
+      animation: flicker 2s infinite;
     }
 
-    p.lead {
-      font-size: clamp(14px, 2vw, 20px);
-      opacity: 0.85;
-      margin-bottom: 18px;
+    @keyframes flicker {
+      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        opacity: 1;
+      }
+      20%, 24%, 55% {
+        opacity: 0.3;
+      }
     }
 
-    .neon-button {
-      border: 1px solid rgba(200,140,255,0.6);
-      padding: 10px 24px;
-      border-radius: 10px;
-      background: rgba(200,140,255,0.1);
-      color: #e9e0ff;
-      text-decoration: none;
-      font-weight: 600;
+    .button {
+      position: absolute;
+      top: 10%;
+      right: 10%;
+      padding: 15px 30px;
+      background: #111;
+      color: #0ff;
+      border: 1px solid #0ff;
       cursor: pointer;
-      transition: transform .18s ease, box-shadow .18s ease;
-      box-shadow: 0 0 14px rgba(200,140,255,0.15);
-    }
-    .neon-button:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 0 28px rgba(200,140,255,0.28);
+      text-transform: uppercase;
+      font-size: 16px;
+      transition: all 0.2s ease;
     }
 
-    /* 캔버스 (입자) */
-    #particle-canvas {
+    .button:hover {
+      filter: drop-shadow(0 0 10px #0ff);
+    }
+
+    .button:active {
+      animation: glitch 0.5s forwards;
+    }
+
+    @keyframes glitch {
+      0% { transform: translate(0); }
+      20% { transform: translate(-5px, 5px); }
+      40% { transform: translate(5px, -5px); }
+      60% { transform: translate(-5px, -5px); }
+      80% { transform: translate(5px, 5px); }
+      100% { transform: translate(0); }
+    }
+
+    .particles {
       position: absolute;
       width: 100%;
       height: 100%;
-      inset: 0;
       pointer-events: none;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
     }
   </style>
 </head>
 <body>
-  <div class="grid-layer"></div>
-  <canvas id="particle-canvas"></canvas>
-  <div class="glow" id="mouse-glow"></div>
+  <div class="neon-sign">CYBER CITY</div>
+  <div class="city"></div>
+  <button class="button">Enter</button>
+  <canvas id="particles"></canvas>
 
-  <!-- Content -->
-  <main class="content" role="main">
-    <h1>CYBERPUNK CITY</h1>
-    <p class="lead">네온과 전기, 디지털 먼지가 흐르는 밤의 도시</p>
-    <a class="neon-button" href="#">ENTER</a>
-  </main>
-
-  <!-- City Silhouette -->
-  <div class="city" aria-hidden="true">
-    <svg viewBox="0 0 1200 300" preserveAspectRatio="none">
-      <g fill="#0a0215" opacity="0.9">
-        <rect x="20" y="200" width="60" height="100"/>
-        <rect x="120" y="180" width="90" height="120"/>
-        <rect x="250" y="150" width="110" height="150"/>
-        <rect x="390" y="170" width="80" height="130"/>
-        <rect x="500" y="130" width="140" height="170"/>
-        <rect x="660" y="160" width="110" height="140"/>
-        <rect x="800" y="140" width="100" height="160"/>
-        <rect x="930" y="180" width="90" height="120"/>
-        <rect x="1050" y="200" width="70" height="100"/>
-      </g>
-    </svg>
-  </div>
-
-  <!-- Particle Script -->
   <script>
-    const canvas = document.getElementById('particle-canvas');
+    const canvas = document.getElementById('particles');
     const ctx = canvas.getContext('2d');
-    let w, h;
-    let particles = [];
-    function resize() {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    function createParticle() {
-      return {
-        x: Math.random() * w,
-        y: Math.random() * (h * 0.6),  // 도시 위 공간까지만
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.8) * 0.2,
-        size: Math.random() * 2.2 + 0.5,
-        alpha: Math.random() * 0.6 + 0.3
-      };
-    }
+    const particlesArray = [];
+    const numberOfParticles = 200;
 
-    for (let i = 0; i < 80; i++) particles.push(createParticle());
-
-    function drawParticles() {
-      ctx.clearRect(0, 0, w, h * 0.7);
-      particles.forEach((p, i) => {
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height * 0.5;
+        this.size = Math.random() * 2 + 1;
+        this.speedX = Math.random() * 0.5 - 0.25;
+        this.speedY = Math.random() * 0.3 + 0.2;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.y > canvas.height * 0.75) {
+          this.y = Math.random() * canvas.height * 0.5;
+        }
+      }
+      draw() {
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
         ctx.beginPath();
-        ctx.fillStyle = `rgba(200,140,255,${p.alpha})`;
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
-
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.y < h * 0.25 || p.alpha <= 0) particles[i] = createParticle();
-      });
-      requestAnimationFrame(drawParticles);
+      }
     }
-    drawParticles();
 
-    // 마우스 네온광원
-    const glow = document.getElementById('mouse-glow');
-    document.addEventListener('mousemove', (e) => {
-      glow.style.left = `${e.clientX}px`;
-      glow.style.top = `${e.clientY}px`;
+    function init() {
+      for (let i = 0; i < numberOfParticles; i++) {
+        particlesArray.push(new Particle());
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particlesArray.forEach(particle => {
+        particle.update();
+        particle.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+
+    init();
+    animate();
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     });
   </script>
 </body>
