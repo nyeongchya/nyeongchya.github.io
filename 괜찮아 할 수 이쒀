@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadow Alley Agency</title>
+
+<style>
+
+/* ---------------------- GLOBAL ---------------------- */
+body {
+    margin: 0;
+    font-family: 'Malgun Gothic', sans-serif;
+    background: linear-gradient(135deg, #040011, #130024, #001827);
+    background-size: 300% 300%;
+    animation: bgShift 12s ease infinite;
+    color: white;
+    overflow-x: hidden;
+}
+
+@keyframes bgShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+section {
+    min-height: 100vh;
+    padding: 120px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* 사이버펑크 네온 폰트 */
+.neon {
+    font-size: 2.8em;
+    color: #ff00f7;
+    text-shadow: 0 0 14px #ff00f7, 0 0 35px #ff00a6;
+}
+
+/* 패널 UI (브로커 인터페이스 느낌) */
+.panel {
+    width: 80%;
+    max-width: 850px;
+    background: rgba(255,255,255,0.06);
+    border: 1.5px solid #00ffe1;
+    padding: 30px;
+    border-radius: 10px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 20px #00ffe144;
+    margin-top: 30px;
+}
+
+/* ---------------------- KEYCARD MENU ---------------------- */
+#keycard-menu {
+    position: fixed;
+    top: 50%;
+    left: 25px;
+    transform: translateY(-50%);
+    z-index: 1000;
+}
+
+.key-btn {
+    display: block;
+    padding: 10px 18px;
+    border: 2px solid #00faff;
+    background: rgba(0,0,0,0.4);
+    margin: 10px 0;
+    cursor: pointer;
+    color: #00faff;
+    transition: 0.2s;
+}
+
+.key-btn:hover {
+    background: rgba(0,255,255,0.25);
+}
+
+.key-btn.active {
+    border-color: #ff00f7;
+    color: #ff00f7;
+    text-shadow: 0 0 8px #ff00f7;
+}
+
+/* ---------------------- STAFF ---------------------- */
+.staff-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 25px;
+}
+
+.staff-card {
+    border: 1.5px solid #00ffe1;
+    padding: 20px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    box-shadow: 0 0 12px #00ffe155;
+}
+
+/* ---------------------- FILES ---------------------- */
+.file-item {
+    padding: 12px 15px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid #ff00f7;
+    margin: 8px 0;
+    border-radius: 5px;
+    font-family: Consolas;
+    color: #ffbfff;
+}
+
+/* ---------------------- MAP ---------------------- */
+.map-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 40px);
+    gap: 6px;
+    margin-top: 25px;
+}
+
+.map-cell {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #00ffe1;
+    background: rgba(255,255,255,0.04);
+    cursor: pointer;
+}
+.map-cell:hover {
+    background: rgba(0,255,255,0.2);
+}
+
+#map-info {
+    margin-top: 20px;
+    color: #ffb4ff;
+}
+
+/* ---------------------- REQUEST ---------------------- */
+textarea, input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid #ff00f7;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 1em;
+}
+
+button {
+    margin-top: 10px;
+    padding: 12px 25px;
+    font-size: 1em;
+    border: 2px solid #00ffe1;
+    background: transparent;
+    color: #00ffe1;
+    cursor: pointer;
+}
+
+button:hover {
+    background: rgba(0,255,255,0.2);
+}
+
+</style>
+</head>
+<body>
+
+<!-- KEYCARD FIXED MENU -->
+<div id="keycard-menu">
+    <div class="key-btn" onclick="nav('hero')">HOME</div>
+    <div class="key-btn" onclick="nav('staff')">STAFF</div>
+    <div class="key-btn" onclick="nav('request')">REQUEST</div>
+    <div class="key-btn" onclick="nav('files')">FILES</div>
+    <div class="key-btn" onclick="nav('map')">MAP</div>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+    <h1 class="neon">Shadow Alley Agency</h1>
+    <p>도시의 가장 어두운 틈에서 움직이는 그림자 브로커 사무소.</p>
+    <p>우리는 감시망 아래서 포착되지 않는 일을 처리한다.</p>
+</section>
+
+<!-- STAFF -->
+<section id="staff">
+    <h1 class="neon">STAFF — CODENAMES</h1>
+    <div class="panel">
+        <div class="staff-grid">
+            <div class="staff-card">
+                <h3>GHOSTWIRE-01</h3>
+                <p>정보 거래와 의뢰 판독을 담당하는 Fixer.</p>
+            </div>
+            <div class="staff-card">
+                <h3>PORTRIFT-42</h3>
+                <p>감시망을 뚫고 데이터를 운반하는 Runner.</p>
+            </div>
+            <div class="staff-card">
+                <h3>SPECTRENODE-A</h3>
+                <p>위험 분석을 수행하는 비인가 Analyst.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- REQUEST -->
+<section id="request">
+    <h1 class="neon">의뢰 접수 시스템</h1>
+    <div class="panel">
+        <input type="text" id="user" placeholder="의뢰자 코드네임">
+        <textarea id="content" rows="6" placeholder="의뢰 내용을 입력하세요"></textarea>
+        <button onclick="send()">전송</button>
+        <p id="req-status"></p>
+    </div>
+</section>
+
+<!-- FILES -->
+<section id="files">
+    <h1 class="neon">Encrypted Files</h1>
+    <div class="panel">
+        <div class="file-item">[FILE–1A] 신분 삭제 의뢰 — SUCCESS</div>
+        <div class="file-item">[FILE–2B] 추적 회피 경로 설정 — ONGOING</div>
+        <div class="file-item">[FILE–2C] 감시망 분석 — FAILURE</div>
+    </div>
+</section>
+
+<!-- MAP -->
+<section id="map">
+    <h1 class="neon">Back Alley Sector Map</h1>
+    <div class="panel">
+        <div class="map-grid">
+            <script>
+                for (let i=0; i<36; i++) 
+                    document.write(`<div class='map-cell' onclick='selectMap(${i})'></div>`);
+            </script>
+        </div>
+        <div id="map-info">선택된 구역 없음</div>
+    </div>
+</section>
+
+<script>
+/* NAVIGATION */
+function nav(id){
+    document.getElementById(id).scrollIntoView({ behavior: "smooth" });
+    document.querySelectorAll(".key-btn").forEach(btn => btn.classList.remove("active"));
+    event.target.classList.add("active");
+}
+
+/* MAP INFO */
+const info = [
+    "A1 - 네온 파츠 블랙마켓",
+    "A2 - 사각지대 감시장소",
+    "A3 - 폐기 메모리 드랍존",
+    "A4 - 불법 신경 링크 지점"
+];
+function selectMap(i){
+    document.getElementById("map-info").innerText =
+        info[i] || "미확인 구역";
+}
+
+/* REQUEST TERMINAL */
+function send(){
+    document.getElementById("req-status").innerText =
+        "요청이 암호화되어 전송되었습니다.";
+}
+</script>
+
+</body>
+</html>
