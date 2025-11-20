@@ -1,193 +1,231 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Cyberpunk City</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadow Alley Agency</title>
 
+<style>
     body {
-      font-family: 'Malgun Gothic','맑은 고딕', sans-serif;
-      background: linear-gradient(180deg, #030008 10%, #070018 40%, #000000 90%);
-      overflow: hidden;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
+        margin: 0;
+        font-family: 'Malgun Gothic', sans-serif;
+        background: #000;
+        color: #fff;
+        overflow-x: hidden;
     }
 
-    /* 네온 격자 배경 */
-    .grid-layer {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(90deg, rgba(122,111,255,0.08) 1px, transparent 1px),
-        linear-gradient(180deg, rgba(122,111,255,0.05) 1px, transparent 1px);
-      background-size: 90px 90px;
-      mix-blend-mode: screen;
-      animation: grid-move 18s linear infinite;
-      pointer-events: none;
-    }
-    @keyframes grid-move {
-      from { background-position: 0 0, 0 0; }
-      to   { background-position: -200px 140px, 160px -100px; }
+    section {
+        padding: 120px 40px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
     }
 
-    /* 마우스 따라다니는 네온 광원 효과 */
-    .glow {
-      position: absolute;
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(200,140,255,0.6), transparent 70%);
-      pointer-events: none;
-      mix-blend-mode: screen;
-      filter: blur(30px);
-      transform: translate(-50%, -50%);
+    /* 🔥 글로벌 네온 텍스트 */
+    .neon {
+        color: #ff00e6;
+        text-shadow: 0 0 10px #ff00e6, 0 0 25px #ff00e6;
     }
 
-    /* 도시 실루엣 */
-    .city {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: 40vh;
-      pointer-events: none;
-      overflow: hidden;
+    /* 🔥 Hero 배경 */
+    #hero {
+        background: url('https://i.imgur.com/8eKQO5Z.jpeg') center/cover no-repeat;
+        position: relative;
     }
-    .city svg { width: 100%; height: 100%; display: block; }
-
-    /* 중앙 콘텐츠 */
-    .content {
-      position: relative;
-      z-index: 5;
-      text-align: center;
+    #hero::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(3px);
+    }
+    #hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 800px;
     }
 
     h1 {
-      font-size: clamp(40px, 6vw, 72px);
-      color: #d9c9ff;
-      text-shadow:
-        0 0 8px rgba(150,100,255,0.7),
-        0 0 24px rgba(200,140,255,0.5),
-        0 0 48px rgba(122,111,255,0.4);
-      margin-bottom: 8px;
-      letter-spacing: 0.05em;
+        font-size: 3.5em;
+        margin-bottom: 20px;
+    }
+    p {
+        font-size: 1.2em;
+        color: #ccc;
+        max-width: 700px;
+        line-height: 1.7em;
     }
 
-    p.lead {
-      font-size: clamp(14px, 2vw, 20px);
-      opacity: 0.85;
-      margin-bottom: 18px;
+    /* 🔥 소개 섹션 배경 */
+    #about {
+        background: linear-gradient(#050010, #0a0018);
     }
 
-    .neon-button {
-      border: 1px solid rgba(200,140,255,0.6);
-      padding: 10px 24px;
-      border-radius: 10px;
-      background: rgba(200,140,255,0.1);
-      color: #e9e0ff;
-      text-decoration: none;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform .18s ease, box-shadow .18s ease;
-      box-shadow: 0 0 14px rgba(200,140,255,0.15);
+    /* 🔥 의뢰창 스타일 */
+    #request {
+        background: linear-gradient(#0a0018, #140028);
     }
-    .neon-button:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 0 28px rgba(200,140,255,0.28);
+    .request-box {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid #ff00e6;
+        padding: 30px;
+        width: 80%;
+        max-width: 600px;
+        backdrop-filter: blur(4px);
+        box-shadow: 0 0 20px rgba(255,0,230,0.4);
+    }
+    input, textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: none;
+        background: rgba(0,0,0,0.4);
+        color: #fff;
+        border-bottom: 2px solid #ff00f2;
+    }
+    textarea {
+        height: 140px;
+        resize: none;
+    }
+    button {
+        padding: 12px 30px;
+        background: transparent;
+        border: 2px solid #ff00e6;
+        color: #ff00e6;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: 0.2s;
+        letter-spacing: 2px;
+        text-shadow: 0 0 8px #ff00e6;
+    }
+    button:hover {
+        background: rgba(255,0,230,0.1);
+        box-shadow: 0 0 20px #ff00e6;
     }
 
-    /* 캔버스 (입자) */
-    #particle-canvas {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      inset: 0;
-      pointer-events: none;
+    /* 🔥 뒷골목 지도 */
+    #map {
+        background: linear-gradient(#140028, #000015);
     }
-  </style>
+    .map-grid {
+        width: 80%;
+        max-width: 600px;
+        height: 350px;
+        background: rgba(255,255,255,0.07);
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        grid-template-rows: repeat(6, 1fr);
+        gap: 4px;
+        border: 2px solid #ff00ff;
+        box-shadow: 0 0 20px #ff00ff;
+    }
+    .grid-cell {
+        background: rgba(0,0,0,0.6);
+        transition: 0.2s;
+        cursor: pointer;
+    }
+    .grid-cell:hover {
+        background: #ff00e6;
+        box-shadow: 0 0 15px #ff00ff;
+    }
+    #map-info {
+        margin-top: 20px;
+        color: #ffbfff;
+    }
+
+</style>
 </head>
 <body>
-  <div class="grid-layer"></div>
-  <canvas id="particle-canvas"></canvas>
-  <div class="glow" id="mouse-glow"></div>
 
-  <!-- Content -->
-  <main class="content" role="main">
-    <h1>CYBERPUNK CITY</h1>
-    <p class="lead">네온과 전기, 디지털 먼지가 흐르는 밤의 도시</p>
-    <a class="neon-button" href="#">ENTER</a>
-  </main>
+<!-- 🟣 HERO SECTION -->
+<section id="hero">
+    <div id="hero-content">
+        <h1 class="neon">Shadow Alley Agency</h1>
+        <p>
+            사이버펑크 도시의 뒷골목엔 법이 닿지 않는 그림자 구역이 있다.  
+            그곳에서 실종된 데이터, 빼앗긴 신분, 추적당하는 넷러너,  
+            그리고 지워져야 할 과거를 가진 자들이 나를 찾아온다.  
+            <br><br>
+            나는 이 도시의 어둠 속을 누비는 브로커,  
+            <strong>그림자 속 문제를 해결하는 유일한 사무소의 운영자다.</strong>
+        </p>
+    </div>
+</section>
 
-  <!-- City Silhouette -->
-  <div class="city" aria-hidden="true">
-    <svg viewBox="0 0 1200 300" preserveAspectRatio="none">
-      <g fill="#0a0215" opacity="0.9">
-        <rect x="20" y="200" width="60" height="100"/>
-        <rect x="120" y="180" width="90" height="120"/>
-        <rect x="250" y="150" width="110" height="150"/>
-        <rect x="390" y="170" width="80" height="130"/>
-        <rect x="500" y="130" width="140" height="170"/>
-        <rect x="660" y="160" width="110" height="140"/>
-        <rect x="800" y="140" width="100" height="160"/>
-        <rect x="930" y="180" width="90" height="120"/>
-        <rect x="1050" y="200" width="70" height="100"/>
-      </g>
-    </svg>
-  </div>
+<!-- 🟣 ABOUT SECTION -->
+<section id="about">
+    <h1 class="neon">우리 사무소</h1>
+    <p>
+        “빛 아래 드러나지 않는 일이라면 뭐든 맡긴다.”  
+        그게 Shadow Alley Agency의 모토다.  
+        <br><br>
+        우린 기업 전쟁의 스파이 파일부터  
+        사이버 파츠 밀수업자 추적,  
+        블랙마켓 브로커의 배신 검증,  
+        감시 드론망을 피한 이동 루트 제작까지  
+        도시가 감추고 싶어 하는 일들을 처리한다.
+        <br><br>
+        여긴 정직한 이들만 오는 곳이 아니다.  
+        대신, **진실을 원하는 이들은 반드시 지나가는 문**이다.
+    </p>
+</section>
 
-  <!-- Particle Script -->
-  <script>
-    const canvas = document.getElementById('particle-canvas');
-    const ctx = canvas.getContext('2d');
-    let w, h;
-    let particles = [];
-    function resize() {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
+<!-- 🟣 REQUEST SECTION -->
+<section id="request">
+    <h1 class="neon">의뢰 터미널</h1>
+    <p>의뢰 내용을 입력해라. 암호화를 거쳐 전용 라인으로 전송된다.</p>
+
+    <div class="request-box">
+        <input type="text" placeholder="코드네임">
+        <textarea placeholder="의뢰 내용을 입력하세요 (추적, 해킹 의혹, 데이터 회수 등)"></textarea>
+        <button onclick="alert('의뢰 수신. 검증 중…')">의뢰 전송</button>
+    </div>
+</section>
+
+<!-- 🟣 MAP SECTION -->
+<section id="map">
+    <h1 class="neon">뒷골목 지도 인터페이스</h1>
+    <p>아래 그리드 중 한 구역을 선택하면 정보가 표시된다.</p>
+
+    <div class="map-grid">
+        <!-- 36칸 자동 생성 -->
+        <script>
+            document.write(
+                Array(36).fill('<div class="grid-cell" onclick="selectArea(this)"></div>').join('')
+            );
+        </script>
+    </div>
+
+    <div id="map-info">선택된 구역 없음</div>
+</section>
+
+<script>
+    const infoText = [
+        "A1 구역: 사이버 파츠 암거래 시장",
+        "A2 구역: 불법 넷러너 은신처",
+        "A3 구역: 감시드론 죽은 구역",
+        "A4 구역: 블랙마켓 데이터 노드",
+        "A5 구역: 무기 밀수 루트",
+        "A6 구역: 기업 스파이 회수지점",
+        "B1 구역: 사이버 중독자 집결지",
+        "B2 구역: 강제 확장 파츠 공방",
+        "B3 구역: 익명 메모리 세탁소",
+        "B4 구역: 해커들 은닉 VPN 출구",
+        "B5 구역: 단기 계약 살수의 집합지",
+        "B6 구역: 고장난 신경망 보관고",
+        // 나머지는 랜덤 메시지
+    ];
+
+    function selectArea(cell) {
+        const index = [...cell.parentNode.children].indexOf(cell);
+        document.getElementById("map-info").innerText =
+            infoText[index] || `미확인 구역: 데이터 불충분`;
     }
-    resize();
-    window.addEventListener('resize', resize);
+</script>
 
-    function createParticle() {
-      return {
-        x: Math.random() * w,
-        y: Math.random() * (h * 0.6),  // 도시 위 공간까지만
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.8) * 0.2,
-        size: Math.random() * 2.2 + 0.5,
-        alpha: Math.random() * 0.6 + 0.3
-      };
-    }
-
-    for (let i = 0; i < 80; i++) particles.push(createParticle());
-
-    function drawParticles() {
-      ctx.clearRect(0, 0, w, h * 0.7);
-      particles.forEach((p, i) => {
-        ctx.beginPath();
-        ctx.fillStyle = `rgba(200,140,255,${p.alpha})`;
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.y < h * 0.25 || p.alpha <= 0) particles[i] = createParticle();
-      });
-      requestAnimationFrame(drawParticles);
-    }
-    drawParticles();
-
-    // 마우스 네온광원
-    const glow = document.getElementById('mouse-glow');
-    document.addEventListener('mousemove', (e) => {
-      glow.style.left = `${e.clientX}px`;
-      glow.style.top = `${e.clientY}px`;
-    });
-  </script>
 </body>
 </html>
