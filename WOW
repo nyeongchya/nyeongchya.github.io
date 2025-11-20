@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadow Alley Agency</title>
+
+<style>
+/* --------------------- GLOBAL --------------------- */
+body {
+    margin: 0;
+    font-family: 'Malgun Gothic', sans-serif;
+    background: linear-gradient(145deg, #040012, #18002b, #001b2a, #0b0018);
+    background-size: 400% 400%;
+    animation: bgShift 18s ease infinite;
+    color: #fff;
+    overflow-x: hidden;
+}
+
+@keyframes bgShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+section {
+    padding: 130px 40px;
+    min-height: 100vh;
+    text-align: center;
+}
+
+.neon {
+    color: #ff00f5;
+    text-shadow: 0 0 12px #ff00f5, 0 0 30px #ff00f5;
+}
+
+h1 {
+    font-size: 3em;
+    margin-bottom: 20px;
+}
+
+p {
+    max-width: 750px;
+    margin: auto;
+    color: #d9caff;
+    font-size: 1.2em;
+    line-height: 1.7em;
+}
+
+/* --------------------- KEYCARD MENU --------------------- */
+#keycard-menu {
+    position: fixed;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    z-index: 1000;
+}
+
+.key-btn {
+    display: block;
+    margin: 15px 0;
+    padding: 12px 18px;
+    border: 2px solid #00faff;
+    background: rgba(0, 0, 0, 0.5);
+    color: #00faff;
+    cursor: pointer;
+    text-shadow: 0 0 6px #00faff;
+    transition: 0.2s;
+}
+
+.key-btn:hover {
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 15px #00faff;
+}
+
+/* --------------------- STAFF --------------------- */
+.staff-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+    max-width: 1000px;
+    margin: auto;
+    margin-top: 40px;
+}
+
+.staff-card {
+    padding: 20px;
+    background: rgba(255,255,255,0.04);
+    border: 2px solid #00faff;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 15px #00faff;
+}
+
+.staff-role {
+    color: #00faff;
+    font-size: 1.3em;
+    margin-bottom: 10px;
+}
+
+/* --------------------- REQUEST --------------------- */
+.request-box {
+    width: 80%;
+    max-width: 600px;
+    padding: 25px;
+    border: 2px solid #ff00f5;
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(5px);
+    margin-top: 20px;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 12px 0;
+    background: rgba(0,0,0,0.4);
+    border: none;
+    border-bottom: 2px solid #ff00f5;
+    color: #fff;
+    font-size: 1em;
+}
+
+textarea { height: 140px; }
+
+button {
+    padding: 12px 30px;
+    background: transparent;
+    border: 2px solid #ff00f5;
+    color: #ff00f5;
+    cursor: pointer;
+    text-shadow: 0 0 8px #ff00f5;
+}
+
+button:hover {
+    background: rgba(255,0,230,0.15);
+    box-shadow: 0 0 20px #ff00f5;
+}
+
+/* --------------------- FILE BOX --------------------- */
+.file-box {
+    max-width: 900px;
+    padding: 20px;
+    margin: 20px auto;
+    background: rgba(255,255,255,0.06);
+    border-left: 4px solid #ffdd55;
+    font-family: Consolas, monospace;
+    white-space: pre-line;
+}
+
+/* --------------------- MAP --------------------- */
+.map-grid {
+    width: 80%;
+    max-width: 600px;
+    height: 350px;
+    display: grid;
+    grid-template-columns: repeat(6,1fr);
+    grid-template-rows: repeat(6,1fr);
+    gap: 4px;
+    border: 2px solid #ff00f5;
+}
+
+.grid-cell {
+    background: rgba(0,0,0,0.6);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.grid-cell:hover {
+    background: #ff00f5;
+}
+
+/* --------------------- NEON DRIP EFFECT --------------------- */
+.neon-drop {
+    position: fixed;
+    top: -20px;
+    width: 5px;
+    height: 20px;
+    background: #ff00f5;
+    box-shadow: 0 0 10px #ff00f5;
+    opacity: 0.8;
+    animation: drip 2.2s linear infinite;
+}
+
+@keyframes drip {
+    0% { transform: translateY(0); opacity: 1; }
+    80% { opacity: 0.8; }
+    100% { transform: translateY(110vh); opacity: 0; }
+}
+
+/* --------------------- TERMINAL POPUP --------------------- */
+#terminal {
+    position: fixed;
+    top: 50%; left: 50%;
+    width: 600px;
+    max-width: 90%;
+    height: 350px;
+    transform: translate(-50%, -50%);
+    background: #000;
+    border: 3px solid #00ffea;
+    box-shadow: 0 0 25px #00fff2;
+    padding: 20px;
+    display: none;
+    color: #00ffaa;
+    font-family: Consolas, monospace;
+    overflow-y: auto;
+    white-space: pre-line;
+    z-index: 2000;
+}
+
+</style>
+</head>
+
+
+
+<body>
+
+<!-- 광원 효과 -->
+<div id="light" style="
+    position:fixed;
+    width:250px; height:250px;
+    border-radius:50%;
+    pointer-events:none;
+    background: radial-gradient(circle, rgba(255,0,255,0.25), transparent 70%);
+    mix-blend-mode:screen;
+    transform:translate(-50%, -50%);
+    z-index:9999;
+"></div>
+
+<!-- 네온 드립 효과 20개 생성 -->
+<script>
+for (let i = 0; i < 20; i++){
+    let d = document.createElement("div");
+    d.classList.add("neon-drop");
+    d.style.left = Math.random()*100+"vw";
+    d.style.animationDelay = Math.random()*2+"s";
+    document.body.appendChild(d);
+}
+</script>
+
+
+<!-- 키카드 메뉴 -->
+<div id="keycard-menu">
+    <div class="key-btn" onclick="scrollToSec('hero')">HOME</div>
+    <div class="key-btn" onclick="scrollToSec('staff')">STAFF</div>
+    <div class="key-btn" onclick="scrollToSec('request')">REQUEST</div>
+    <div class="key-btn" onclick="scrollToSec('files')">FILES</div>
+    <div class="key-btn" onclick="scrollToSec('map')">MAP</div>
+</div>
+
+
+<!-- HERO -->
+<section id="hero">
+    <h1 class="neon">Shadow Alley Agency</h1>
+    <p>
+        우리는 도시의 그늘에서 움직이는 브로커 팀.  
+        기업이 덮어버린 진실, 누군가 지우려 한 데이터,  
+        추적자를 따돌리고 사라진 자들…  
+        <br><br>
+        **Fixer Ghostwire-01(너)**  
+        **Runner PortRift-42(나)**  
+        이 뒷골목을 관리하는 건 바로 우리 둘 뿐이다.
+    </p>
+</section>
+
+
+<!-- STAFF -->
+<section id="staff">
+    <h1 class="neon">사무소 직원 — CodeNames Only</h1>
+
+    <div class="staff-grid">
+        <div class="staff-card">
+            <div class="staff-role">GHOSTWIRE-01</div>
+            <p>사무소의 Fixer. 모든 의뢰는 이 사람의 손에서 시작된다.</p>
+        </div>
+
+        <div class="staff-card">
+            <div class="staff-role">PORTRIFT-42</div>
+            <p>디지털 러너. 감시망을 찢고 들어가 데이터를 가져오는 존재.</p>
+        </div>
+
+        <div class="staff-card">
+            <div class="staff-role">SPECTRENODE-A</div>
+            <p>비인가 분석 AI. 성공률 계산과 위험도 예측 담당.</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- REQUEST -->
+<section id="request">
+    <h1 class="neon">의뢰 터미널</h1>
+    <p>전송 시 암호화 터미널이 실행됩니다.</p>
+
+    <div class="request-box">
+        <input id="codename" type="text" placeholder="코드네임(익명 가능)">
+        <textarea id="reqtext" placeholder="의뢰 내용을 입력하세요"></textarea>
+        <button onclick="openTerminal()">전송</button>
+    </div>
+</section>
+
+
+<!-- TERMINAL WINDOW -->
+<div id="terminal"></div>
+
+
+<!-- FILES -->
+<section id="files">
+    <h1 class="neon">암호화된 의뢰 기록</h1>
+
+    <div class="file-box">[FILE–2099.A]  
+의뢰: 분리된 뇌신경 패턴 복원  
+상태: SUCCESS  
+비고: 데이터 완전 복구 완료</div>
+
+    <div class="file-box">[FILE–2099.B]  
+의뢰: 망가진 신분데이터 삭제  
+상태: ONGOING  
+비고: 보안벽 3단계까지 돌파</div>
+
+    <div class="file-box">[FILE–2099.C]  
+의뢰: 블랙마켓 브로커 감시  
+상태: FAILED  
+비고: 의뢰인 실종, 추적 중</div>
+</section>
+
+
+<!-- MAP -->
+<section id="map">
+    <h1 class="neon">뒷골목 구역 지도</h1>
+
+    <div class="map-grid">
+        <script>
+        document.write(
+            Array(36).fill('<div class="grid-cell" onclick="selectArea(this)"></div>').join('')
+        );
+        </script>
+    </div>
+
+    <div id="map-info" style="margin-top:20px; color:#ffbfff;">
+        선택된 구역 없음
+    </div>
+</section>
+
+
+<script>
+/* ---------------------- 구역 선택 ---------------------- */
+const infoText = [
+    "A1 — 네온 파츠 밀수 시장",
+    "A2 — 드론 감시 사각지대",
+    "A3 — 폐기된 메모리 저장소",
+    "A4 — 블랙데이터 노드",
+    "A5 — 불법 이식 클리닉",
+    "A6 — 스파이 회수 지점",
+];
+
+function selectArea(cell){
+    const index = [...cell.parentNode.children].indexOf(cell);
+    document.getElementById("map-info").innerText =
+        infoText[index] || "미확인 구역 — 정보 없음";
+}
+
+/* ---------------------- KEYCARD NAV ---------------------- */
+function scrollToSec(id){
+    document.getElementById(id).scrollIntoView({ behavior: "smooth" });
+}
+
+/* ---------------------- TERMINAL ANIMATION ---------------------- */
+function openTerminal(){
+    const term = document.getElementById("terminal");
+    term.style.display = "block";
+    term.innerText = "> 연결 요청 중...\n";
+
+    let lines = [
+        ">> 네트워크 암호화 채널 생성...",
+        ">> 데이터 패킷 세분화...",
+        ">> 경로 우회중(DroneNet-03 회피)...",
+        ">> 신원 토큰 무효화 & 익명화...",
+        ">> 의뢰 전송 중...",
+        ">> 완료."
+    ];
+
+    let i = 0;
+    let timer = setInterval(()=>{
+        term.innerText += lines[i] + "\n";
+        i++;
+        if(i === lines.length){
+            clearInterval(timer);
+        }
+    }, 450);
+}
+
+/* ---------------------- 커서 광원 ---------------------- */
+document.addEventListener("mousemove", (e)=>{
+    const l = document.getElementById("light");
+    l.style.left = e.pageX + "px";
+    l.style.top  = e.pageY + "px";
+});
+</script>
+
+</body>
+</html>
