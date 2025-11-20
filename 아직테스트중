@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadow Alley Agency</title>
+
+<style>
+/* --------------------- GLOBAL --------------------- */
+body {
+    margin: 0;
+    font-family: 'Malgun Gothic', sans-serif;
+    background: linear-gradient(145deg, #040012, #18002b, #001b2a, #0b0018);
+    background-size: 400% 400%;
+    animation: bgShift 18s ease infinite;
+    color: #fff;
+    overflow-x: hidden;
+    position: relative;
+}
+
+@keyframes bgShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* 중앙 정렬 문제 해결 */
+section {
+    padding: 130px 40px;
+    min-height: 100vh;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.neon {
+    color: #ff00f5;
+    text-shadow: 0 0 12px #ff00f5, 0 0 30px #ff00f5;
+}
+
+p {
+    max-width: 780px;
+    line-height: 1.8em;
+    color: #d9caff;
+}
+
+/* --------------------- KEYCARD MENU --------------------- */
+#keycard-menu {
+    position: fixed;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    z-index: 1000;
+}
+
+.key-btn {
+    display: block;
+    margin: 12px 0;
+    padding: 12px 18px;
+    border: 2px solid #00faff;
+    background: rgba(0, 0, 0, 0.5);
+    color: #00faff;
+    cursor: pointer;
+    text-shadow: 0 0 6px #00faff;
+    transition: 0.2s;
+}
+
+.key-btn:hover {
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 15px #00faff;
+}
+
+/* 선택된 섹션 표시 효과 */
+.key-btn.active {
+    border-color: #ff00f5;
+    color: #ff00f5;
+    text-shadow: 0 0 10px #ff00f5;
+}
+
+
+/* 보안 레벨 바 */
+#security-bar {
+    width: 8px;
+    height: 110px;
+    background: linear-gradient(#00faff, #ff00f5);
+    margin-left: 50px;
+    border-radius: 6px;
+    box-shadow: 0 0 12px #00faff;
+}
+
+
+/* --------------------- STAFF --------------------- */
+.staff-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+    max-width: 1000px;
+}
+
+.staff-card {
+    padding: 20px;
+    background: rgba(255,255,255,0.04);
+    border: 2px solid #00faff;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 15px #00faff;
+}
+
+.staff-role {
+    color: #00faff;
+    font-size: 1.3em;
+    margin-bottom: 10px;
+}
+
+/* --------------------- REQUEST --------------------- */
+.request-box {
+    max-width: 600px;
+    padding: 25px;
+    border: 2px solid #ff00f5;
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(5px);
+}
+
+/* 위험 경고 HUD */
+#risk-alert {
+    margin-top: 15px;
+    padding: 8px 18px;
+    background: rgba(255, 0, 0, 0.2);
+    border: 2px solid #ff2222;
+    color: #ff7777;
+    font-family: Consolas;
+    text-shadow: 0 0 6px #ff4444;
+    animation: warningPulse 1.4s infinite;
+}
+
+@keyframes warningPulse {
+    0% { opacity: 0.4; }
+    50% { opacity: 1; }
+    100% { opacity: 0.4; }
+}
+
+/* 치안 지수 */
+#risk-level {
+    margin-top: 12px;
+    font-family: Consolas;
+    color: #ffaa00;
+}
+
+/* --------------------- Glitch Film Layer --------------------- */
+#film {
+    pointer-events: none;
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: repeating-linear-gradient(
+        rgba(255,0,255,0.04) 0px,
+        rgba(0,0,0,0.1) 2px,
+        rgba(0,0,0,0.05) 3px
+    );
+    mix-blend-mode: overlay;
+    z-index: 999;
+    animation: filmAnim 4s infinite;
+}
+
+@keyframes filmAnim {
+    0% {opacity: 0.1;}
+    50% {opacity: 0.22;}
+    100% {opacity: 0.1;}
+}
+
+/* EMI(전자기 간섭) 번쩍 효과 */
+.emi-flash {
+    position: fixed;
+    pointer-events: none;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: radial-gradient(circle, rgba(255,0,255,0.4), transparent 70%);
+    opacity: 0;
+    mix-blend-mode: screen;
+    animation: emiFlash 0.4s ease-out;
+}
+
+@keyframes emiFlash {
+    0% { opacity: 0.9; }
+    100% { opacity: 0; }
+}
+
+</style>
+</head>
+
+
+<body>
+
+<!-- 필름 글리치 -->
+<div id="film"></div>
+
+<!-- 광원 효과 유지 -->
+<div id="light" style="
+    position:fixed;
+    width:250px; height:250px;
+    border-radius:50%;
+    pointer-events:none;
+    background: radial-gradient(circle, rgba(255,0,255,0.25), transparent 70%);
+    mix-blend-mode:screen;
+    transform:translate(-50%, -50%);
+    z-index:998;
+"></div>
+
+
+<!-- 키카드 메뉴 -->
+<div id="keycard-menu">
+    <div id="security-bar"></div>
+    <div class="key-btn" onclick="nav('hero')">HOME</div>
+    <div class="key-btn" onclick="nav('staff')">STAFF</div>
+    <div class="key-btn" onclick="nav('request')">REQUEST</div>
+    <div class="key-btn" onclick="nav('files')">FILES</div>
+    <div class="key-btn" onclick="nav('map')">MAP</div>
+</div>
+
+
+
+
+<!-- HERO -->
+<section id="hero">
+    <h1 class="neon">Shadow Alley Agency</h1>
+    <p>
+        여기는 감시망도 지도에도 없는 곳.  
+        우리가 운영하는 이 뒷골목 사무소는  
+        **도시가 숨긴 가장 위험한 진실**을 다루는 브로커들의 은거지다.
+    </p>
+</section>
+
+
+<!-- STAFF -->
+<section id="staff">
+    <h1 class="neon">STAFF — CodeNames</h1>
+
+    <div class="staff-grid">
+        <div class="staff-card">
+            <div class="staff-role">GHOSTWIRE-01</div>
+            <p>도시 모든 정보 흐름을 조율하는 Fixer.</p>
+        </div>
+
+        <div class="staff-card">
+            <div class="staff-role">PORTRIFT-42</div>
+            <p>감시망을 뚫고 데이터의 틈새를 지나는 Runner.</p>
+        </div>
+
+        <div class="staff-card">
+            <div class="staff-role">SPECTRENODE-A</div>
+            <p>비인가 분석 AI. 계산되지 않은 위험을 감지한다.</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- REQUEST -->
+<section id="request">
+    <h1 class="neon">의뢰 터미널</h1>
+
+    <div id="risk-alert">⚠ HIGH RISK ZONE — 감시망 간섭 발생 중</div>
+    <div id="risk-level">City Risk Index: 계산 중...</div>
+
+    <div class="request-box">
+        <input id="codename" type="text" placeholder="코드네임(익명 가능)">
+        <textarea id="reqtext" placeholder="의뢰 내용을 입력하세요"></textarea>
+        <button onclick="openTerminal()">전송</button>
+    </div>
+</section>
+
+
+<!-- FILES -->
+<section id="files">
+    <h1 class="neon">암호화된 의뢰 파일</h1>
+    <p>문서 파일이 불안정하게 로딩될 수 있습니다.</p>
+
+    <div class="file-box">[FILE–2099.A] 의뢰: 뉴럴 패턴 복원 — SUCCESS</div>
+    <div class="file-box">[FILE–2099.B] 의뢰: 신분 데이터 삭제 — ONGOING</div>
+    <div class="file-box">[FILE–2099.C] 의뢰: 브로커 감시 — FAILED</div>
+</section>
+
+
+<!-- MAP -->
+<section id="map">
+    <h1 class="neon">뒷골목 구역 지도</h1>
+    <div class="map-grid">
+        <script>
+        document.write(
+            Array(36).fill('<div class="grid-cell" onclick="selectArea(this)"></div>').join('')
+        );
+        </script>
+    </div>
+    <div id="map-info" style="margin-top:20px; color:#ffbfff;">선택된 구역 없음</div>
+</section>
+
+
+
+<!-- JS -->
+<script>
+/* ---------------------- KEYCARD NAV ---------------------- */
+function nav(id){
+    document.getElementById(id).scrollIntoView({ behavior: "smooth" });
+
+    document.querySelectorAll(".key-btn").forEach(btn => btn.classList.remove("active"));
+    event.target.classList.add("active");
+}
+
+/* ---------------------- MAP ---------------------- */
+const infoText = [
+    "A1 — 네온 파츠 밀수 시장",
+    "A2 — 드론 감시 사각지대",
+    "A3 — 폐기된 메모리 저장소",
+    "A4 — 블랙데이터 노드",
+    "A5 — 불법 이식 클리닉",
+    "A6 — 스파이 회수 지점",
+];
+function selectArea(cell){
+    const index = [...cell.parentNode.children].indexOf(cell);
+    document.getElementById("map-info").innerText =
+        infoText[index] || "미확인 구역 — 정보 없음";
+}
+
+/* ---------------------- 위험 지수 ---------------------- */
+function updateRisk(){
+    let r = Math.floor(Math.random()*100);
+    let risk = document.getElementById("risk-level");
+    risk.innerText = `City Risk Index: ${r}%`;
+
+    if(r > 70) risk.style.color = "#ff2222";
+    else if(r > 40) risk.style.color = "#ffaa00";
+    else risk.style.color = "#55ff77";
+}
+setInterval(updateRisk, 3000);
+updateRisk();
+
+/* ---------------------- EMI FLASH ---------------------- */
+window.addEventListener("scroll", ()=>{
+    if(Math.random() < 0.12){
+        let e = document.createElement("div");
+        e.classList.add("emi-flash");
+        document.body.appendChild(e);
+        setTimeout(()=>e.remove(), 400);
+    }
+});
+
+/* ---------------------- CURSOR LIGHT ---------------------- */
+document.addEventListener("mousemove", (e)=>{
+    const l = document.getElementById("light");
+    l.style.left = e.pageX + "px";
+    l.style.top  = e.pageY + "px";
+});
+</script>
+
+</body>
+</html>
