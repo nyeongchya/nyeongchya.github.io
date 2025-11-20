@@ -3,229 +3,539 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shadow Alley Agency</title>
+<title>A Shadow Broker's Office</title>
 
 <style>
-    body {
-        margin: 0;
-        font-family: 'Malgun Gothic', sans-serif;
-        background: #000;
-        color: #fff;
-        overflow-x: hidden;
-    }
+/* ---------------------- GLOBAL ---------------------- */
+body {
+    margin: 0;
+    font-family: 'Malgun Gothic', sans-serif;
+    background: linear-gradient(135deg, #040011, #130024, #001827);
+    background-size: 300% 300%;
+    animation: bgShift 12s ease infinite;
+    color: white;
+    overflow-x: hidden;
+}
 
-    section {
-        padding: 120px 40px;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-    }
+@keyframes bgShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
 
-    /* 🔥 글로벌 네온 텍스트 */
-    .neon {
-        color: #ff00e6;
-        text-shadow: 0 0 10px #ff00e6, 0 0 25px #ff00e6;
-    }
+section {
+    min-height: 70vh;
+    padding: 100px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
 
-    /* 🔥 Hero 배경 */
-    #hero {
-        background: url('https://i.imgur.com/8eKQO5Z.jpeg') center/cover no-repeat;
-        position: relative;
-    }
-    #hero::after {
-        content: '';
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: rgba(0,0,0,0.6);
-        backdrop-filter: blur(3px);
-    }
-    #hero-content {
-        position: relative;
-        z-index: 2;
-        max-width: 800px;
-    }
+.neon {
+    font-size: 2.8em;
+    color: #ff00f7;
+    text-shadow: 0 0 14px #ff00f7, 0 0 35px #ff00a6;
+}
 
-    h1 {
-        font-size: 3.5em;
-        margin-bottom: 20px;
-    }
-    p {
-        font-size: 1.2em;
-        color: #ccc;
-        max-width: 700px;
-        line-height: 1.7em;
-    }
+.panel {
+    width: 80%;
+    max-width: 850px;
+    background: rgba(255,255,255,0.06);
+    border: 1.5px solid #00ffe1;
+    padding: 30px;
+    border-radius: 10px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 20px #00ffe144;
+    margin-top: 30px;
+}
 
-    /* 🔥 소개 섹션 배경 */
-    #about {
-        background: linear-gradient(#050010, #0a0018);
-    }
+/* ---------------------- KEYCARD MENU ---------------------- */
+#keycard-menu {
+    position: fixed;
+    top: 50%;
+    left: 25px;
+    transform: translateY(-50%);
+    z-index: 1000;
+}
 
-    /* 🔥 의뢰창 스타일 */
-    #request {
-        background: linear-gradient(#0a0018, #140028);
-    }
-    .request-box {
-        background: rgba(255,255,255,0.03);
-        border: 1px solid #ff00e6;
-        padding: 30px;
-        width: 80%;
-        max-width: 600px;
-        backdrop-filter: blur(4px);
-        box-shadow: 0 0 20px rgba(255,0,230,0.4);
-    }
-    input, textarea {
-        width: 100%;
-        padding: 10px;
-        margin: 10px 0;
-        border: none;
-        background: rgba(0,0,0,0.4);
-        color: #fff;
-        border-bottom: 2px solid #ff00f2;
-    }
-    textarea {
-        height: 140px;
-        resize: none;
-    }
-    button {
-        padding: 12px 30px;
-        background: transparent;
-        border: 2px solid #ff00e6;
-        color: #ff00e6;
-        cursor: pointer;
-        margin-top: 10px;
-        transition: 0.2s;
-        letter-spacing: 2px;
-        text-shadow: 0 0 8px #ff00e6;
-    }
-    button:hover {
-        background: rgba(255,0,230,0.1);
-        box-shadow: 0 0 20px #ff00e6;
-    }
+.key-btn {
+    display: block;
+    padding: 10px 18px;
+    border: 2px solid #00faff;
+    background: rgba(0,0,0,0.4);
+    margin: 10px 0;
+    cursor: pointer;
+    color: #00faff;
+    transition: 0.2s;
+}
 
-    /* 🔥 뒷골목 지도 */
-    #map {
-        background: linear-gradient(#140028, #000015);
-    }
-    .map-grid {
-        width: 80%;
-        max-width: 600px;
-        height: 350px;
-        background: rgba(255,255,255,0.07);
-        display: grid;
-        grid-template-columns: repeat(6, 1fr);
-        grid-template-rows: repeat(6, 1fr);
-        gap: 4px;
-        border: 2px solid #ff00ff;
-        box-shadow: 0 0 20px #ff00ff;
-    }
-    .grid-cell {
-        background: rgba(0,0,0,0.6);
-        transition: 0.2s;
-        cursor: pointer;
-    }
-    .grid-cell:hover {
-        background: #ff00e6;
-        box-shadow: 0 0 15px #ff00ff;
-    }
-    #map-info {
-        margin-top: 20px;
-        color: #ffbfff;
-    }
+.key-btn:hover { background: rgba(0,255,255,0.25); }
+.key-btn.active {
+    border-color: #ff00f7;
+    color: #ff00f7;
+    text-shadow: 0 0 8px #ff00f7;
+    animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 8px #ff00f7; }
+    50% { box-shadow: 0 0 18px #ff00f7; }
+    100% { box-shadow: 0 0 8px #ff00f7; }
+}
+
+/* ---------------------- STAFF ---------------------- */
+.staff-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 25px;
+}
+
+.staff-card {
+    border: 1.5px solid #00ffe1;
+    padding: 20px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    box-shadow: 0 0 12px #00ffe155;
+    cursor: pointer;
+}
+
+/* ---------------------- FILES ---------------------- */
+.file-item {
+    position: relative;
+    overflow: hidden;
+    padding: 12px 15px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid #ff00f7;
+    margin: 8px 0;
+    border-radius: 5px;
+    font-family: Consolas;
+    color: #ffbfff;
+    transition: all 0.25s ease;
+    cursor: pointer;
+}
+
+.file-item:hover {
+    background: rgba(255,0,255,0.15);
+    box-shadow: 0 0 12px #ff00ff;
+    transform: translateX(4px);
+}
+
+.file-item::after {
+    content: '';
+    position: absolute;
+    top: -20%;
+    left: -10%;
+    width: 120%;
+    height: 40%;
+    background: linear-gradient(90deg, rgba(255,0,255,0.3), rgba(0,255,255,0.3), rgba(255,0,255,0.3));
+    transform: skewX(-20deg);
+    animation: glitchDrop 2s infinite;
+}
+
+@keyframes glitchDrop {
+    0% { top: -20%; opacity: 0; }
+    10% { opacity: 1; }
+    50% { top: 100%; opacity: 0; }
+    100% { top: 100%; opacity: 0; }
+}
+
+.hidden-file {
+  display:none;
+  color:#ff00ff; 
+  border:1px dashed #ff00ff;
+  animation: glitch 1s infinite;
+}
+
+/* ---------------------- MAP ---------------------- */
+.map-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 40px);
+    gap: 6px;
+    margin-top: 25px;
+}
+
+.map-cell {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #00ffe1;
+    background: rgba(255,255,255,0.04);
+    cursor: pointer;
+}
+.map-cell:hover { background: rgba(0,255,255,0.2); }
+
+#map-info { margin-top: 20px; color: #ffb4ff; }
+
+/* ---------------------- REQUEST ---------------------- */
+textarea, input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid #ff00f7;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 1em;
+}
+
+button {
+    margin-top: 10px;
+    padding: 12px 25px;
+    font-size: 1em;
+    border: 2px solid #00ffe1;
+    background: transparent;
+    color: #00ffe1;
+    cursor: pointer;
+}
+
+button:hover { background: rgba(0,255,255,0.2); }
+button:active {
+    box-shadow: 0 0 15px #00ffe1 inset;
+    transform: scale(0.98);
+    transition: 0.1s;
+}
+
+/* ---------------------- POPUP ---------------------- */
+#staff-popup, #file-popup {
+    display:none;
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: rgba(0,0,0,0.85);
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+#staff-data, #file-data {
+    background: rgba(30,10,40,0.95);
+    border: 1px solid #ff00f7;
+    padding: 25px;
+    width: 50%;
+    text-align:center;
+    border-radius:8px;
+    color:#fff;
+    animation: glitch 1s infinite;
+}
+
+@keyframes glitch {
+    0% { text-shadow: 2px 2px #ff00f7; }
+    50% { text-shadow: -2px -2px #00ffe1; }
+    100% { text-shadow: 2px -2px #ff00f7; }
+}
+
+/* ---------------------- EFFECTS ---------------------- */
+span[style*="#55ff77"] { animation: pulse 1.6s infinite; }
+@keyframes pulse {
+  0% { text-shadow: 0 0 2px #55ff77; }
+  50% { text-shadow: 0 0 9px #55ff77; }
+  100% { text-shadow: 0 0 2px #55ff77; }
+}
+
+span[style*="#ffaa00"] { animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity:0.4; } 100% { opacity:1; } }
+
+body::after {
+  content:"";
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  pointer-events:none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255,255,255,0.03),
+    rgba(255,255,255,0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  opacity:0.07;
+  animation: flicker 0.2s infinite;
+}
+
+@keyframes flicker { 0% { opacity:0.05; } 50% { opacity:0.15; } 100% { opacity:0.07; } }
+
+#neonFog {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    opacity: 0.32;
+}
+
 
 </style>
 </head>
+
 <body>
 
-<!-- 🟣 HERO SECTION -->
+    <audio id="hover-sound" src="hover.mp3" preload="auto"></audio>
+    <audio id="glitch-sound" src="glitch.mp3" preload="auto"></audio>
+    
+<!-- =========================== -->
+<!-- KEYCARD FIXED MENU -->
+<!-- =========================== -->
+<div id="keycard-menu">
+    <div class="key-btn" onclick="nav('hero')">HOME</div>
+    <div class="key-btn" onclick="nav('staff')">STAFF</div>
+    <div class="key-btn" onclick="nav('request')">REQUEST</div>
+    <div class="key-btn" onclick="nav('files')">FILES</div>
+    <div class="key-btn" onclick="nav('map')">MAP</div>
+</div>
+
+<!-- =========================== -->
+<!-- HERO -->
+<!-- =========================== -->
 <section id="hero">
-    <div id="hero-content">
-        <h1 class="neon">Shadow Alley Agency</h1>
-        <p>
-            사이버펑크 도시의 뒷골목엔 법이 닿지 않는 그림자 구역이 있다.  
-            그곳에서 실종된 데이터, 빼앗긴 신분, 추적당하는 넷러너,  
-            그리고 지워져야 할 과거를 가진 자들이 나를 찾아온다.  
-            <br><br>
-            나는 이 도시의 어둠 속을 누비는 브로커,  
-            <strong>그림자 속 문제를 해결하는 유일한 사무소의 운영자다.</strong>
-        </p>
+    <h1 class="neon">A shadow broker's office</h1>
+    <p>도시의 가장 어두운 틈에서 움직이는 그림자 브로커 사무소.</p>
+    <p>우리는 감시망 아래서 포착되지 않는 일을 처리한다.</p>
+</section>
+
+<!-- =========================== -->
+<!-- STAFF -->
+<!-- =========================== -->
+<section id="staff">
+    <h1 class="neon">STAFF — CODENAMES</h1>
+    <div class="panel staff-grid">
+        <div class="staff-card" onclick="openStaff('gw1')">
+            <h3>GHOSTWIRE-01</h3>
+            <p>정보 거래와 의뢰 판독 담당</p>
+        </div>
+        <div class="staff-card" onclick="openStaff('gw2')">
+            <h3>PORTRIFT-42</h3>
+            <p>데이터 운반과 감시망 우회 담당</p>
+        </div>
+        <div class="staff-card" onclick="openStaff('gw3')">
+            <h3>SPECTRENODE-A</h3>
+            <p>위험 분석 비인가 Analyst</p>
+        </div>
     </div>
 </section>
 
-<!-- 🟣 ABOUT SECTION -->
-<section id="about">
-    <h1 class="neon">우리 사무소</h1>
-    <p>
-        “빛 아래 드러나지 않는 일이라면 뭐든 맡긴다.”  
-        그게 Shadow Alley Agency의 모토다.  
-        <br><br>
-        우린 기업 전쟁의 스파이 파일부터  
-        사이버 파츠 밀수업자 추적,  
-        블랙마켓 브로커의 배신 검증,  
-        감시 드론망을 피한 이동 루트 제작까지  
-        도시가 감추고 싶어 하는 일들을 처리한다.
-        <br><br>
-        여긴 정직한 이들만 오는 곳이 아니다.  
-        대신, **진실을 원하는 이들은 반드시 지나가는 문**이다.
-    </p>
-</section>
+<!-- STAFF POPUP -->
+<div id="staff-popup" onclick="closeStaff()">
+    <div id="staff-data"></div>
+</div>
 
-<!-- 🟣 REQUEST SECTION -->
+<!-- =========================== -->
+<!-- REQUEST -->
+<!-- =========================== -->
 <section id="request">
-    <h1 class="neon">의뢰 터미널</h1>
-    <p>의뢰 내용을 입력해라. 암호화를 거쳐 전용 라인으로 전송된다.</p>
-
-    <div class="request-box">
-        <input type="text" placeholder="코드네임">
-        <textarea placeholder="의뢰 내용을 입력하세요 (추적, 해킹 의혹, 데이터 회수 등)"></textarea>
-        <button onclick="alert('의뢰 수신. 검증 중…')">의뢰 전송</button>
+    <h1 class="neon">의뢰 접수 시스템</h1>
+    <div class="panel">
+        <input type="text" id="request-input" placeholder="의뢰자 코드네임">
+        <textarea id="request-content" rows="6" placeholder="의뢰 내용을 입력하세요"></textarea>
+        <button onclick="sendRequest()">전송</button>
+        <div id="terminal-output" style="margin-top:15px;"></div>
     </div>
 </section>
 
-<!-- 🟣 MAP SECTION -->
-<section id="map">
-    <h1 class="neon">뒷골목 지도 인터페이스</h1>
-    <p>아래 그리드 중 한 구역을 선택하면 정보가 표시된다.</p>
+<!-- =========================== -->
+<!-- FILES -->
+<!-- =========================== -->
+<section id="files">
+    <h1 class="neon">Encrypted Files</h1>
+    <div class="panel" id="files-list">
+        <div class="file-item" onclick="openFile('K584')">
+            <strong>[FILE–K584]</strong><br>
+            <span>제목: 존재하되 존재하지 않는 자</span><br>
+            <span>의뢰자: <b>신원 불명</b></span><br>
+            <span>상태: <span style="color:#ff2222">FAILED</span></span>
+        </div>
 
-    <div class="map-grid">
-        <!-- 36칸 자동 생성 -->
-        <script>
-            document.write(
-                Array(36).fill('<div class="grid-cell" onclick="selectArea(this)"></div>').join('')
-            );
-        </script>
+        <div class="file-item" onclick="openFile('C901')">
+            <strong>[FILE–C901]</strong><br>
+            <span>제목: 익명 신분세탁</span><br>
+            <span>의뢰자: <b>LAMINAR-9</b></span><br>
+            <span>상태: <span style="color:#55ff77">SUCCESS</span></span>
+        </div>
+
+        <div class="file-item" onclick="openFile('N777')">
+            <strong>[FILE–N777]</strong><br>
+            <span>제목: 네온 신호 탈취 사건</span><br>
+            <span>의뢰자: <b>PULSEWALKER-Δ13</b></span><br>
+            <span>상태: <span style="color:#55ff77">SUCCESS</span></span>
+        </div>
+
+        <div class="file-item" onclick="openFile('H021')">
+            <strong>[FILE–H021]</strong><br>
+            <span>제목: 사라지는 신원 루프</span><br>
+            <span>의뢰자: <b>NULLFRAME-0X</b></span><br>
+            <span>상태: <span style="color:#ff2222">FAILED</span></span>
+        </div>
+
+        <div class="file-item hidden-file" id="hidden-file" onclick="openFile('Z0??')">
+            <strong>[FILE–Z0??]</strong><br>
+            <span>제목: 기록되지 않은 의뢰</span><br>
+            <span>의뢰자: <b>UNKNOWN</b></span><br>
+            <span>상태: <span style="color:#ff00ff">?????</span></span>
+        </div>
+
     </div>
+</section>
 
-    <div id="map-info">선택된 구역 없음</div>
+<!-- FILE POPUP -->
+<div id="file-popup" onclick="closeFile()">
+    <div id="file-data"></div>
+</div>
+
+<!-- =========================== -->
+<!-- MAP -->
+<!-- =========================== -->
+<section id="map">
+    <h1 class="neon">Back Alley Sector Map</h1>
+    <div class="panel">
+        <div class="map-grid" id="map-grid"></div>
+        <div id="map-info">선택된 구역 없음</div>
+    </div>
 </section>
 
 <script>
-    const infoText = [
-        "A1 구역: 사이버 파츠 암거래 시장",
-        "A2 구역: 불법 넷러너 은신처",
-        "A3 구역: 감시드론 죽은 구역",
-        "A4 구역: 블랙마켓 데이터 노드",
-        "A5 구역: 무기 밀수 루트",
-        "A6 구역: 기업 스파이 회수지점",
-        "B1 구역: 사이버 중독자 집결지",
-        "B2 구역: 강제 확장 파츠 공방",
-        "B3 구역: 익명 메모리 세탁소",
-        "B4 구역: 해커들 은닉 VPN 출구",
-        "B5 구역: 단기 계약 살수의 집합지",
-        "B6 구역: 고장난 신경망 보관고",
-        // 나머지는 랜덤 메시지
-    ];
+// ===========================
+// NAVIGATION
+// ===========================
+function nav(id){
+    document.getElementById(id).scrollIntoView({ behavior: "smooth" });
+    document.querySelectorAll(".key-btn").forEach(btn => btn.classList.remove("active"));
+    event.target.classList.add("active");
+}
 
-    function selectArea(cell) {
-        const index = [...cell.parentNode.children].indexOf(cell);
-        document.getElementById("map-info").innerText =
-            infoText[index] || `미확인 구역: 데이터 불충분`;
+// ===========================
+// STAFF POPUP
+// ===========================
+const staffProfiles = {
+    gw1: {name:"GHOSTWIRE-01", role:"Memory Hacker", description:"데이터를 훔치고, 기억 흔적을 조작하는 전문가."},
+    gw2: {name:"GHOSTWIRE-02", role:"Trace Cleaner", description:"모든 로그와 흔적을 지우는 침묵의 그림자."},
+    gw3: {name:"GHOSTWIRE-03", role:"Data Phantom", description:"서버 속에서 사라지고 나타나며 정보를 수집."}   
+};
+
+function openStaff(id){
+    const staff = staffProfiles[id];
+    const popup = document.getElementById("staff-popup");
+    const content = document.getElementById("staff-data");
+    content.innerHTML = `<h2>${staff.name}</h2><p><strong>Role:</strong> ${staff.role}</p><p>${staff.description}</p><p style="font-size:0.8em;color:#55ff77">Click anywhere to close</p>`;
+    popup.style.display="flex";
+}
+function closeStaff(){ document.getElementById("staff-popup").style.display="none"; }
+
+// ===========================
+// FILE POPUP
+// ===========================
+/* ===========================
+   ENCRYPTED FILES — NEW DATA
+   =========================== */
+   const filesData = {
+    "K584": {
+        title: "존재하되 존재하지 않는 자",
+        content: "대상 존재를 유지하되 외부 기록—행동 로그, CCTV, 시민 데이터베이스에서 완전 삭제하는 임무.",
+        status: "FAILED"
+    },
+    "C901": {
+        title: "익명 신분세탁",
+        content: "디지털 ID 폐기 후 새로운 시민권 생성. 뉴로-시그너처 재지정 완료.",
+        status: "SUCCESS"
+    },
+    "Z0??": {
+        title: "기록되지 않은 의뢰",
+        content: "권한 없음. 내용이 고강도 양자 암호화 상태.",
+        status: "???"
+    },
+    "N777": {
+        title: "네온 신호 탈취 사건",
+        content: "도시 전력망 일부가 '맥박 신호'로 변조됨. 의뢰인은 이 신호가 비밀 집단의 연락망이라 주장하며, 신호 원점을 역추적하길 요청함.",
+        status: "PENDING"
+    },
+    "H021": {
+        title: "사라지는 신원 루프",
+        content: "한 시민의 디지털 신분이 7일 주기로 초기화됨. 시스템 심층 루프 의심. 루프 생성자의 정체를 추적하라는 의뢰.",
+        status: "FAILED"
+    },
+    "R530": {
+        title: "검은 연기의 경로",
+        content: "폐공장에서 발생하는 '학습된 연기 패턴'이 무기 밀매 루트를 은폐 중. 드론 감시망을 우회할 새로운 경로 설계 요청.",
+        status: "SUCCESS"
+    },
+    "X002": {
+        title: "사고 원점 추적",
+        content: "도심 중심부에서 발생한 집단 신경 오류. 불법 신경 링크 실험으로 추정되며, 네트워크 소스 추적 의뢰.",
+        status: "PENDING"
+    },
+    "V913": {
+        title: "합성 기억 제조 공정 추적",
+        content: "여러 시민에게 동일한 조작 기억이 주입됨. 기억 제조소의 생산점을 추적해달라는 요청.",
+        status: "FAILED"
+    },
+    "D404": {
+        title: "존재할 수 없는 존재",
+        content: "데이터 그리드 내 존재하지 않아야 할 유령 노드가 감지됨. 추적하면 사라지고, 사라지면 재출현하는 스펙트럼 서버.",
+        status: "FAILED"
     }
+};
+
+function openFile(id){
+    const popup = document.getElementById("file-popup");
+    const content = document.getElementById("file-data");
+    const file = filesData[id];
+
+    content.innerHTML = `
+        <p style="color:#00ffe1; font-family:Consolas;">
+            [DECRYPTING FILE–${id}…]
+        </p>
+        <p style="color:#ffaa00; font-family:Consolas;">■■■□□ 43%</p>
+    `;
+    popup.style.display = "flex";
+
+    setTimeout(() => {
+        content.innerHTML = `
+            <h2>${id} — ${file.title}</h2>
+            <p>${file.content}</p>
+            <p>Status: <span style="color:#ff00ff">${file.status}</span></p>
+            <p style="font-size:0.8em;color:#ffaa00">Click anywhere to close</p>
+        `;
+    }, 800);
+}
+function closeFile(){ document.getElementById("file-popup").style.display="none"; }
+
+// ===========================
+// MAP GRID & PUZZLE
+// ===========================
+const mapGrid = document.getElementById("map-grid");
+const mapInfo = document.getElementById("map-info");
+let selectionSequence = [];
+
+for(let i=0;i<36;i++){
+    const cell = document.createElement("div");
+    cell.className="map-cell";
+    cell.onclick=()=>selectMap(i);
+    mapGrid.appendChild(cell);
+}
+
+function selectMap(i){
+    const infoList = ["A1 - 네온 파츠 블랙마켓","A2 - 사각지대 감시장소","A3 - 폐기 메모리 드랍존","A4 - 불법 신경 링크 지점"];
+    mapInfo.innerText = infoList[i] || "미확인 구역";
+
+    selectionSequence.push(i);
+    if(selectionSequence.length>4) selectionSequence.shift();
+    const secretCode = [11,4,22,30];
+    if(secretCode.every((v,idx)=>v===selectionSequence[idx])){
+        document.getElementById("hidden-file").style.display="block";
+        mapInfo.innerText = "숨겨진 의뢰 파일 해금!";
+    }
+}
+
+// ===========================
+// REQUEST TERMINAL
+// ===========================
+function sendRequest(){
+    const input = document.getElementById("request-input").value.trim();
+    const output = document.getElementById("terminal-output");
+    if(!input){ output.innerText="입력값이 비어 있습니다."; return; }
+    output.innerHTML = `<p style="color:#55ff77">[TERMINAL] 암호화된 요청이 전송되었습니다.</p>`;
+    document.getElementById("request-input").value="";
+}
 </script>
+
+<canvas id="neonFog"></canvas>
 
 </body>
 </html>
