@@ -35,7 +35,7 @@ section {
 .neon {
     font-size: 2.8em;
     color: #ff00f7;
-    text-shadow: 0 0 14px #ff00f7, 0 0 35px #ff00a6;
+    text-shadow: 0 0 14px #ff00f7, 0 0 35px #ff00f6;
 }
 
 .panel {
@@ -364,8 +364,9 @@ html, body {
 
 <body>
 
-    <div id="glitchCursor"></div>
+    <div id="scroll-bg"></div>
 
+    <div id="glitchCursor"></div>
 
     <audio id="hover-sound" src="hover.mp3" preload="auto"></audio>
     <audio id="glitch-sound" src="glitch.mp3" preload="auto"></audio>
@@ -529,6 +530,14 @@ html, body {
         <div id="map-info">선택된 구역 없음</div>
     </div>
 </section>
+
+<section class="parallax">
+  <div class="overlay-text">
+    <h1>WELCOME TO THE GRID</h1>
+    <p>Cyber UI Interface System</p>
+  </div>
+</section>
+
 
 <script>
 // ===========================
@@ -833,6 +842,125 @@ body {
     color: white;
   }
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #000;
+  color: #fff;
+  font-family: "Roboto", sans-serif;
+  height: 200vh; /* 스크롤 가능하게 */
+}
+
+/* 비 효과 Canvas */
+#rain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* 첫 화면 */
+.hero {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(#020202, #0d0d0d);
+  z-index: 1;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 4rem;
+  letter-spacing: 4px;
+  text-shadow: 0 0 15px #0ff;
+}
+
+/* 도시 섹션 */
+.city {
+  height: 100vh;
+  background: url('cyberpunk-city.jpg') center/cover no-repeat fixed;
+  filter: brightness(0.8) saturate(1.5);
+}
+
+#scroll-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: -1;
+
+    /* 기본 색 */
+    background: linear-gradient(135deg, #220044, #000000);
+    mix-blend-mode: screen;
+    opacity: 0.55;
+    transition: background 0.15s linear;
+}
+
+.parallax {
+  background-image: url('/mnt/data/IMG_0671.jpeg'); /* 이미지 경로 */
+  height: 600px;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay-text {
+  text-align: center;
+  color: cyan;
+  font-family: 'Orbitron', sans-serif;
+  animation: neonFlicker 2.5s infinite;
+  text-shadow:
+    0 0 5px cyan,
+    0 0 10px cyan,
+    0 0 20px cyan,
+    0 0 40px #00ffff,
+    0 0 80px #00ffff;
+}
+
+.overlay-text h1 {
+  font-size: 3.5rem;
+  margin: 0;
+  letter-spacing: 3px;
+}
+
+.overlay-text p {
+  font-size: 1.3rem;
+  margin-top: 10px;
+}
+
+/* 네온 깜빡임 효과 */
+@keyframes neonFlicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
+    opacity: 1;
+    text-shadow:
+      0 0 5px cyan,
+      0 0 10px cyan,
+      0 0 20px cyan,
+      0 0 40px #00ffff,
+      0 0 80px #00ffff;
+  }
+  20%, 24%, 55% {
+    opacity: 0.4;
+    text-shadow: none;
+  }
+}
+
+
     </style>
     
     
@@ -903,6 +1031,24 @@ function nav(id, el){
     el.classList.add("active");
 }
 
+// ===========================
+// SCROLL-BASED BACKGROUND COLOR SHIFT
+// ===========================
+window.addEventListener("scroll", () => {
+    const scrollRatio = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+
+    // 0 ~ 1 사이 값
+    const r1 = Math.floor(20 + scrollRatio * 120);   // 보라 → 사이언
+    const g1 = Math.floor(0 + scrollRatio * 150);
+    const b1 = Math.floor(80 + scrollRatio * 100);
+
+    const r2 = Math.floor(0 + scrollRatio * 80);     // 검정 → 네온블루
+    const g2 = Math.floor(0 + scrollRatio * 80);
+    const b2 = Math.floor(0 + scrollRatio * 180);
+
+    document.getElementById("scroll-bg").style.background =
+        `linear-gradient(135deg, rgb(${r1},${g1},${b1}), rgb(${r2},${g2},${b2}))`;
+});
 
 
     </script>
