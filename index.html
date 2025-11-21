@@ -10,7 +10,7 @@
 body {
     margin: 0;
     font-family: 'Malgun Gothic', sans-serif;
-    background: linear-gradient(135deg, #040011, #130024, #001827);
+    background: linear-gradient(135deg, #200a68, #000000, #4b62ca);
     background-size: 300% 300%;
     animation: bgShift 12s ease infinite;
     color: white;
@@ -262,11 +262,110 @@ body::after {
     opacity: 0.32;
 }
 
+body{
+    cursor: pointer;
+    .glitch-chunk {
+    position: fixed;
+    width: 14px;
+    height: 14px;
+    background: linear-gradient(45deg, #ff00ff, #00fff2);
+    opacity: 0.75;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    filter: blur(2px);
+    animation: chunkGlitch 0.25s linear forwards;
+}
+
+@keyframes chunkGlitch {
+    0% { 
+        transform: translate(0, 0) scale(1);
+        opacity: 0.9;
+        filter: blur(0px);
+    }
+    30% {
+        transform: translate(-4px, 3px) scale(1.3);
+        opacity: 0.7;
+        filter: blur(1px);
+    }
+    60% {
+        transform: translate(3px, -4px) scale(1.7);
+        opacity: 0.4;
+        filter: blur(2px);
+    }
+    100% { 
+        transform: translate(0, 0) scale(2.2);
+        opacity: 0;
+        filter: blur(3px);
+    }
+}}
+.glitch-chunk {
+    position: fixed;
+    width: 14px;
+    height: 14px;
+    background: linear-gradient(45deg, #ff00ff, #00fff2);
+    opacity: 0.75;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    filter: blur(2px);
+    animation: chunkGlitch 0.25s linear forwards;
+}
+
+@keyframes chunkGlitch {
+    0% { 
+        transform: translate(0, 0) scale(1);
+        opacity: 0.9;
+        filter: blur(0px);
+    }
+    30% {
+        transform: translate(-4px, 3px) scale(1.3);
+        opacity: 0.7;
+        filter: blur(1px);
+    }
+    60% {
+        transform: translate(3px, -4px) scale(1.7);
+        opacity: 0.4;
+        filter: blur(2px);
+    }
+    100% { 
+        transform: translate(0, 0) scale(2.2);
+        opacity: 0;
+        filter: blur(3px);
+    }
+}
+
+/* 진짜 커서 숨기기 */
+html, body {
+    cursor: none;
+}
+
+/* 글리치 덩어리 커서 */
+#glitchCursor {
+    position: fixed;
+    width: 24px;
+    height: 24px;
+    background: radial-gradient(circle, #00fff0 0%, #ff00ff 60%);
+    border-radius: 50%;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    filter: blur(3px);
+    transform: translate(-50%, -50%);
+    animation: glitchPulse 0.15s infinite;
+}
+
+@keyframes glitchPulse {
+    0%   { transform: translate(-50%, -50%) scale(1); filter: blur(2px); }
+    50%  { transform: translate(-49%, -51%) scale(1.3); filter: blur(4px); }
+    100% { transform: translate(-51%, -48%) scale(1); filter: blur(3px); }
+}
+
 
 </style>
 </head>
 
 <body>
+
+    <div id="glitchCursor"></div>
+
 
     <audio id="hover-sound" src="hover.mp3" preload="auto"></audio>
     <audio id="glitch-sound" src="glitch.mp3" preload="auto"></audio>
@@ -326,7 +425,7 @@ body::after {
         <input type="text" id="request-input" placeholder="의뢰자 코드네임">
         <textarea id="request-content" rows="6" placeholder="의뢰 내용을 입력하세요"></textarea>
         <button onclick="sendRequest()">전송</button>
-        <div id="terminal-output" style="margin-top:15px;"></div>
+        <div id="terminal-output" s tyle="margin-top:15px;"></div>
     </div>
 </section>
 
@@ -383,12 +482,34 @@ body::after {
             <span>상태: <span style="color:#ff2222">FAILED</span></span>
         </div>
 
+        <div class="file-item" onclick="openFile('R530')">
+            <strong>[FILE–R530]</strong><br>
+            <span>제목: 검은 연기의 경로</span><br>
+            <span>의뢰자: <b>???</b></span><br>
+            <span>상태: <span style="color: #55ff77;">SUCCESS</span></span>
+        </div>
+
+        <div class="file-item" onclick="openFile('X002')">
+            <strong>[FILE–X002]</strong><br>
+            <span>제목: 사고 원점 추적</span><br>
+            <span>의뢰자: <b>???</b></span><br>
+            <span>상태: <span style="color: #ffaa00;">PENDING</span></span>
+        </div>
+
+        <div class="file-item" onclick="openFile('V913')">
+            <strong>[FILE–V913]</strong><br>
+            <span>제목: 합성 기억 제조 공정 추적</span><br>
+            <span>의뢰자: <b>???</b></span><br>
+            <span>상태: <span style="color: #ff0033;">FAILED</span></span>
+        </div>
+
         <div class="file-item hidden-file" id="hidden-file" onclick="openFile('Z0??')">
             <strong>[FILE–Z0??]</strong><br>
             <span>제목: 기록되지 않은 의뢰</span><br>
             <span>의뢰자: <b>UNKNOWN</b></span><br>
             <span>상태: <span style="color:#ff00ff">?????</span></span>
         </div>
+        
 
     </div>
 </section>
@@ -530,7 +651,12 @@ for(let i=0;i<36;i++){
 }
 
 function selectMap(i){
-    const infoList = ["A1 - 네온 파츠 블랙마켓","A2 - 사각지대 감시장소","A3 - 폐기 메모리 드랍존","A4 - 불법 신경 링크 지점"];
+    const infoList = ["A1 - 네온 파츠 블랙마켓","A2 - 사각지대 감시장소","A3 - 폐기 메모리 드랍존","A4 - 불법 신경 링크 지점","A5 - 암호화 통신 허브","A6 - 그림자 브로커 연락소",
+                      "B1 - 데이터 해킹 포인트","B2 - 익명 거래 구역","B3 - 불법 개조 워크숍","B4 - 기억 조작 클리닉","B5 - 암시장 진입로","B6 - 위장 카페",
+                      "C1 - 신원 세탁소","C2 - 비인가 드론 정비소","C3 - 폐기 신경 임플란트 상점","C4 - 암호화 화폐 환전소","C5 - 비밀 정보 중개소","C6 - 그림자 네트워크 노드",
+                      "D1 - 불법 감시 장비 상점","D2 - 기억 칩 리퍼브 샵","D3 - 신경 인터페이스 바이어스 포인트","D4 - 데이터 브로커 연락처","D5 - 암호화 메시지 릴레이","D6 - 비인가 사이버웨어 딜러",
+                      "E1 - 폐기 전자 부품 시장","E2 - 신원 위장 서비스","E3 - 불법 소프트웨어 유통점","E4 - 기억 삭제 서비스","E5 - 암호화 통신 장비 상점","E6 - 그림자 브로커 지점",
+                      "F1 - 비밀 거래 장소","F2 - 불법 네트워크 접속점","F3 - 신경 링크 업그레이드 샵","F4 - 데이터 복구 서비스","F5 - 암호화 화폐 채굴장","F6 - 폐기 신경 임플란트 시장"];
     mapInfo.innerText = infoList[i] || "미확인 구역";
 
     selectionSequence.push(i);
@@ -669,6 +795,32 @@ function sendRequest(){
       50% { text-shadow: -1px -1px #ff00ff, 1px 1px #00ffff; }
       100% { text-shadow: 2px 1px #ff00ff, -2px -1px #00ffff; }
     }
+
+    /* 모든 요소 기본 커서 제거 */
+* {
+    cursor: none !important;
+}
+
+/* 글리치 커서 */
+#glitchCursor {
+    position: fixed;
+    width: 24px;
+    height: 24px;
+    background: radial-gradient(circle, #00fff0 0%, #ff00ff 60%);
+    border-radius: 50%;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    filter: blur(3px);
+    transform: translate(-50%, -50%);
+    animation: glitchPulse 0.15s infinite;
+}
+
+@keyframes glitchPulse {
+    0%   { transform: translate(-50%, -50%) scale(1); filter: blur(2px); }
+    50%  { transform: translate(-49%, -51%) scale(1.3); filter: blur(4px); }
+    100% { transform: translate(-51%, -48%) scale(1); filter: blur(3px); }
+}
+
     </style>
     
     
@@ -714,6 +866,33 @@ function sendRequest(){
     }
     
     document.getElementById("secret-popup").addEventListener("click", closeSecret);
+
+     const glitchCursor = document.getElementById("glitchCursor");
+
+document.addEventListener("mousemove", (e) => {
+    glitchCursor.style.left = e.pageX + "px";
+    glitchCursor.style.top = e.pageY + "px";
+});    
+
+document.addEventListener("mousemove", (e) => {
+    glitchCursor.style.left = e.clientX + "px";
+    glitchCursor.style.top = e.clientY + "px";
+});
+
+document.addEventListener("mousemove", (e) => {
+    glitchCursor.style.left = e.buttonX + "px";
+    glitchCursor.style.top = e.buttonY + "px";
+});
+
+
+function nav(id, el){
+    document.getElementById(id).scrollIntoView({ behavior: "smooth" });
+    document.querySelectorAll(".key-btn").forEach(btn => btn.classList.remove("active"));
+    el.classList.add("active");
+}
+
+
+
     </script>
     
     <div class="file-item secret-file" onclick="openSecret('Z-SHADOW')">
@@ -722,7 +901,8 @@ function sendRequest(){
         <span>의뢰자: <b>UNKNOWN SIGNAL</b></span><br>
         <span>상태: <span style="color:#ff55ff">CLASSIFIED</span></span>
     </div>
-    
+
+<div class="key-btn" onclick="nav('hero', this)">HOME</div>
 
 </body>
 </html>
