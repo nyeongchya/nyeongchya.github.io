@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cyber Broker Agency — Underground Portal</title>
+  <style>
+    /* --- Reset & base --- */
+    :root{
+      --bg:#071022; --panel:#0b1220; --neon:#00ffe1; --accent:#ff00d9; --muted:#9aa4b2;
+      --glass: rgba(255,255,255,0.04);
+      --radius:14px;
+      font-family: Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#02040a 0%, #071022 60%);color:#e6f7ff}
+    a{color:var(--neon)}
+
+    /* --- Layout --- */
+    .app{display:grid;grid-template-columns:260px 1fr;gap:20px;padding:28px;min-height:100vh}
+    .sidebar{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:20px;backdrop-filter: blur(6px);box-shadow:0 8px 24px rgba(0,0,0,0.6)}
+    .brand{font-weight:700;letter-spacing:1px;font-size:18px;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+    .brand .logo{width:36px;height:36px;border-radius:8px;background:linear-gradient(45deg,var(--neon),var(--accent));box-shadow:0 6px 18px rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;font-weight:800}
+    .nav{display:flex;flex-direction:column;gap:8px}
+    .nav button{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:10px;border-radius:12px;color:var(--muted);text-align:left;cursor:pointer}
+    .nav button.active{border-color:rgba(0,255,225,0.16);color:var(--neon);box-shadow:0 6px 20px rgba(0,255,225,0.04);}
+    .section{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:20px;backdrop-filter: blur(4px);min-height:120px}
+
+    /* --- Header / Controls --- */
+    header.main{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
+    .controls{display:flex;gap:8px;align-items:center}
+    .btn{background:linear-gradient(90deg,var(--neon),var(--accent));border:none;padding:8px 14px;border-radius:10px;color:#041018;font-weight:700;cursor:pointer}
+    .ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px 12px;border-radius:10px;color:var(--muted)}
+
+    /* --- Board --- */
+    .board{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:14px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .tag{display:inline-block;padding:6px 8px;border-radius:8px;font-size:12px;background:rgba(0,0,0,0.3);color:var(--muted)}
+    .muted{color:var(--muted);font-size:13px}
+
+    /* --- Landing large hero --- */
+    .hero{display:flex;gap:20px;align-items:center}
+    .hero .left{flex:1}
+    .neon-text{font-size:34px;font-weight:800;line-height:1;letter-spacing:0.6px;background:linear-gradient(90deg,var(--neon),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .sub{color:var(--muted);margin-top:8px}
+
+    /* --- Login --- */
+    .login{display:flex;flex-direction:column;gap:8px}
+    input,textarea,select{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);padding:10px;border-radius:10px;color:inherit}
+
+    /* --- composer --- */
+    .composer{display:flex;flex-direction:column;gap:8px}
+
+    footer{margin-top:20px;color:var(--muted);font-size:13px}
+
+    /* --- Responsive --- */
+    @media (max-width:880px){.app{grid-template-columns:1fr;padding:16px}.sidebar{order:2}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="logo">CB</div>CYPHER-BROKERS</div>
+      <nav class="nav">
+        <button id="nav-home" class="active">랜딩</button>
+        <button id="nav-board">의뢰 게시판</button>
+        <button id="nav-composer">비밀 의뢰 전송</button>
+        <button id="nav-login">브로커 로그인</button>
+      </nav>
+      <div style="height:18px"></div>
+      <div class="section">
+        <div class="muted">브로커 상태</div>
+        <div id="broker-status" style="margin-top:8px">비로그인</div>
+        <div style="height:12px"></div>
+        <div class="muted">데모 지갑</div>
+        <div style="font-weight:700;margin-top:6px">₿ 0.042</div>
+      </div>
+      <footer style="margin-top:14px">© Cyber Broker Agency — 잔혹하고 우아하게</footer>
+    </aside>
+
+    <main>
+      <header class="main">
+        <div>
+          <div class="muted">위치: Neon Sector · 채널: anonymous</div>
+        </div>
+        <div class="controls">
+          <button class="ghost" id="import-sample">샘플 로드</button>
+          <button class="btn" id="publish-btn">Repository에 커밋</button>
+        </div>
+      </header>
+
+      <!-- --- Sections --- -->
+
+      <section id="page-home" class="section">
+        <div class="hero">
+          <div class="left">
+            <div class="neon-text">사이버펑크 도시의 뒷골목, 의뢰는 우리에게</div>
+            <div class="sub">보안국이 못 푼 사건, 잃어버린 데이터, 의뢰인과 대가만 있으면 된다. 브로커 대시보드로 바로 시작.</div>
+            <div style="height:14px"></div>
+            <div style="display:flex;gap:8px">
+              <button class="btn" onclick="goto('board')">의뢰 둘러보기</button>
+              <button class="ghost" onclick="goto('composer')">비밀 의뢰 전송</button>
+            </div>
+          </div>
+          <div style="width:320px">
+            <div style="padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)">
+              <div class="muted">최근 체결</div>
+              <div style="margin-top:10px;font-weight:700">데이터 복구 — 익명·완료</div>
+              <div class="muted" style="margin-top:8px">보수: ₿0.02 · 청구: 3일 전</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-board" class="section" hidden>
+        <header style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:800">의뢰 게시판</div>
+            <div class="muted">현재 공개된 의뢰 목록 — 익명 접수</div>
+          </div>
+          <div>
+            <button class="ghost" id="new-job">새 의뢰</button>
+          </div>
+        </header>
+        <div id="board" class="board"></div>
+      </section>
+
+      <section id="page-composer" class="section" hidden>
+        <div style="font-weight:800">비밀 의뢰 전송기</div>
+        <div class="muted">의뢰는 암호화되어 저장됩니다. 데모에서는 간단한 Base64로 처리합니다.</div>
+        <div style="height:12px"></div>
+        <div class="composer">
+          <input id="c-title" placeholder="의뢰 제목" />
+          <textarea id="c-body" rows="6" placeholder="의뢰 내용(성격, 요구사항, 보수)"></textarea>
+          <div style="display:flex;gap:8px">
+            <input id="c-pay" placeholder="보수 (예: ₿0.01)" style="flex:0 0 160px" />
+            <input id="c-tags" placeholder="태그(쉼표로 구분)" />
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn" id="send-secret">전송(암호화)</button>
+            <button class="ghost" id="clear-composer">초기화</button>
+          </div>
+        </div>
+        <div id="composer-result" style="margin-top:12px;word-break:break-all"></div>
+      </section>
+
+      <section id="page-login" class="section" hidden>
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div style="flex:1">
+            <div style="font-weight:800">브로커 로그인</div>
+            <div class="muted">간단한 데모 인증. 실제 서비스에서는 OAuth / WebAuthn 등을 사용하세요.</div>
+            <div style="height:12px"></div>
+            <div class="login">
+              <input id="login-id" placeholder="브로커 ID" />
+              <input id="login-pass" placeholder="패스코드" />
+              <div style="display:flex;gap:8px">
+                <button class="btn" id="do-login">로그인</button>
+                <button class="ghost" id="do-logout">로그아웃</button>
+              </div>
+            </div>
+          </div>
+          <div style="width:320px">
+            <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03)">
+              <div class="muted">브로커 프로필</div>
+              <div id="profile" style="margin-top:8px">비로그인</div>
+              <div style="height:8px"></div>
+              <div class="muted">권장</div>
+              <div class="muted">이메일 연동, 키스토어 백업, 2FA</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    /* ---------- Simple client-side 'app' state & helpers ---------- */
+    const pages = {home:document.getElementById('page-home'), board:document.getElementById('page-board'), composer:document.getElementById('page-composer'), login:document.getElementById('page-login')}
+    const navMap = { 'nav-home':'home','nav-board':'board','nav-composer':'composer','nav-login':'login'}
+    for(const id in navMap){document.getElementById(id).addEventListener('click', ()=> goto(navMap[id]))}
+
+    function goto(name){ Object.values(pages).forEach(p=>p.hidden=true); pages[name].hidden=false; document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active')); document.getElementById('nav-'+name).classList.add('active'); }
+
+    /* ---------- Sample data management (localStorage backed) ---------- */
+    const KEY_JOBS = 'cba.jobs.v1';
+    function sampleJobs(){
+      return [
+        {id:1,title:'데이터 복구 — 폐기된 코어', body:'기업 서버에서 삭제된 로그 복구. 접근권 증명 필요. 상세 조건은 DM', pay:'₿0.02', tags:['forensics','data']},
+        {id:2,title:'익명 대상 감시', body:'지정 IP의 트래픽 패턴 분석. 익명성 우선.', pay:'₿0.015', tags:['opsec','intel']},
+        {id:3,title:'유물 탈취', body:'소스: 중고 전시장. 보수 대가 협상 가능', pay:'₿0.05', tags:['raid','stealth']}
+      ]
+    }
+    function loadJobs(){ const raw = localStorage.getItem(KEY_JOBS); if(!raw) { const s = sampleJobs(); localStorage.setItem(KEY_JOBS, JSON.stringify(s)); return s; } try{return JSON.parse(raw)}catch(e){return []} }
+    function saveJobs(jobs){ localStorage.setItem(KEY_JOBS, JSON.stringify(jobs)); renderBoard(); }
+
+    /* ---------- Rendering ---------- */
+    function renderBoard(){ const board = document.getElementById('board'); board.innerHTML=''; const jobs = loadJobs(); if(!jobs.length){board.innerHTML='<div class="muted">의뢰가 없습니다. 샘플을 불러오세요.</div>';return}
+      jobs.forEach(j=>{
+        const c = document.createElement('div'); c.className='card';
+        c.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:700">${escapeHtml(j.title)}</div><div class="tag">${escapeHtml(j.pay||'—')}</div></div>
+                       <div class="muted" style="margin-top:8px">${escapeHtml(j.tags.join(', '))}</div>
+                       <div style="margin-top:10px;color:var(--muted);font-size:14px">${escapeHtml(j.body)}</div>
+                       <div style="height:12px"></div>
+                       <div style="display:flex;justify-content:space-between;align-items:center">
+                         <div class="muted">ID:${j.id}</div>
+                         <div><button class="ghost" onclick="claim(${j.id})">수주</button> <button class="ghost" onclick="removeJob(${j.id})">삭제</button></div>
+                       </div>`
+        board.appendChild(c);
+      })
+    }
+
+    function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function removeJob(id){ const jobs = loadJobs().filter(j=>j.id!==id); saveJobs(jobs); }
+    function claim(id){ alert('의뢰 '+id+'에 수주 제안을 보냈습니다. (데모)') }
+
+    /* ---------- Composer: simple base64 '암호화' demo ---------- */
+    document.getElementById('send-secret').addEventListener('click', ()=>{
+      const t = document.getElementById('c-title').value.trim();
+      const b = document.getElementById('c-body').value.trim();
+      const pay = document.getElementById('c-pay').value.trim();
+      const tags = document.getElementById('c-tags').value.split(',').map(s=>s.trim()).filter(Boolean);
+      if(!t||!b){ alert('제목과 내용을 입력하세요.'); return }
+      const payload = JSON.stringify({title:t,body:b,pay:pay,tags:tags,ts:Date.now()});
+      const encrypted = btoa(unescape(encodeURIComponent(payload))); // 데모용
+      // 저장: encrypted blob을 localStorage에 따로 저장
+      const storeKey = 'cba.secret.'+Date.now();
+      localStorage.setItem(storeKey, encrypted);
+      document.getElementById('composer-result').innerText = '암호화된 블롭: '+encrypted.substring(0,120)+'... 저장키='+storeKey;
+      // 동시에 공개 게시판에 간단히 메타 등록(익명)
+      const jobs = loadJobs(); const newid = (jobs[jobs.length-1]?.id||0)+1; jobs.push({id:newid,title:t,body:'[비공개 내용 — 암호화됨]',pay:pay,tags:tags}); saveJobs(jobs);
+    })
+    document.getElementById('clear-composer').addEventListener('click', ()=>{document.getElementById('c-title').value='';document.getElementById('c-body').value='';document.getElementById('c-pay').value='';document.getElementById('c-tags').value='';document.getElementById('composer-result').innerText='';})
+
+    /* ---------- Login (demo) ---------- */
+    function updateProfileUI(){ const p = localStorage.getItem('cba.broker'); const el = document.getElementById('profile'); const status = document.getElementById('broker-status'); if(!p){el.innerText='비로그인';status.innerText='비로그인'; return} const obj = JSON.parse(p); el.innerText = obj.id+' · 등급:'+ (obj.rank||'신입'); status.innerText = '로그인: '+obj.id }
+    document.getElementById('do-login').addEventListener('click', ()=>{
+      const id = document.getElementById('login-id').value.trim(); const pass = document.getElementById('login-pass').value.trim(); if(!id||!pass){alert('아이디/패스코드를 입력하세요.');return}
+      localStorage.setItem('cba.broker', JSON.stringify({id:id,rank:'브로커',ts:Date.now()})); updateProfileUI(); alert('로그인 완료 — 데모')
+    })
+    document.getElementById('do-logout').addEventListener('click', ()=>{ localStorage.removeItem('cba.broker'); updateProfileUI(); alert('로그아웃') })
+
+    /* ---------- Utilities & UI wiring ---------- */
+    document.getElementById('import-sample').addEventListener('click', ()=>{ localStorage.setItem(KEY_JOBS, JSON.stringify(sampleJobs())); renderBoard(); alert('샘플 의뢰를 불러왔습니다.') })
+    document.getElementById('new-job').addEventListener('click', ()=>{ goto('composer'); document.getElementById('c-title').focus(); })
+
+    // "Repository에 커밋" 버튼은 실제 Git 작업을 도와주는 안내창으로 연결
+    document.getElementById('publish-btn').addEventListener('click', ()=>{
+      const help = `VS Code에서 다음 명령으로 웹사이트를 업로드하세요:\n\n1) git add .\n2) git commit -m "Add cyber-broker site"\n3) git push origin main\n\n그 다음 GitHub 저장소의 Settings → Pages에서 main 브랜치를 선택해 GitHub Pages를 활성화하면 됩니다.`
+      alert(help);
+    })
+
+    // 초기화
+    renderBoard(); updateProfileUI();
+
+  </script>
+</body>
+</html>
