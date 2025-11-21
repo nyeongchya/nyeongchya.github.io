@@ -1,567 +1,760 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
-import { Mail, Lock, List, Home, MapPin, Zap, Key, EyeOff } from 'lucide-react'
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OverCity 2098 — Broker Nexus (Standalone)</title>
 
-/*
-OverCity 2098 — Broker Nexus (full extension)
-- 이 문서는 기존 코드에 '살을 붙이는' 방식으로 확장되었습니다.
-- 새로 추가된 주요 기능:
-  1) 로컬 브로커 계정 등록/해시 저장 (Web Crypto 기반 비밀번호 해싱)
-  2) 로그인/토큰 발급(로컬) — 실제 백엔드 연동용 mock API와 API 스펙 주석 포함
-  3) 클라이언트 측 AES-GCM 암호화/복호화 유지
-  4) 홈 화면 시각·사운드 효과 추가 (스캔라인, 노이즈, 글리치 텍스트, 저주파 허밍)
-  5) 글리치(GlitchText) 컴포넌트로 제목 및 중요 텍스트 곳곳에 글리치 효과 적용
-  6) 의뢰(타이핑 스타일) 내용을 일반인이 남긴 의뢰문처럼 구체화
-  7) 비밀 팝업을 단독 사용자(SECRET_OWNER)만 접근할 수 있게 수정
-  8) 배포 가이드 / 백엔드 API 스펙 주석 추가
+  <!-- Google font for cyberpunk feel -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
-주의: 이 파일은 데모·로컬용입니다. 실제 운영 전 보안 감사를 반드시 수행하세요.
-*/
-
-// CONFIG
-const SECRET_OWNER = 'raven' // 이 계정이 로그인하면 비밀 팝업이 보입니다. 요청에 따라 '한 사람만' 접근 가능하도록 변경했습니다.
-
-export default function OverCityApp(){
-  const [route, setRoute] = useState('home')
-  const [query, setQuery] = useState('')
-
-  // --- Auth state (로컬 사용자 관리) ---
-  const [users, setUsers] = useState(()=> JSON.parse(localStorage.getItem('oc_users') || '{}'))
-  const [loggedIn, setLoggedIn] = useState(()=> JSON.parse(localStorage.getItem('oc_logged')) || {})
-  const [authModalOpen, setAuthModalOpen] = useState(false)
-  const [credentials, setCredentials] = useState({ user: '', pass: '' })
-  const [secretUnlocked, setSecretUnlocked] = useState(false)
-
-  // --- Domain data ---
-  const [jobs, setJobs] = useState(expandedJobs)
-  const [intel, setIntel] = useState(expandedIntel)
-  const [mapZones, setMapZones] = useState(expandedMap)
-  const [items, setItems] = useState(sampleItems)
-  const [wallet, setWallet] = useState(()=> Number(localStorage.getItem('oc_wallet')) || 5000)
-  const [selectedJob, setSelectedJob] = useState(null)
-  const [secureMessage, setSecureMessage] = useState('')
-  const [noiseOn, setNoiseOn] = useState(true)
-  const audioCtxRef = useRef(null)
-  const oscRef = useRef(null)
-
-  useEffect(()=>{ localStorage.setItem('oc_wallet', String(wallet)) },[wallet])
-  useEffect(()=>{ localStorage.setItem('oc_users', JSON.stringify(users)) },[users])
-  useEffect(()=>{ localStorage.setItem('oc_logged', JSON.stringify(loggedIn)) },[loggedIn])
-
-  useEffect(()=>{
-    // secret popup unlocked when SECRET_OWNER is logged in
-    setSecretUnlocked(Boolean(loggedIn[SECRET_OWNER]))
-  },[loggedIn])
-
-  // --- WebAudio: 저주파 허밍 (선택적) ---
-  useEffect(()=>{
-    if(noiseOn){
-      try{
-        const AudioCtx = window.AudioContext || window.webkitAudioContext
-        audioCtxRef.current = audioCtxRef.current || new AudioCtx()
-        const ctx = audioCtxRef.current
-        const osc = ctx.createOscillator()
-        const gain = ctx.createGain()
-        osc.type = 'sine'
-        osc.frequency.value = 40 // 저주파
-        gain.gain.value = 0.004
-        osc.connect(gain)
-        gain.connect(ctx.destination)
-        osc.start()
-        oscRef.current = { osc, gain }
-      }catch(e){ /* 사파리 등 일부 브라우저는 사용자 상호작용 필요 */ }
-    }else{
-      if(oscRef.current){
-        try{ oscRef.current.osc.stop(); oscRef.current = null }catch(e){}
-      }
+  <style>
+    :root{
+      --bg-0: #050509;
+      --bg-1: #0b0b0f;
+      --panel: rgba(18,18,20,0.7);
+      --neon-cyan: #00f0ff;
+      --neon-pink: #ff34b3;
+      --neon-emerald: #3cffb5;
+      --text: #e6eef6;
+      --muted: #9aa3ad;
+      /* Glitch controls */
+      --glitch-x: 2px;        /* horizontal displacement */
+      --glitch-y: -1px;       /* vertical displacement */
+      --glitch-speed: 1600ms; /* base animation period */
+      --scanline-opacity: 0.06;
+      --transition-fast: 160ms;
     }
-    return ()=>{
-      if(oscRef.current){ try{ oscRef.current.osc.stop() }catch(e){} }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: "Share Tech Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+      background: linear-gradient(180deg,var(--bg-0) 0%, var(--bg-1) 60%, #000 100%);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow-y:scroll;
+      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><g fill="none" stroke="%23ffffff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v8M2 12h8M22 12h-8M12 22v-8"/></g></svg>') 12 12, crosshair;
     }
-  },[noiseOn])
 
-  // ---------- Web Crypto helpers (비밀번호 해시용 + AES-GCM) ----------
-  async function hashPassword(password, salt){
-    const enc = new TextEncoder()
-    const baseKey = await window.crypto.subtle.importKey('raw', enc.encode(password), {name:'PBKDF2'}, false, ['deriveBits'])
-    const derived = await window.crypto.subtle.deriveBits({ name: 'PBKDF2', salt: enc.encode(salt), iterations: 200000, hash: 'SHA-256' }, baseKey, 256)
-    const hashArr = new Uint8Array(derived)
-    return btoa(String.fromCharCode(...hashArr))
-  }
+    /* basic layout */
+    .wrap{max-width:1100px;margin:28px auto;padding:24px;position:relative;z-index:2}
+    header{display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .brand{display:flex;align-items:center;gap:14px}
+    .logo{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,var(--neon-pink),#7b5cff);box-shadow:0 6px 25px rgba(0,0,0,0.6)}
+    .title{line-height:1}
+    .title h1{margin:0;font-family: 'Orbitron', sans-serif;font-size:20px;letter-spacing:1px}
+    .title p{margin:0;font-size:12px;color:var(--muted)}
 
-  async function registerBroker(user, password){
-    if(!user || !password) return false
-    if(users[user]) return false
-    const salt = Math.random().toString(36).slice(2,12)
-    const hash = await hashPassword(password, salt)
-    setUsers(u => ({ ...u, [user]: { salt, hash, created: Date.now() } }))
-    return true
-  }
+    nav{display:flex;gap:8px;align-items:center}
+    .nav-btn{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:8px 12px;border-radius:10px;font-size:13px;color:var(--text);transition:all var(--transition-fast);display:inline-flex;gap:8px;align-items:center}
+    .nav-btn:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,0.7)}
 
-  async function verifyBroker(user, password){
-    const rec = users[user]
-    if(!rec) return false
-    const hash = await hashPassword(password, rec.salt)
-    return hash === rec.hash
-  }
+    /* panels */
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+    .panel{background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.04); padding:14px;border-radius:12px;backdrop-filter:blur(4px)}
 
-  // AES helpers preserved
-  async function deriveKey(password, salt){
-    const enc = new TextEncoder()
-    const keyMat = await window.crypto.subtle.importKey('raw', enc.encode(password), {name:'PBKDF2'}, false, ['deriveKey'])
-    const key = await window.crypto.subtle.deriveKey({name:'PBKDF2', salt: enc.encode(salt), iterations: 250000, hash:'SHA-256'}, keyMat, {name:'AES-GCM', length:256}, true, ['encrypt','decrypt'])
-    return key
-  }
+    .big{grid-column:span 3}
+    .two{grid-column:span 2}
 
-  async function encryptAES(text, password){
-    const iv = window.crypto.getRandomValues(new Uint8Array(12))
-    const salt = window.crypto.getRandomValues(new Uint8Array(16))
-    const saltB = Array.from(salt).map(n=>String.fromCharCode(n)).join('')
-    const saltStr = btoa(saltB)
-    const key = await deriveKey(password, saltStr)
-    const enc = new TextEncoder()
-    const cipher = await window.crypto.subtle.encrypt({name:'AES-GCM', iv}, key, enc.encode(text))
-    const cArr = new Uint8Array(cipher)
-    const ivStr = btoa(String.fromCharCode(...iv))
-    const cipherStr = btoa(String.fromCharCode(...cArr))
-    return `${saltStr}:${ivStr}:${cipherStr}`
-  }
+    h2{margin:0 0 8px 0;font-family:'Orbitron';letter-spacing:0.6px}
+    p.small{margin:0;color:var(--muted);font-size:13px}
 
-  async function decryptAES(pack, password){
-    try{
-      const [saltStr, ivStr, cipherStr] = pack.split(':')
-      const ivB = atob(ivStr).split('').map(c=>c.charCodeAt(0))
-      const cipherB = atob(cipherStr).split('').map(c=>c.charCodeAt(0))
-      const key = await deriveKey(password, saltStr)
-      const plain = await window.crypto.subtle.decrypt({name:'AES-GCM', iv: new Uint8Array(ivB)}, key, new Uint8Array(cipherB))
-      return new TextDecoder().decode(plain)
-    }catch(e){
-      return null
+    /* summary boxes */
+    .stats{display:flex;gap:12px;margin-top:12px}
+    .stat{background:rgba(0,0,0,0.25);padding:12px;border-radius:10px;flex:1;text-align:center}
+    .stat .num{font-size:22px;font-weight:700;color:var(--neon-emerald)}
+
+    /* list */
+    .list{display:flex;flex-direction:column;gap:10px}
+    .job{padding:10px;border-radius:10px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.02);transition:transform 180ms}
+    .job:hover{transform:translateY(-6px)}
+    .job .meta{font-size:12px;color:var(--muted)}
+
+    /* map */
+    .map-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+    .zone{padding:10px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.2));border:1px solid rgba(255,255,255,0.03);cursor:help;position:relative;transition:transform 160ms}
+    .zone:hover{transform:translateY(-6px)}
+    .zone .key{font-size:12px;color:var(--muted);margin-top:8px}
+    .zone .tag{position:absolute;right:10px;top:10px;font-size:11px;background:rgba(0,0,0,0.5);padding:6px;border-radius:6px}
+
+    /* market */
+    .market{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+    .item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;background:rgba(0,0,0,0.2)}
+    .item .meta{font-size:12px;color:var(--muted)}
+
+    /* controls */
+    .controls{display:flex;gap:8px;align-items:center}
+    .btn{background:linear-gradient(90deg,var(--neon-pink),var(--neon-cyan));border:none;padding:8px 12px;border-radius:10px;color:#000;font-weight:700;cursor:pointer}
+    .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text);font-weight:600}
+    .micro{font-size:12px;padding:6px 8px;border-radius:8px}
+
+    /* footer */
+    footer{margin-top:18px;text-align:center;color:var(--muted);font-size:12px;padding:18px}
+
+    /* Glitch CSS (layers) */
+    .glitch {
+      position: relative;
+      display: inline-block;
+      color: var(--text);
+      --g1: var(--glitch-x);
+      --g2: calc(var(--glitch-x) * -1);
+      --gy: var(--glitch-y);
     }
-  }
+    .glitch::before,
+    .glitch::after{
+      content: attr(data-text);
+      position: absolute;
+      left:0;top:0;
+      width:100%;
+      height:100%;
+      overflow:visible;
+      clip-path: inset(0 0 0 0);
+      pointer-events:none;
+    }
+    .glitch::before{
+      color: var(--neon-pink);
+      transform:translate(var(--g1), var(--gy));
+      mix-blend-mode:screen;
+      opacity:0.9;
+      animation:glitch-anim var(--glitch-speed) linear infinite;
+    }
+    .glitch::after{
+      color: var(--neon-cyan);
+      transform:translate(var(--g2), calc(var(--gy) * -1));
+      mix-blend-mode:screen;
+      opacity:0.85;
+      animation:glitch-anim-2 calc(var(--glitch-speed) * 0.7) linear infinite;
+    }
 
-  // ---------- Auth flows (register / login using hashed passwords) ----------
-  async function handleRegister(){
-    const u = prompt('등록할 브로커 아이디를 입력하세요 (예: raven)')
-    const p = prompt('패스워드를 입력하세요')
-    if(!u||!p) return alert('입력 필요')
-    const ok = await registerBroker(u,p)
-    if(ok) alert('등록 완료 — 로컬 저장. 테스트용 계정입니다.')
-    else alert('이미 존재하거나 실패')
-  }
+    @keyframes glitch-anim {
+      0%{transform:translate(var(--g1), var(--gy))}
+      10%{transform:translate(calc(var(--g1) * 1.3), var(--gy))}
+      20%{transform:translate(calc(var(--g1) * -0.6), calc(var(--gy) * 1.2))}
+      30%{transform:translate(var(--g1), calc(var(--gy) * -1))}
+      40%{transform:translate(0,0)}
+      100%{transform:translate(var(--g1), var(--gy))}
+    }
+    @keyframes glitch-anim-2 {
+      0%{transform:translate(var(--g2), calc(var(--gy) * -1))}
+      15%{transform:translate(calc(var(--g2) * -1.5), calc(var(--gy) * -1.2))}
+      35%{transform:translate(var(--g2), 0)}
+      60%{transform:translate(calc(var(--g2) * 0.8), var(--gy))}
+      100%{transform:translate(var(--g2), calc(var(--gy) * -1))}
+    }
 
-  async function handleLogin(){
-    const u = prompt('브로커 아이디')
-    const p = prompt('패스워드')
-    if(!u||!p) return
-    const ok = await verifyBroker(u,p)
-    if(ok){
-      const token = await encryptAES(JSON.stringify({ user: u, ts: Date.now() }), p)
-      setLoggedIn(l => ({ ...l, [u]: token }))
-      alert('로그인 성공')
-      setAuthModalOpen(false)
-    }else alert('로그인 실패')
-  }
+    /* scanlines */
+    .scanlines:before{
+      content:"";
+      position:fixed;left:0;right:0;top:0;bottom:0;pointer-events:none;
+      background-image:linear-gradient(rgba(255,255,255,var(--scanline-opacity)) 1px, transparent 1px);
+      background-size:100% 4px;
+      mix-blend-mode:overlay;
+      z-index:1;
+    }
 
-  function logoutUser(user){
-    setLoggedIn(l => { const c = { ...l }; delete c[user]; return c })
-  }
+    /* noise overlay (using SVG data inline for portability) */
+    .noise{
+      position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none;opacity:0.08;
+      background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><filter id="n"><feTurbulence baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="512" height="512" filter="url(%23n)" opacity="0.85"/></svg>');
+      mix-blend-mode:overlay;z-index:0;
+    }
 
-  // ---------- Market ----------
-  function buyItem(id){
-    const it = items.find(i=>i.id===id)
-    if(!it) return
-    if(wallet < it.price){ alert('잔액 부족'); return }
-    setWallet(w => w - it.price)
-    setItems(items.map(i => i.id===id ? { ...i, stock: i.stock-1 } : i))
-    // 로컬 구매 로그
-    const p = JSON.parse(localStorage.getItem('oc_purchases') || '[]')
-    p.push({ id: it.id, name: it.name, time: Date.now() })
-    localStorage.setItem('oc_purchases', JSON.stringify(p))
-    alert(`구매 완료: ${it.name}`)
-  }
+    /* tooltip */
+    .tooltip{position:absolute;background:linear-gradient(180deg,rgba(0,0,0,0.9),rgba(10,10,10,0.9));padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);font-size:13px;transform:translateY(-8px);white-space:nowrap;z-index:20;pointer-events:none}
 
-  // ---------- Mock backend API (스펙 포함) ----------
-  /*
-    백엔드 연동을 위해 아래 함수를 참고하세요.
-    - apiRegisterBroker(user, pass) -> POST /api/brokers/register { user, salt, hash } (권장: 서버에서 salt+hash 생성)
-    - apiLogin(user, password) -> POST /api/brokers/login { user, proof } -> returns JWT
-    - apiFetchJobs() -> GET /api/jobs -> returns jobs array
-    - apiCreateJob(payload) -> POST /api/jobs
+    /* easter eggs */
+    .egg{position:fixed;bottom:16px;right:16px;opacity:0.28;transition:opacity 200ms}
+    .egg:hover{opacity:1}
 
-    로컬에서 테스트할 땐 현재 registerBroker / verifyBroker 를 사용하세요.
-  */
+    /* subtle animations */
+    .fade-in{animation:fadeIn 600ms ease both}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
-  async function apiFetchJobs(){
-    // 실제 서비스에서는 fetch('/api/jobs') ...
-    return new Promise(res=> setTimeout(()=> res(expandedJobs), 300))
-  }
+    /* responsive */
+    @media (max-width:900px){
+      .grid{grid-template-columns:repeat(1,1fr)}
+      .map-grid{grid-template-columns:repeat(2,1fr)}
+    }
+  </style>
+</head>
+<body class="scanlines">
 
-  // ---------- UI helpers ----------
-  const filteredJobs = jobs.filter(j => (j.title + j.tags.join(' ') + j.client + j.status + j.desc).toLowerCase().includes(query.toLowerCase()))
+  <div class="noise"></div>
 
-  // ---------- Render ----------
-  return (
-    <div className={`min-h-screen bg-gradient-to-b from-zinc-900 via-stone-900 to-black text-zinc-100 relative overflow-hidden`}> 
-
-      {/* Global visual noise & scanlines */}
-      <style>{`
-        @keyframes glitch-anim { 0% { transform: translate(0,0); } 20% { transform: translate(-2px,0); } 40% { transform: translate(2px,0); } 60% { transform: translate(-1px,0); } 100% { transform: translate(0,0); } }
-        .scanlines { background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 100% 4px; }
-        .glitch-wrap { position: relative; display: inline-block }
-        .glitch-wrap .glitch { position: absolute; left:0; top:0; } 
-        .glitch-red { clip-path: inset(0 0 60% 0); transform: translate(1px, -1px); opacity: .85; animation: glitch-anim 1.6s linear infinite; }
-        .glitch-blue { clip-path: inset(60% 0 0 0); transform: translate(-1px, 1px); opacity: .85; animation: glitch-anim 1.2s linear infinite; }
-      `}</style>
-
-      <div className="pointer-events-none fixed inset-0 mix-blend-screen opacity-16 scanlines" />
-      <div className="pointer-events-none fixed inset-0 bg-[url('/_oc_noise.png')] opacity-10" />
-
-      <header className="max-w-6xl mx-auto p-6 flex items-center justify-between z-10 relative">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-500 rounded-2xl shadow-2xl flex items-center justify-center transform -skew-x-6">🕶️</div>
-          <div>
-            <GlitchText className="text-2xl font-bold tracking-tight" text={'OverCity 2098 — Broker Nexus'} />
-            <p className="text-sm text-zinc-400">은밀한 의뢰, 안전한 연결 — 로그? 우리는 그런 걸 모른다.</p>
-          </div>
-        </div>
-
-        <nav className="flex gap-3 items-center">
-          <NavButton icon={<Home size={16} />} active={route==='home'} onClick={()=>setRoute('home')}>Home</NavButton>
-          <NavButton icon={<List size={16} />} active={route==='jobs'} onClick={()=>setRoute('jobs')}>Jobs <span className="ml-1 text-xs text-zinc-400">({jobs.length})</span></NavButton>
-          <NavButton icon={<Zap size={16} />} active={route==='intel'} onClick={()=>setRoute('intel')}>Intel</NavButton>
-          <NavButton icon={<MapPin size={16} />} active={route==='map'} onClick={()=>setRoute('map')}>Map</NavButton>
-          <NavButton icon={<Mail size={16} />} active={route==='contact'} onClick={()=>setRoute('contact')}>Contact</NavButton>
-
-          <div className="ml-2 flex items-center gap-2">
-            <button onClick={()=>setAuthModalOpen(true)} className="px-3 py-2 rounded-lg border border-zinc-700 text-sm flex items-center gap-2">{Object.keys(loggedIn).length? '브로커' : '로그인'} <Key size={14} /></button>
-            <button onClick={()=>setNoiseOn(n=>!n)} className="px-2 py-2 rounded-lg border text-xs">사운드</button>
-          </div>
-        </nav>
-      </header>
-
-      <main className="max-w-6xl mx-auto px-6 pb-20 relative z-10">
-        {route === 'home' && (
-          <section>
-            <Hero wallet={wallet} />
-
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-6">
-              <Card title="브로커 프로필" desc="프로필을 설정하고, 신뢰 점수를 쌓으세요. (로컬 저장)" />
-              <Card title="암시장" desc="아이템 라인업과 구매. 익명 트랜잭션은 실험적입니다." />
-              <Card title="연결 포털" desc="의뢰 등록과 직접 연결 -- 익명 옵션 포함." />
-              <Card title="비밀 팝업" desc={`오직 ${SECRET_OWNER}만 접근 가능한 비밀 공간.`} />
-            </div>
-
-            <section className="mt-8 p-6 rounded-2xl bg-gradient-to-br from-zinc-850 to-zinc-900 border border-zinc-800 backdrop-blur-md">
-              <h3 className="text-lg font-semibold"><GlitchText text={'최근 활동'} className={'inline-block'} /></h3>
-              <p className="text-sm text-zinc-400 mt-2">사람들이 우리에게 남긴 의뢰(샘플) 및 현재 오픈된 의뢰를 보여줍니다.</p>
-
-              <div className="mt-4 grid md:grid-cols-3 gap-4">
-                <div className="p-4 bg-zinc-900 rounded-xl border">
-                  <h4 className="font-semibold">총 완료 의뢰</h4>
-                  <div className="text-3xl font-bold mt-2">{jobs.filter(j=>j.status==='completed').length}</div>
-                  <p className="text-xs text-zinc-500 mt-1">과거 의뢰 통계</p>
-                </div>
-                <div className="p-4 bg-zinc-900 rounded-xl border">
-                  <h4 className="font-semibold">오픈 의뢰</h4>
-                  <div className="text-3xl font-bold mt-2">{jobs.filter(j=>j.status==='open').length}</div>
-                  <p className="text-xs text-zinc-500 mt-1">현재 접수 가능한 의뢰</p>
-                </div>
-                <div className="p-4 bg-zinc-900 rounded-xl border">
-                  <h4 className="font-semibold">지갑</h4>
-                  <div className="text-3xl font-bold mt-2">{wallet} creds</div>
-                  <p className="text-xs text-zinc-500 mt-1">현금성 크레딧</p>
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <h4 className="font-semibold">최근 의뢰(사용자 제출 양식 예시)</h4>
-                <div className="mt-3 space-y-3">
-                  {jobs.slice(0,6).map(j => (
-                    <div key={j.id} className="p-3 bg-zinc-850 rounded-lg border border-zinc-800">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <div className="font-semibold"><GlitchText text={j.title} /></div>
-                          <div className="text-xs text-zinc-400">{j.location} · 보상: {j.reward} · 상태: {j.status}</div>
-                        </div>
-                        <div className="text-xs text-zinc-500">{j.client}</div>
-                      </div>
-                      <p className="mt-2 text-sm text-zinc-300">{j.desc}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-            </section>
-          </section>
-        )}
-
-        {route === 'jobs' && (
-          <section className="mt-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">의뢰 목록</h2>
-              <div className="flex items-center gap-2">
-                <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="검색: 해킹, 잠입, 배달..." className="bg-zinc-800 px-3 py-2 rounded-lg text-sm outline-none" />
-              </div>
-            </div>
-
-            <div className="mt-4 grid gap-4 md:grid-cols-2">
-              {filteredJobs.map(job => (
-                <motion.div whileHover={{ y: -6 }} key={job.id} className={`p-4 bg-zinc-850 rounded-2xl border ${job.status==='open'? 'border-emerald-600/30' : 'border-zinc-800'}`}>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="font-bold text-lg"><GlitchText text={job.title} /></h3>
-                      <p className="text-xs text-zinc-400">클라이언트: {job.client} · 보상: {job.reward} creds · 상태: {job.status}</p>
-                      <div className="mt-2 flex gap-2 flex-wrap">
-                        {job.tags.map(t => <span key={t} className="text-xs px-2 py-1 bg-zinc-800 rounded-full">{t}</span>)}
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <button onClick={()=>setSelectedJob(job)} className="px-3 py-1 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 text-black text-sm">보기</button>
-                      {job.status==='open' && <button onClick={async ()=>{ const pw = prompt('암호를 입력하세요 (수신자와 공유)'); if(!pw) return; const enc = await encryptAES('Accept:'+job.id, pw); setSecureMessage(enc); setRoute('contact')}} className="px-3 py-1 rounded-lg border border-zinc-700 text-sm">수락(암호화)</button>}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {selectedJob && (
-              <div className="mt-6 p-4 bg-zinc-900 rounded-xl border border-zinc-800">
-                <h3 className="font-semibold">의뢰 상세 — {selectedJob.title}</h3>
-                <p className="text-sm text-zinc-300 mt-2">{selectedJob.desc}</p>
-                <p className="text-xs text-zinc-500 mt-2">위치: {selectedJob.location} · 단계: {selectedJob.difficulty}</p>
-                <div className="mt-3 flex gap-2">
-                  {selectedJob.status==='open' && <button onClick={async ()=>{ const pw = prompt('암호를 입력하세요 (로컬 키)'); if(!pw) return; const enc = await encryptAES('Accept:'+selectedJob.id, pw); setSecureMessage(enc); setRoute('contact')}} className="px-3 py-1 rounded-lg bg-gradient-to-br from-emerald-500 to-green-400 text-black">실행</button>}
-                  <button onClick={()=>setSelectedJob(null)} className="px-3 py-1 rounded-lg border border-zinc-700">닫기</button>
-                </div>
-              </div>
-            )}
-          </section>
-        )}
-
-        {route === 'intel' && (
-          <section className="mt-6">
-            <h2 className="text-xl font-semibold">실시간 인텔</h2>
-            <div className="mt-4 space-y-3">
-              {intel.map(i => (
-                <article key={i.id} className="p-3 bg-zinc-850 rounded-lg border border-zinc-800 backdrop-blur-sm">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="font-semibold">{i.title}</h4>
-                      <p className="text-xs text-zinc-400">{i.time} · 신뢰도: {i.trust}</p>
-                    </div>
-                    <div className="text-xs px-2 py-1 bg-zinc-800 rounded">#{i.tag}</div>
-                  </div>
-                  <p className="mt-2 text-sm text-zinc-300">{i.body}</p>
-                </article>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {route === 'map' && (
-          <section className="mt-6">
-            <h2 className="text-xl font-semibold">오버시티 지도</h2>
-            <div className="mt-4 grid md:grid-cols-3 gap-4">
-              {mapZones.map(z => (
-                <div key={z.id} className="p-4 bg-zinc-850 rounded-xl border border-zinc-800 transform hover:scale-105 transition-transform">
-                  <h3 className="font-semibold">{z.name}</h3>
-                  <p className="text-xs text-zinc-400">레벨: {z.level} · 주의: {z.hazard}</p>
-                  <p className="mt-2 text-sm text-zinc-300">{z.desc}</p>
-                  <p className="mt-2 text-xs text-zinc-500">핵심 포인트: {z.key}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {route === 'contact' && (
-          <section className="mt-6 max-w-2xl">
-            <h2 className="text-xl font-semibold">보안 채널</h2>
-            <p className="text-sm text-zinc-400 mt-1">메시지는 클라이언트에서 실제 AES-GCM으로 암호화됩니다. 비밀번호는 로컬에서만 사용됩니다.</p>
-
-            <div className="mt-4 p-4 bg-zinc-850 rounded-xl border border-zinc-800">
-              <label className="text-xs text-zinc-400">보낼 메시지</label>
-              <textarea value={secureMessage} onChange={e=>setSecureMessage(e.target.value)} className="w-full mt-2 bg-zinc-800 p-3 rounded-lg text-sm h-28"></textarea>
-
-              <div className="mt-3 flex gap-2">
-                <button onClick={async ()=>{ const pw = prompt('암호 입력 (수신자와 공유)'); if(!pw) return; const enc = await encryptAES(secureMessage || 'ping', pw); navigator.clipboard?.writeText(enc); alert('암호화된 페이로드가 클립보드에 복사되었습니다.') }} className="px-3 py-2 rounded-lg bg-gradient-to-br from-indigo-600 to-violet-500 text-black flex items-center gap-2">암호화 & 복사 <Lock size={14} /></button>
-                <button onClick={async ()=>{ const pack = prompt('복호화할 페이로드를 붙여넣으세요'); const pw = prompt('암호 입력'); if(!pack||!pw) return; const dec = await decryptAES(pack, pw); if(!dec) alert('복호화 실패'); else setSecureMessage(dec)}} className="px-3 py-2 rounded-lg border">복호화</button>
-                <button onClick={()=>{setSecureMessage('')}} className="px-3 py-2 rounded-lg border">지우기</button>
-              </div>
-
-              <div className="mt-4 text-xs text-zinc-500">팁: 메시지 앞에 Accept:JOB_ID 를 붙이면 내부 워크플로우가 트리거됩니다.</div>
-            </div>
-
-            <div className="mt-6 p-4 bg-zinc-900 rounded-xl border">
-              <h4 className="font-semibold">아이템 마켓</h4>
-              <p className="text-xs text-zinc-400 mt-1">구매한 아이템은 로컬에 저장됩니다. (데모)</p>
-              <div className="mt-3 grid md:grid-cols-2 gap-3">
-                {items.map(it => (
-                  <div key={it.id} className="p-3 bg-zinc-850 rounded-lg border flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold">{it.name}</div>
-                      <div className="text-xs text-zinc-400">{it.desc}</div>
-                      <div className="text-xs text-zinc-500 mt-1">재고: {it.stock}</div>
-                    </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <div className="font-bold">{it.price} creds</div>
-                      <button disabled={it.stock<=0} onClick={()=>buyItem(it.id)} className="px-3 py-1 rounded-lg bg-gradient-to-br from-rose-500 to-orange-400 text-black text-sm">구매</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* Secret popup — 이제 SECRET_OWNER (예: raven) 계정만 접근 가능 */}
-        {secretUnlocked && (
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="fixed right-6 bottom-6 z-50 p-4 bg-black/70 border border-emerald-600 rounded-xl backdrop-blur-md">
-            <div className="flex items-center gap-2">
-              <div className="text-sm font-semibold">SECRET — 브로커 전용</div>
-              <button onClick={()=>{navigator.clipboard?.writeText(JSON.stringify({ vault: 'protocol keys', time: Date.now() })); alert('비밀 데이터 클립보드 저장(데모)')}} className="px-2 py-1 rounded bg-emerald-600 text-black text-xs">클립</button>
-            </div>
-            <div className="text-xs text-zinc-400 mt-2">이 공간은 {SECRET_OWNER} 전용입니다. 외부 노출 금지.</div>
-          </motion.div>
-        )}
-
-      </main>
-
-      <footer className="max-w-6xl mx-auto p-6 text-center text-xs text-zinc-500 z-10 relative">© 2098 OverCity Broker Nexus · 운영팀은 정부 감시를 즐겨하지 않습니다.</footer>
-
-      {/* Auth modal (브로커 관리) */}
-      {authModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-60">
-          <div className="absolute inset-0 bg-black/70" onClick={()=>setAuthModalOpen(false)} />
-          <motion.div initial={{ scale: .95, opacity:0 }} animate={{ scale:1, opacity:1 }} className="relative z-50 w-full max-w-xl p-6 bg-zinc-900 border border-zinc-800 rounded-xl">
-            <h3 className="font-semibold text-lg">브로커 계정 관리 (로컬)</h3>
-            <p className="text-xs text-zinc-400 mt-1">등록/로그인/로그아웃을 테스트하세요. (데모용 로컬 저장)</p>
-
-            <div className="mt-4 grid grid-cols-1 gap-3">
-              <div className="flex gap-2">
-                <button onClick={handleRegister} className="px-3 py-2 rounded bg-emerald-600 text-black">브로커 등록</button>
-                <button onClick={handleLogin} className="px-3 py-2 rounded bg-rose-500 text-black">브로커 로그인</button>
-                <button onClick={()=>{ if(confirm('모두 로그아웃하시겠습니까?')) setLoggedIn({}) }} className="px-3 py-2 rounded border">로그아웃(모두)</button>
-              </div>
-
-              <div className="text-xs text-zinc-400">현재 등록된 브로커: {Object.keys(users).join(', ') || '없음'}</div>
-              <div className="text-xs text-zinc-400">현재 로그인: {Object.keys(loggedIn).join(', ') || '없음'}</div>
-            </div>
-
-            <div className="mt-4 text-xs text-zinc-500">주의: 이 데모는 로컬 암호화/저장을 사용합니다. 실사용 전 보안 감사를 권장합니다.</div>
-          </motion.div>
-        </div>
-      )}
-
-    </div>
-  )
-}
-
-// ---------- Small UI components ----------
-function NavButton({ children, icon, active, onClick }){
-  return (
-    <button onClick={onClick} className={`flex items-center gap-2 px-3 py-2 rounded-lg ${active? 'bg-zinc-800 border border-zinc-700': 'hover:bg-zinc-900'}`}>
-      <span className="opacity-90">{icon}</span>
-      <span className="text-sm">{children}</span>
-    </button>
-  )
-}
-
-function GlitchText({ text, className }){
-  // 글리치 효과: 원본 + 레이어(빨강/파랑)
-  return (
-    <span className={`glitch-wrap ${className || ''}`} style={{ position: 'relative' }}>
-      <span style={{ position:'relative' }}>{text}</span>
-      <span className="glitch glitch-red" aria-hidden>{text}</span>
-      <span className="glitch glitch-blue" aria-hidden>{text}</span>
-    </span>
-  )
-}
-
-function Hero({ wallet }){
-  return (
-    <section className="mt-2 p-6 rounded-2xl bg-gradient-to-br from-zinc-850 to-zinc-900 border border-zinc-800 backdrop-blur-sm scanlines">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h2 className="text-3xl font-bold"><GlitchText text={'OverCity — 뒷골목에선 우리는 법보다 빠르다'} /></h2>
-          <p className="text-zinc-400 mt-2">의뢰 접수 · 익명 연결 · 실시간 인텔. 브로커로서 필요한 모든 도구를 한 곳에.</p>
-          <div className="mt-3 text-xs text-zinc-500">경고: 정부 감시는 늘어났습니다. 은밀하게 행동하세요.</div>
-        </div>
-        <div className="flex gap-2 items-center">
-          <div className="text-xs text-zinc-400">지갑</div>
-          <div className="px-3 py-2 rounded-2xl bg-zinc-800 border">{wallet} creds</div>
-          <button className="px-4 py-2 rounded-2xl bg-gradient-to-br from-rose-500 to-orange-400 text-black">의뢰 올리기</button>
+  <div class="wrap fade-in" id="app">
+    <header>
+      <div class="brand">
+        <div class="logo">🕶️</div>
+        <div class="title">
+          <h1><span class="glitch" data-text="OverCity 2098 — Broker Nexus">OverCity 2098 — Broker Nexus</span></h1>
+          <p class="small">은밀한 의뢰 · 익명 연결 · 실시간 인텔</p>
         </div>
       </div>
-    </section>
-  )
-}
 
-function Card({ title, desc }){
-  return (
-    <div className="p-4 bg-zinc-850 rounded-2xl border border-zinc-800">
-      <h4 className="font-semibold">{title}</h4>
-      <p className="text-sm text-zinc-400 mt-2">{desc}</p>
+      <nav>
+        <button class="nav-btn" data-target="home">Home</button>
+        <button class="nav-btn" data-target="jobs">Jobs <span style="font-size:11px;margin-left:8px;color:var(--muted)">(<span id="jobs-count">0</span>)</span></button>
+        <button class="nav-btn" data-target="intel">Intel</button>
+        <button class="nav-btn" data-target="map">Map</button>
+        <button class="nav-btn" data-target="contact">Contact</button>
+        <div style="width:8px"></div>
+        <button id="loginBtn" class="nav-btn">로그인</button>
+        <button id="soundToggle" class="nav-btn">사운드</button>
+      </nav>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main style="margin-top:18px">
+      <!-- HOME -->
+      <section id="home" class="panel big">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+          <div>
+            <h2 style="font-size:22px;margin-bottom:6px"><span class="glitch" data-text="OverCity — 뒷골목에선 우리는 법보다 빠르다">OverCity — 뒷골목에선 우리는 법보다 빠르다</span></h2>
+            <p class="small">의뢰 접수 · 익명 연결 · 실시간 인텔. 브로커로서 필요한 모든 도구를 한 곳에.</p>
+            <div style="margin-top:8px;color:var(--muted);font-size:13px">경고: 정부의 감시가 강화되었습니다. 은밀하게 행동하세요.</div>
+          </div>
+
+          <div class="controls">
+            <div style="text-align:right">
+              <div style="font-size:12px;color:var(--muted)">지갑</div>
+              <div style="background:rgba(0,0,0,0.4);padding:8px;border-radius:12px;margin-top:6px" id="wallet">5000 creds</div>
+            </div>
+            <button id="postJob" class="btn">의뢰 올리기</button>
+          </div>
+        </div>
+
+        <div class="grid" style="margin-top:16px">
+          <div class="panel">
+            <h3>브로커 프로필</h3>
+            <p class="small">프로필을 설정하고 신뢰 점수를 쌓으세요. (로컬 저장)</p>
+            <div style="margin-top:10px;color:var(--muted);font-size:13px">현재 로그인: <span id="who">없음</span></div>
+          </div>
+
+          <div class="panel">
+            <h3>암시장</h3>
+            <p class="small">아이템 라인업과 구매. 익명 트랜잭션은 실험적입니다.</p>
+          </div>
+
+          <div class="panel">
+            <h3>연결 포털</h3>
+            <p class="small">의뢰 등록과 직접 연결 — 익명 옵션 포함.</p>
+          </div>
+
+          <div class="panel">
+            <h3>비밀 팝업</h3>
+            <p class="small">오직 <strong id="secret-owner">raven</strong> 전용입니다.</p>
+            <div style="margin-top:8px;color:var(--muted)">현재 비밀 팝업 상태: <span id="secretState">잠김</span></div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px" class="panel">
+          <h3><span class="glitch" data-text="최근 활동">최근 활동</span></h3>
+          <p class="small">사람들이 우리에게 남긴 의뢰(샘플) 및 현재 오픈된 의뢰를 보여줍니다.</p>
+
+          <div class="stats" style="margin-top:12px">
+            <div class="stat">
+              <div class="num" id="completed-count">0</div>
+              <div class="small" style="color:var(--muted)">총 완료 의뢰</div>
+            </div>
+            <div class="stat">
+              <div class="num" id="open-count">0</div>
+              <div class="small" style="color:var(--muted)">오픈 의뢰</div>
+            </div>
+            <div class="stat">
+              <div class="num" id="wallet-count">5000</div>
+              <div class="small" style="color:var(--muted)">지갑 (creds)</div>
+            </div>
+          </div>
+
+          <div style="margin-top:14px">
+            <h4 style="margin:0 0 8px 0">최근 의뢰 (사용자 제출 예시)</h4>
+            <div id="recent-list" class="list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- JOBS -->
+      <section id="jobs" class="panel" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h2>의뢰 목록</h2>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="job-search" placeholder="검색: 해킹, 잠입, 배달..." style="background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:8px;color:var(--text)" />
+            <button id="refreshJobs" class="btn micro">갱신</button>
+          </div>
+        </div>
+
+        <div id="jobs-list" style="margin-top:12px" class="list"></div>
+      </section>
+
+      <!-- INTEL -->
+      <section id="intel" class="panel" style="display:none">
+        <h2>실시간 인텔</h2>
+        <div id="intel-list" style="margin-top:10px" class="list"></div>
+      </section>
+
+      <!-- MAP -->
+      <section id="map" class="panel" style="display:none">
+        <h2>오버시티 지도</h2>
+        <div class="map-grid" id="map-grid"></div>
+      </section>
+
+      <!-- CONTACT / MARKET -->
+      <section id="contact" class="panel" style="display:none">
+        <h2>보안 채널 & 아이템 마켓</h2>
+        <p class="small">메시지는 클라이언트 측 AES-GCM으로 암호화됩니다. 비밀번호는 로컬에서만 사용하세요.</p>
+
+        <div style="margin-top:12px;display:flex;gap:12px;align-items:flex-start">
+          <div style="flex:1">
+            <textarea id="payload" placeholder="보낼 메시지..." style="width:100%;height:120px;background:transparent;border:1px solid rgba(255,255,255,0.04);padding:10px;border-radius:8px;color:var(--text)"></textarea>
+            <div style="margin-top:8px;display:flex;gap:8px">
+              <button id="encryptBtn" class="btn micro">암호화 & 복사</button>
+              <button id="decryptBtn" class="btn secondary micro">복호화</button>
+              <button id="clearPayload" class="btn secondary micro">지우기</button>
+            </div>
+            <div style="margin-top:8px;color:var(--muted);font-size:12px">팁: 메시지 앞에 <code>Accept:JOB_ID</code>를 붙이면 내부 워크플로우가 트리거됩니다.</div>
+          </div>
+
+          <div style="width:320px">
+            <div style="background:rgba(0,0,0,0.18);padding:10px;border-radius:10px">
+              <h4 style="margin:0 0 8px 0">아이템 마켓</h4>
+              <div id="market" class="market"></div>
+            </div>
+            <div style="margin-top:10px;background:rgba(0,0,0,0.18);padding:10px;border-radius:10px">
+              <div style="font-size:13px;color:var(--muted)">구매 로그</div>
+              <div id="purchases" style="font-size:12px;margin-top:8px;color:var(--muted)">없음</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="panel" style="margin-top:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <div style="color:var(--muted)">© 2098 OverCity Broker Nexus</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="font-size:12px;color:var(--muted)">글리치 강도</div>
+          <input id="glitchRange" type="range" min="0" max="6" value="2" style="width:140px" />
+          <button id="showDev" class="btn micro">이스터에그</button>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Easter Egg button -->
+  <div class="egg" title="SYS·LAYER">
+    <button id="eggBtn" style="padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:8px;border:1px solid rgba(255,255,255,0.03);color:var(--muted)">SYS·LAYER</button>
+  </div>
+
+  <!-- secret popup placeholder -->
+  <div id="secretPopup" style="position:fixed;right:18px;bottom:92px;width:260px;background:rgba(0,0,0,0.8);border:1px solid rgba(0,255,150,0.12);padding:12px;border-radius:12px;display:none;z-index:60">
+    <div style="color:var(--neon-emerald);font-weight:700;margin-bottom:8px">SECRET — 브로커 전용</div>
+    <div style="color:var(--muted);font-size:13px">이 공간은 raven 전용입니다. 외부 노출 금지.</div>
+    <div style="margin-top:10px">
+      <button id="clipSecret" class="btn micro">클립보드 복사(데모)</button>
     </div>
-  )
-}
+  </div>
 
-// ----- Expanded sample data: 사용자 제출 양식 스타일로 의뢰문을 구체화 -----
-const expandedJobs = [
-  { id: 'H-1001', title: "헬릭스 로그 정리 — '제발 부탁해요'", client: '김. (개인)', reward: 8000, tags: ['clean','forensics'], location: 'Mid-Arcology 3F', difficulty: 'Medium', desc: '"제 실수로 연구소 접속 흔적이 남았어요. 아이들 때문에 소란 피우기 싫습니다. 로그에서 제 흔적을 지워주세요." — 개인 의뢰인', status: 'completed' },
-  { id: 'H-1002', title: "블랙셰도우 잠입 — '가족을 구해주세요'", client: '익명', reward: 15000, tags: ['infiltrate','stealth'], location: 'Lower Docks', difficulty: 'High', desc: '"배송차로 위장해서 구역에 들어가야 합니다. 내부에서 특정 봉투를 회수해야 해요. 치명상은 절대 안 됩니다." — 익명', status: 'completed' },
+  <script>
+    /* ===============================
+       Data (jobs, intel, map, items)
+       =============================== */
+    const SECRET_OWNER = 'raven';
 
-  // 오픈된 의뢰 — 일반인이 남긴 느낌으로 구체화
-  { id: 'J-9001', title: "데이터 스키밍 — 연구소 로그 (긴급)", client: '익명(연구원)', reward: 12000, tags: ['hack','stealth'], location: 'Mid-Arcology 7F', difficulty: 'High', desc: '"저는 해당 연구소의 내부 연구원이지만 내부 고발자입니다. 특정 프로젝트의 로그(2098-09 ~ 2098-11)를 외부로 빼낼 수 있나요? 증거가 필요합니다. 네트워크로 접근 가능하지만 모니터링이 심해요."', status: 'open' },
+    const jobs = [
+      { id: 'H-1001', title: "헬릭스 로그 정리 — '제발 부탁해요'", client: '김. (개인)', reward: 8000, tags: ['clean','forensics'], location: 'Mid-Arcology 3F', difficulty: 'Medium', desc: '"제 실수로 연구소 접속 흔적이 남았어요. 아이들 때문에 소란 피우기 싫습니다. 로그에서 제 흔적을 지워주세요." — 개인 의뢰인', status: 'completed' },
+      { id: 'H-1002', title: "블랙셰도우 잠입 — '가족을 구해주세요'", client: '익명', reward: 15000, tags: ['infiltrate','stealth'], location: 'Lower Docks', difficulty: 'High', desc: '"배송차로 위장해서 구역에 들어가야 합니다. 내부에서 특정 봉투를 회수해야 해요. 치명상은 절대 안 됩니다." — 익명', status: 'completed' },
+      { id: 'J-9001', title: "데이터 스키밍 — 연구소 로그 (긴급)", client: '익명(연구원)', reward: 12000, tags: ['hack','stealth'], location: 'Mid-Arcology 7F', difficulty: 'High', desc: '"저는 해당 연구소의 내부 연구원이지만 내부 고발자입니다. 특정 프로젝트의 로그(2098-09 ~ 2098-11)를 외부로 빼낼 수 있나요? 증거가 필요합니다. 네트워크로 접근 가능하지만 모니터링이 심해요."', status: 'open' },
+      { id: 'J-9002', title: "스페셜 패키지 배달 — '급합니다'", client: '소형 갱', reward: 2300, tags: ['delivery','fast'], location: 'Neon Market, Sector 3', difficulty: 'Low', desc: '"정해진 시간(23:10-23:30)에 A→B 지점으로 패키지 전달. 겉으로 보기엔 음식 배달처럼. 감시가 낮은 시간대입니다. 차량 제공 가능."', status: 'open' },
+      { id: 'J-9003', title: "아이언 포겟 — 표적 회수 (민감)", client: '기업청부', reward: 48000, tags: ['extraction','high-risk'], location: 'Corporate Spire 12', difficulty: 'Very High', desc: '"회사의 내부 컨택에서 표적을 안전하게 데려오길 원함. 비치명적 제압 권장. 경호원 다수, 권한 토큰이 필요할 수도 있음."', status: 'open' },
+      { id: 'J-9101', title: "스마트 센서 교란 — 이벤트", client: '언더넷 포럼', reward: 9000, tags: ['electronic','timing'], location: 'Neon Market', difficulty: 'Medium', desc: '"시장 구역 A의 센서가 30초 동안 멈춰야 합니다. 상인들이 일시적으로 진열을 바꿀 수 있도록 교란 스크립트 배포 필요."', status: 'open' },
+      { id: 'J-9102', title: "은색 패스 위조 — 출입 허가", client: '소매상', reward: 4200, tags: ['forge','low-risk'], location: 'Lower Docks', difficulty: 'Low', desc: '"임시 출입증이 필요합니다. 단기간(4시간) 유효한 출입 패스로, OCR 검증을 우회할 수 있어야 합니다. 사진 및 최소 정보 제공 가능."', status: 'open' },
+      { id: 'J-9201', title: "잃어버린 녹음 회수 — 엄마의 목소리", client: '최. (일반)', reward: 3000, tags: ['recovery','sensitive'], location: 'Old Subway', difficulty: 'Low', desc: '"지하철 폐쇄역 근처에서 녹음파일을 잃어버렸어요. 제게 중요한 대화가 들어있습니다. 데이터 복구가 가능할까요? 플러그나 물리적 접근 둘 다 가능합니다."', status: 'open' },
+    ];
 
-  { id: 'J-9002', title: "스페셜 패키지 배달 — '급합니다'", client: '소형 갱', reward: 2300, tags: ['delivery','fast'], location: 'Neon Market, Sector 3', difficulty: 'Low', desc: '"정해진 시간(23:10-23:30)에 A→B 지점으로 패키지 전달. 겉으로 보기엔 음식 배달처럼. 감시가 낮은 시간대입니다. 차량 제공 가능."', status: 'open' },
+    const intel = [
+      { id: 'I-1', title: '시내 CCTV 루트 재조정', time: '2098-11-18 02:12', trust: 'B+', tag: 'surveillance', body: '중앙 통제실이 새 스케줄을 배포 — 과거 루트와 차이 있음. 야간 패턴 주의.' },
+      { id: 'I-2', title: '블루버드 드론 배치', time: '2098-11-20 21:04', trust: 'A-', tag: 'aerial', body: '특정 구역 상공에 감시 드론이 늘어남. 전자전 장비 보유 가능.' },
+      { id: 'I-3', title: '큐브 노드 재배치', time: '2098-11-21 01:30', trust: 'A', tag: 'network', body: '기업 노드들이 트래픽 우회 경로를 설정 — 특정 구간에 레이턴시 급증.' },
+    ];
 
-  { id: 'J-9003', title: "아이언 포겟 — 표적 회수 (민감)", client: '기업청부', reward: 48000, tags: ['extraction','high-risk'], location: 'Corporate Spire 12', difficulty: 'Very High', desc: '"회사의 내부 컨택에서 표적을 안전하게 데려오길 원함. 비치명적 제압 권장. 경호원 다수, 권한 토큰이 필요할 수도 있음."', status: 'open' },
+    const mapZones = [
+      { id: 'Z-1', name: 'Neon Market', level: 2, hazard: 'medium', desc: '상점과 암시장 혼재. 감시 빈도는 낮음.', key: '후미 골목의 상자 창고 — 교환 포인트' },
+      { id: 'Z-2', name: 'Mid-Arcology', level: 5, hazard: 'high', desc: '고층 연구/기업 구역. 보안 레이어가 빽빽함.', key: '보안 엘리베이터 루트가 핵심' },
+      { id: 'Z-3', name: 'Lower Docks', level: 3, hazard: 'variable', desc: '배후 거래와 소규모 갱 활동. 야간이 활발함.', key: '컨테이너 사이 은밀한 통로' },
+      { id: 'Z-4', name: 'Old Subway', level: 2, hazard: 'low', desc: '인적이 드문 지하 통로 — 전자 감시 구멍이 많음.', key: '폐쇄역 플랫폼 B' },
+      { id: 'Z-5', name: 'Corporate Spire', level: 6, hazard: 'very high', desc: '기업 핵심 구역 — 접근시 허가 필요.', key: '옥상 통신 노드' },
+      { id: 'Z-6', name: 'Ghost Alley', level: 4, hazard: 'extreme', desc: '실종 신고가 반복되는 구역. 전파 간섭 심함.', key: '녹슨 전신주 아래' },
+      { id: 'Z-7', name: 'Chrome Jungles', level: 6, hazard: 'very high', desc: '반금속 생체실험 흔적. 접근 시 신호 왜곡.', key: '폐단지 내부 실험실' },
+    ];
 
-  { id: 'J-9101', title: "스마트 센서 교란 — 이벤트", client: '언더넷 포럼', reward: 9000, tags: ['electronic','timing'], location: 'Neon Market', difficulty: 'Medium', desc: '"시장 구역 A의 센서가 30초 동안 멈춰야 합니다. 상인들이 일시적으로 진열을 바꿀 수 있도록 교란 스크립트 배포 필요."', status: 'open' },
+    const items = [
+      { id: 'IT-1', name: '시그널 스크램블러', desc: '단시간 드론/감시와 통신 차단', price: 1800, stock: 3 },
+      { id: 'IT-2', name: 'Temp ID Chip', desc: '임시 출입증 에뮬레이터', price: 950, stock: 8 },
+      { id: 'IT-3', name: 'EMP 팩(소형)', desc: '전자기 펄스로 장비 마비', price: 4200, stock: 1 },
+    ];
 
-  { id: 'J-9102', title: "은색 패스 위조 — 출입 허가", client: '소매상', reward: 4200, tags: ['forge','low-risk'], location: 'Lower Docks', difficulty: 'Low', desc: '"임시 출입증이 필요합니다. 단기간(4시간) 유효한 출입 패스로, OCR 검증을 우회할 수 있어야 합니다. 사진 및 최소 정보 제공 가능."', status: 'open' },
+    /* ================
+       App State
+       ================ */
+    const state = {
+      wallet: Number(localStorage.getItem('oc_wallet') || 5000),
+      purchases: JSON.parse(localStorage.getItem('oc_purchases') || '[]'),
+      users: JSON.parse(localStorage.getItem('oc_users') || '{}'),
+      logged: JSON.parse(localStorage.getItem('oc_logged') || '{}'),
+      secretUnlocked: false,
+    };
 
-  { id: 'J-9201', title: "잃어버린 녹음 회수 — 엄마의 목소리", client: '최. (일반)', reward: 3000, tags: ['recovery','sensitive'], location: 'Old Subway', difficulty: 'Low', desc: '"지하철 폐쇄역 근처에서 녹음파일을 잃어버렸어요. 제게 중요한 대화가 들어있습니다. 데이터 복구가 가능할까요? 플러그나 물리적 접근 둘 다 가능합니다."', status: 'open' },
-]
+    /* ================
+       Helpers & Rendering
+       ================ */
+    function $(sel){ return document.querySelector(sel) }
+    function $all(sel){ return Array.from(document.querySelectorAll(sel)) }
 
-const expandedIntel = [
-  { id: 'I-1', title: '시내 CCTV 루트 재조정', time: '2098-11-18 02:12', trust: 'B+', tag: 'surveillance', body: '중앙 통제실이 새 스케줄을 배포 — 과거 루트와 차이 있음. 야간 패턴 주의.' },
-  { id: 'I-2', title: '블루버드 드론 배치', time: '2098-11-20 21:04', trust: 'A-', tag: 'aerial', body: '특정 구역 상공에 감시 드론이 늘어남. 전자전 장비 보유 가능.' },
-  { id: 'I-3', title: '큐브 노드 재배치', time: '2098-11-21 01:30', trust: 'A', tag: 'network', body: '기업 노드들이 트래픽 우회 경로를 설정 — 특정 구간에 레이턴시 급증.' },
-]
+    function renderSummary(){
+      $('#completed-count').textContent = jobs.filter(j=>j.status==='completed').length;
+      $('#open-count').textContent = jobs.filter(j=>j.status==='open').length;
+      $('#jobs-count').textContent = jobs.length;
+      $('#wallet').textContent = state.wallet + ' creds';
+      $('#wallet-count').textContent = state.wallet;
+      $('#who').textContent = Object.keys(state.logged).length ? Object.keys(state.logged).join(', ') : '없음';
+      $('#secretState').textContent = state.logged[SECRET_OWNER] ? '열림' : '잠김';
+      renderRecent();
+      renderJobs();
+      renderIntel();
+      renderMap();
+      renderMarket();
+      renderPurchases();
+    }
 
-const expandedMap = [
-  { id: 'Z-1', name: 'Neon Market', level: 2, hazard: 'medium', desc: '상점과 암시장 혼재. 감시 빈도는 낮음.', key: '후미 골목의 상자 창고 — 교환 포인트' },
-  { id: 'Z-2', name: 'Mid-Arcology', level: 5, hazard: 'high', desc: '고층 연구/기업 구역. 보안 레이어가 빽빽함.', key: '보안 엘리베이터 루트가 핵심' },
-  { id: 'Z-3', name: 'Lower Docks', level: 3, hazard: 'variable', desc: '배후 거래와 소규모 갱 활동. 야간이 활발함.', key: '컨테이너 사이 은밀한 통로' },
-  { id: 'Z-4', name: 'Old Subway', level: 2, hazard: 'low', desc: '인적이 드문 지하 통로 — 전자 감시 구멍이 많음.', key: '폐쇄역 플랫폼 B' },
-  { id: 'Z-5', name: 'Corporate Spire', level: 6, hazard: 'very high', desc: '기업 핵심 구역 — 접근시 허가 필요.', key: '옥상 통신 노드' },
-]
+    function renderRecent(){
+      const list = $('#recent-list'); list.innerHTML = '';
+      jobs.slice(0,6).forEach(j=>{
+        const el = document.createElement('div'); el.className='job';
+        el.innerHTML = `<div style="display:flex;justify-content:space-between"><div><div style="font-weight:700">${j.title}</div><div class="meta">${j.location} · 보상: ${j.reward} · 상태: ${j.status}</div></div><div style="font-size:12px;color:var(--muted)">${j.client}</div></div><p style="margin-top:8px;color:var(--muted)">${j.desc}</p>`;
+        list.appendChild(el);
+      });
+    }
 
-const sampleItems = [
-  { id: 'IT-1', name: '시그널 스크램블러', desc: '단시간 드론/감시와 통신 차단', price: 1800, stock: 3 },
-  { id: 'IT-2', name: 'Temp ID Chip', desc: '임시 출입증 에뮬레이터', price: 950, stock: 8 },
-  { id: 'IT-3', name: 'EMP 팩(소형)', desc: '전자기 펄스로 비휘발성 장비 마비', price: 4200, stock: 1 },
-]
+    function renderJobs(filter=''){
+      const list = $('#jobs-list'); list.innerHTML = '';
+      jobs.filter(j=> (j.title + j.tags.join(' ') + j.client + j.status + j.desc).toLowerCase().includes(filter.toLowerCase()))
+      .forEach(j=>{
+        const el = document.createElement('div'); el.className='job';
+        const openBtn = j.status==='open' ? `<button class="btn micro" data-accept="${j.id}">수락</button>` : '';
+        el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700">${j.title}</div><div class="meta">클라이언트: ${j.client} · 보상: ${j.reward} creds · 상태: ${j.status}</div></div><div style="display:flex;flex-direction:column;gap:6px">${openBtn}<button class="btn secondary micro" data-view="${j.id}">보기</button></div></div>`;
+        list.appendChild(el);
+      });
+      $all('button[data-accept]').forEach(b=>b.onclick = async (e)=>{
+        const id = e.currentTarget.dataset.accept;
+        const pw = prompt('암호를 입력하세요 (수신자와 공유)');
+        if(!pw) return;
+        const enc = await encryptAES('Accept:' + id, pw);
+        $('#payload').value = enc;
+        alert('의뢰 수락 메시지(암호화)가 페이로드에 생성되었습니다. Contact 탭에서 복사/전송하세요.');
+        setView('contact');
+      });
+      $all('button[data-view]').forEach(b=>b.onclick = (e)=>{
+        const id = e.currentTarget.dataset.view;
+        const j = jobs.find(x=>x.id===id);
+        if(!j) return;
+        alert(`${j.title}\n\n${j.desc}\n\n위치: ${j.location}\n난이도: ${j.difficulty}\n상태: ${j.status}`);
+      });
+    }
 
-/*
-Deployment guide (간단 요약)
-1) Vite + React 설치 (추천):
-   - npm create vite@latest overcity -- --template react
-   - cd overcity && npm install
-   - Tailwind 설정: tailwindcss init + postcss + autoprefixer, index.css에 Tailwind 지시문 추가
-   - npm install framer-motion lucide-react
-2) 파일 복사: 이 파일을 src/OverCityApp.jsx 로 저장 후 App.jsx에서 import
-3) 빌드/배포: npm run build -> Netlify/Cloudflare Pages에 배포
+    function renderIntel(){
+      const list = $('#intel-list'); list.innerHTML = '';
+      intel.forEach(i=>{
+        const el = document.createElement('div'); el.className='job';
+        el.innerHTML = `<div style="font-weight:700">${i.title}</div><div class="meta">${i.time} · 신뢰도: ${i.trust}</div><p style="margin-top:8px;color:var(--muted)">${i.body}</p>`;
+        list.appendChild(el);
+      });
+    }
 
-Backend API notes (간단 스펙)
-- POST /api/register { user } -> returns salt and server-side hash storage (server should never accept plain passwords)
-- POST /api/login { user, proof } -> returns JWT
-- GET /api/jobs -> returns list of jobs (with fields id,title,desc,client,reward,status)
-- POST /api/jobs -> create new job (authenticated)
-- POST /api/purchase -> charge and record purchase (authenticated)
+    function renderMap(){
+      const grid = $('#map-grid'); grid.innerHTML = '';
+      mapZones.forEach(z=>{
+        const el = document.createElement('div'); el.className='zone';
+        el.innerHTML = `<div style="font-weight:700">${z.name}</div><div class="meta">레벨: ${z.level} · 주의: ${z.hazard}</div><div class="key">${z.desc}</div><div class="tag">${z.key || ''}</div>`;
+        el.onmouseenter = (ev)=>showTip(ev.target, `<strong>${z.name}</strong><br/>${z.desc}<br/><span style='color:var(--muted)'>핵심: ${z.key || 'N/A'}</span>`);
+        el.onmouseleave = hideTip;
+        grid.appendChild(el);
+      });
+    }
 
-보안 권장사항: 서버 측에서 password hashing(scrypt/argon2), rate-limiting, TLS, HSM/Key management 적용
-*/
+    function renderMarket(){
+      const m = $('#market'); m.innerHTML = '';
+      items.forEach(it=>{
+        const el = document.createElement('div'); el.className = 'item';
+        el.innerHTML = `<div><div style="font-weight:700">${it.name}</div><div class="meta">${it.desc}</div><div class="meta">재고: ${it.stock}</div></div><div style="text-align:right"><div style="font-weight:700">${it.price} creds</div><div style="margin-top:8px"><button ${it.stock<=0?'disabled':''} class="btn micro" data-buy="${it.id}">구매</button></div></div>`;
+        m.appendChild(el);
+      });
+      $all('button[data-buy]').forEach(b=>b.onclick = (e)=>{
+        const id = e.currentTarget.dataset.buy;
+        buyItem(id);
+      });
+    }
+
+    function renderPurchases(){
+      const el = $('#purchases');
+      if(state.purchases.length===0) el.textContent='없음';
+      else el.innerHTML = state.purchases.slice(-6).map(p=>`<div>${new Date(p.time).toLocaleString()} — ${p.name}</div>`).join('');
+    }
+
+    /* tooltip logic */
+    let tipEl;
+    function showTip(target, html){
+      hideTip();
+      tipEl = document.createElement('div'); tipEl.className='tooltip'; tipEl.innerHTML = html;
+      document.body.appendChild(tipEl);
+      const r = target.getBoundingClientRect();
+      tipEl.style.left = (r.left + window.scrollX) + 'px';
+      tipEl.style.top = (r.top + window.scrollY - tipEl.offsetHeight - 10) + 'px';
+    }
+    function hideTip(){ if(tipEl){ tipEl.remove(); tipEl=null } }
+
+    /* ================
+       Actions
+       ================ */
+    function setView(id){
+      ['#home','#jobs','#intel','#map','#contact'].forEach(s => {
+        const el = document.querySelector(s);
+        if(!el) return;
+        el.style.display = (s === '#' + id) ? '' : 'none';
+      });
+      // highlight nav
+      $all('nav .nav-btn').forEach(b => {
+        b.style.opacity = b.dataset.target === id ? '1' : '0.8';
+      });
+    }
+
+    $all('nav .nav-btn').forEach(b=>{
+      b.onclick = ()=>setView(b.dataset.target);
+    });
+
+    $('#postJob').onclick = ()=>{
+      const title = prompt('의뢰 제목을 입력하세요');
+      const desc = prompt('의뢰 상세를 입력하세요 (일반인처럼 작성)') || '';
+      const reward = Number(prompt('보상 크레딧 (숫자)') || 1000);
+      if(!title) return alert('제목 필요');
+      const id = 'U-' + Math.floor(Math.random()*90000 + 10000);
+      jobs.unshift({ id, title, client:'웹 의뢰자', reward, tags:['user'], location:'유저 지정', difficulty:'Var', desc, status:'open' });
+      alert('의뢰가 등록되었습니다. Jobs 탭에서 확인하세요.');
+      renderSummary();
+      setView('jobs');
+    };
+
+    $('#refreshJobs').onclick = ()=>renderJobs($('#job-search').value);
+
+    $('#job-search').addEventListener('input', ()=>renderJobs($('#job-search').value));
+
+    /* ================
+       Buy item
+       ================ */
+    function buyItem(id){
+      const it = items.find(x=>x.id===id);
+      if(!it) return;
+      if(state.wallet < it.price) return alert('잔액 부족');
+      it.stock -= 1;
+      state.wallet -= it.price;
+      state.purchases.push({ id: it.id, name: it.name, time: Date.now() });
+      localStorage.setItem('oc_purchases', JSON.stringify(state.purchases));
+      localStorage.setItem('oc_wallet', String(state.wallet));
+      alert(`${it.name} 구매 완료`);
+      renderSummary();
+    }
+
+    /* ================
+       Encryption (AES-GCM w/ PBKDF2)
+       ================ */
+    async function deriveKey(password, saltBytes){
+      const enc = new TextEncoder();
+      const baseKey = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+      const key = await crypto.subtle.deriveKey({ name:'PBKDF2', salt: saltBytes, iterations: 200000, hash:'SHA-256' }, baseKey, { name:'AES-GCM', length: 256 }, false, ['encrypt','decrypt']);
+      return key;
+    }
+
+    async function encryptAES(plaintext, password){
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const key = await deriveKey(password, salt);
+      const enc = new TextEncoder();
+      const cipher = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, key, enc.encode(plaintext));
+      return btoa(JSON.stringify({ salt:Array.from(salt), iv:Array.from(iv), data:Array.from(new Uint8Array(cipher)) }));
+    }
+
+    async function decryptAES(packB64, password){
+      try{
+        const pack = JSON.parse(atob(packB64));
+        const salt = new Uint8Array(pack.salt);
+        const iv = new Uint8Array(pack.iv);
+        const data = new Uint8Array(pack.data);
+        const key = await deriveKey(password, salt);
+        const plain = await crypto.subtle.decrypt({ name:'AES-GCM', iv }, key, data);
+        return new TextDecoder().decode(plain);
+      }catch(e){
+        return null;
+      }
+    }
+
+    $('#encryptBtn').onclick = async ()=>{
+      const text = $('#payload').value || 'ping';
+      const pw = prompt('암호 입력 (수신자와 공유하세요)');
+      if(!pw) return;
+      const enc = await encryptAES(text, pw);
+      try{ await navigator.clipboard.writeText(enc); alert('암호화된 페이로드가 클립보드에 복사되었습니다.'); }catch(e){ alert('암호화 결과:\n' + enc) }
+    };
+
+    $('#decryptBtn').onclick = async ()=>{
+      const pack = prompt('복호화할 페이로드 붙여넣기 (base64) — 취소하면 현재 페이로드 사용');
+      const p = pack || $('#payload').value;
+      if(!p) return;
+      const pw = prompt('암호 입력');
+      if(!pw) return;
+      const dec = await decryptAES(p, pw);
+      if(dec === null) alert('복호화 실패 — 비밀번호/페이로드 확인');
+      else{ $('#payload').value = dec; alert('복호화 완료 — 페이로드에 내용이 채워졌습니다.') }
+    };
+
+    $('#clearPayload').onclick = ()=>$('#payload').value='';
+
+    /* ================
+       Broker register/login (local hashed store)
+       ================ */
+    async function hashPassword(password, saltBytes){
+      const enc = new TextEncoder();
+      const baseKey = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+      const derived = await crypto.subtle.deriveBits({ name:'PBKDF2', salt: saltBytes, iterations: 200000, hash:'SHA-256' }, baseKey, 256);
+      return btoa(String.fromCharCode(...new Uint8Array(derived)));
+    }
+
+    async function registerBroker(name, password){
+      if(!name || !password) return false;
+      if(state.users[name]) return false;
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const h = await hashPassword(password, salt);
+      state.users[name] = { salt:Array.from(salt), hash:h, created: Date.now() };
+      localStorage.setItem('oc_users', JSON.stringify(state.users));
+      return true;
+    }
+
+    async function verifyBroker(name, password){
+      const rec = state.users[name];
+      if(!rec) return false;
+      const salt = new Uint8Array(rec.salt);
+      const h = await hashPassword(password, salt);
+      return h === rec.hash;
+    }
+
+    $('#loginBtn').onclick = async ()=>{
+      const mode = prompt('로그인 또는 등록 (type: login / register)').trim();
+      if(mode === 'register'){
+        const u = prompt('등록할 브로커 ID (예: raven)'); if(!u) return alert('ID 필요');
+        const p = prompt('패스워드'); if(!p) return alert('PW 필요');
+        const ok = await registerBroker(u,p);
+        alert(ok? '등록 성공 (로컬 저장)' : '등록 실패 (이미 존재)');
+        renderSummary();
+        return;
+      }
+      const u = prompt('브로커 ID'); if(!u) return;
+      const p = prompt('패스워드'); if(!p) return;
+      const ok = await verifyBroker(u,p);
+      if(ok){
+        const token = await encryptAES(JSON.stringify({ user:u, ts:Date.now() }), p);
+        state.logged[u] = token;
+        localStorage.setItem('oc_logged', JSON.stringify(state.logged));
+        alert('로그인 성공');
+        if(u === SECRET_OWNER){
+          state.secretUnlocked = true;
+          $('#secretPopup').style.display = '';
+        }
+        renderSummary();
+      }else alert('로그인 실패');
+    };
+
+    $('#clipSecret').onclick = ()=>{
+      navigator.clipboard?.writeText(JSON.stringify({ vault:'protocol-keys', time:Date.now() })).then(()=>alert('데모 비밀이 클립보드에 복사되었습니다.'));
+    };
+
+    /* ================
+       Secret popup reveal on login
+       ================ */
+    if(state.logged[SECRET_OWNER]) {
+      state.secretUnlocked = true;
+      $('#secretPopup').style.display = '';
+    }
+
+    /* ================
+       Easter egg button
+       ================ */
+    $('#eggBtn').onclick = ()=> {
+      alert('Easter Egg: 시스템 내부 레이어 접근 권한 부족 — (데모)');
+      // playful fake effect: toggle small glitch intensity
+      const r = $('#glitchRange');
+      r.value = Math.min(6, Number(r.value) + 2);
+      applyGlitchStrength(r.value);
+    };
+
+    $('#showDev').onclick = ()=>{
+      alert('Dev Easter: 저장된 브로커 목록과 로그인 토큰을 콘솔로 출력합니다.');
+      console.log('users', state.users);
+      console.log('logged', state.logged);
+      alert('콘솔을 확인하세요.');
+    };
+
+    /* ================
+       Sound (low hum)
+       ================ */
+    let audioCtx, osc, gain;
+    let playing = false;
+    $('#soundToggle').onclick = ()=>{
+      if(!playing){
+        try{
+          audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+          osc = audioCtx.createOscillator();
+          gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = 40;
+          gain.gain.value = 0.004;
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          playing = true;
+          $('#soundToggle').textContent = '사운드 (ON)';
+        }catch(e){ alert('사운드 시작 실패 — 일부 브라우저는 사용자 상호작용 필요') }
+      } else {
+        if(osc){ try{ osc.stop(); }catch(e){} }
+        playing = false;
+        $('#soundToggle').textContent = '사운드';
+      }
+    };
+
+    /* ================
+       Glitch strength control
+       ================ */
+    function applyGlitchStrength(v){
+      // map 0..6 -> px
+      const px = (v * 1.2).toFixed(2) + 'px';
+      document.documentElement.style.setProperty('--glitch-x', px);
+      document.documentElement.style.setProperty('--glitch-y', (v>2? -1*v/2 : -1) + 'px');
+      // and alter speed
+      const speed = 1200 + (6 - v) * 600;
+      document.documentElement.style.setProperty('--glitch-speed', speed + 'ms');
+    }
+    $('#glitchRange').addEventListener('input', (e)=>{ applyGlitchStrength(e.target.value) });
+
+    /* initialize */
+    applyGlitchStrength($('#glitchRange').value);
+    renderSummary();
+
+    /* small UX: switch view on load */
+    setView('home');
+
+    /* expose for debugging (optional) */
+    window._oc = { jobs, intel, mapZones, items, state, encryptAES, decryptAES };
+  </script>
+</body>
+</html>
