@@ -9,7 +9,7 @@
 /* ---------------------- GLOBAL ---------------------- */
 body {
     margin: 0;
-    font-family: 'Malgun Gothic', sans-serif;
+    font-family: 'Gowun Dodum', sans-serif;
     background: linear-gradient(135deg, #200a68, #000000, #4b62ca);
     background-size: 300% 300%;
     animation: bgShift 12s ease infinite;
@@ -109,7 +109,7 @@ section {
     border: 1px solid #ff00f7;
     margin: 8px 0;
     border-radius: 5px;
-    font-family: Consolas;
+    font-family: 'Gowun Dodum', sans-serif;
     color: #ffbfff;
     transition: all 0.25s ease;
     cursor: pointer;
@@ -358,8 +358,17 @@ html, body {
     100% { transform: translate(-51%, -48%) scale(1); filter: blur(3px); }
 }
 
+body {
+  font-family: "Gowun Dodum", sans-serif;
+}
+
 
 </style>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap');
+</style>
+
 </head>
 
 <body>
@@ -403,7 +412,7 @@ html, body {
         </div>
         <div class="staff-card" onclick="openStaff('gw2')">
             <h3>PORTRIFT-42</h3>
-            <p>데이터 운반과 감시망 우회 담당</p>
+            <p>데이터 운반과 감시망 우회</p>
         </div>
         <div class="staff-card" onclick="openStaff('gw3')">
             <h3>SPECTRENODE-A</h3>
@@ -627,10 +636,10 @@ function openFile(id){
     const file = filesData[id];
 
     content.innerHTML = `
-        <p style="color:#00ffe1; font-family:Consolas;">
+        <p style="color:#00ffe1; font-family:'Gowun Dodum', sans-serif;">
             [DECRYPTING FILE–${id}…]
         </p>
-        <p style="color:#ffaa00; font-family:Consolas;">■■■□□ 43%</p>
+        <p style="color:#ffaa00; font-family:'Gowun Dodum', sans-serif;">■■■□□ 43%</p>
     `;
     popup.style.display = "flex";
 
@@ -755,7 +764,7 @@ function sendRequest(){
       border: 1px solid #ff66ff;
       transform: rotate(10deg);
       color: white;
-      font-family: Consolas;
+      font-family: 'Gowun Dodum';
       text-shadow: 0 0 4px #ff00ff;
     }
     
@@ -832,7 +841,7 @@ function sendRequest(){
 
 body {
     margin: 0;
-    font-family: 'Malgun Gothic', sans-serif;
+    font-family: 'Gowun Dodum', sans-serif;
     background-image: url("/mnt/data/A_digital_illustration_in_a_cyberpunk_art_style_de.png");
     background-size: cover;           /* 화면 전체에 꽉 차게 */
     background-position: center;      /* 중앙 정렬 */
@@ -851,7 +860,7 @@ body {
 body {
   background: #000;
   color: #fff;
-  font-family: "Roboto", sans-serif;
+  font-family: "Gowun Dodum", sans-serif;
   height: 200vh; /* 스크롤 가능하게 */
 }
 
@@ -922,7 +931,7 @@ body {
 .overlay-text {
   text-align: center;
   color: cyan;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Gowun Dodum', sans-serif;
   animation: neonFlicker 2.5s infinite;
   text-shadow:
     0 0 5px cyan,
@@ -960,6 +969,48 @@ body {
   }
 }
 
+.rain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.raindrop {
+  position: absolute;
+  width: 1px;
+  height: 80px;
+  background: rgba(0, 255, 255, 0.5); /* 사이버펑크 네온 청록 */
+  filter: blur(1px);
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh);
+  }
+}
+
+::selection {
+  background: white;
+  color: black;
+}
+
+/* Firefox 전용 */
+::-moz-selection {
+  background: white;
+  color: black;
+}
+
+.gowun-dodum-regular {
+  font-family: "Gowun Dodum", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
 
     </style>
     
@@ -968,7 +1019,7 @@ body {
     <!-- SECRET FILE POPUP TEMPLATE -->
     <!-- =========================== -->
     <div id="secret-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.88); justify-content:center; align-items:center; z-index:99999;">
-      <div id="secret-content" class="secret-popup" style="background:rgba(40,0,50,0.9); padding:25px; border:2px solid #ff00ff; width:50%; border-radius:10px; text-align:center; color:white; font-family:Consolas;"></div>
+      <div id="secret-content" class="secret-popup" style="background:rgba(40,0,50,0.9); padding:25px; border:2px solid #ff00ff; width:50%; border-radius:10px; text-align:center; color:white; font-family:Gowun Dodum;"></div>
     </div>
     
     <script>
@@ -1061,6 +1112,25 @@ window.addEventListener("scroll", () => {
     </div>
 
 <div class="key-btn" onclick="nav('hero', this)">HOME</div>
+
+<div class="rain"></div>
+
+<script>
+  const rainContainer = document.querySelector('.rain');
+
+  for (let i = 0; i < 120; i++) {  // 빗줄기 개수 조절
+    const drop = document.createElement('div');
+    drop.classList.add('raindrop');
+    
+    drop.style.left = Math.random() * 100 + "vw";
+    drop.style.animationDuration = (Math.random() * 0.5 + 0.5) + "s";
+    drop.style.animationDelay = Math.random() * 5 + "s";
+    drop.style.opacity = Math.random();
+
+    rainContainer.appendChild(drop);
+  }
+</script>
+
 
 </body>
 </html>
