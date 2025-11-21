@@ -82,6 +82,7 @@ section {
     100% { box-shadow: 0 0 8px #ff00f7; }
 }
 
+/* ---------------------- STAFF ---------------------- */
 .staff-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -97,6 +98,7 @@ section {
     cursor: pointer;
 }
 
+/* ---------------------- FILES ---------------------- */
 .file-item {
     position: relative;
     overflow: hidden;
@@ -143,6 +145,7 @@ section {
   animation: glitch 1s infinite;
 }
 
+/* ---------------------- MAP ---------------------- */
 .map-grid {
     display: grid;
     grid-template-columns: repeat(6, 40px);
@@ -161,6 +164,7 @@ section {
 
 #map-info { margin-top: 20px; color: #ffb4ff; }
 
+/* ---------------------- REQUEST ---------------------- */
 textarea, input {
     width: 100%;
     padding: 12px;
@@ -189,6 +193,7 @@ button:active {
     transition: 0.1s;
 }
 
+/* ---------------------- POPUP ---------------------- */
 #staff-popup, #file-popup {
     display:none;
     position:fixed;
@@ -217,6 +222,7 @@ button:active {
     100% { text-shadow: 2px -2px #ff00f7; }
 }
 
+/* ---------------------- EFFECTS ---------------------- */
 span[style*="#55ff77"] { animation: pulse 1.6s infinite; }
 @keyframes pulse {
   0% { text-shadow: 0 0 2px #55ff77; }
@@ -325,10 +331,12 @@ body{
     }
 }
 
+/* 진짜 커서 숨기기 */
 html, body {
     cursor: none;
 }
 
+/* 글리치 덩어리 커서 */
 #glitchCursor {
     position: fixed;
     width: 24px;
@@ -352,6 +360,7 @@ body {
   font-family: "Gowun Dodum", sans-serif;
 }
 
+
 </style>
 
 <style>
@@ -368,7 +377,10 @@ body {
 
     <audio id="hover-sound" src="hover.mp3" preload="auto"></audio>
     <audio id="glitch-sound" src="glitch.mp3" preload="auto"></audio>
-
+    
+<!-- =========================== -->
+<!-- KEYCARD FIXED MENU -->
+<!-- =========================== -->
 <div id="keycard-menu">
     <div class="key-btn" onclick="nav('hero')">HOME</div>
     <div class="key-btn" onclick="nav('staff')">STAFF</div>
@@ -377,12 +389,18 @@ body {
     <div class="key-btn" onclick="nav('map')">MAP</div>
 </div>
 
+<!-- =========================== -->
+<!-- HERO -->
+<!-- =========================== -->
 <section id="hero">
     <h1 class="neon">A shadow broker's office</h1>
     <p>도시의 가장 어두운 틈에서 움직이는 그림자 브로커 사무소.</p>
     <p>우리는 감시망 아래서 포착되지 않는 일을 처리한다.</p>
 </section>
 
+<!-- =========================== -->
+<!-- STAFF -->
+<!-- =========================== -->
 <section id="staff">
     <h1 class="neon">STAFF — CODENAMES</h1>
     <div class="panel staff-grid">
@@ -401,10 +419,14 @@ body {
     </div>
 </section>
 
+<!-- STAFF POPUP -->
 <div id="staff-popup" onclick="closeStaff()">
     <div id="staff-data"></div>
 </div>
 
+<!-- =========================== -->
+<!-- REQUEST -->
+<!-- =========================== -->
 <section id="request">
     <h1 class="neon">의뢰 접수 시스템</h1>
     <div class="panel">
@@ -415,14 +437,20 @@ body {
     </div>
 </section>
 
+
+<!-- =========================== -->
+<!-- FILES -->
+<!-- =========================== -->
 <section id="files">
     <h1 class="neon">Encrypted Files</h1>
     <div class="panel" id="files-list">
 
         <section id="files">
-            <h1 class="neon">Encrypted Files</h1>
             <div class="panel" id="files-list">
-
+        
+                <!-- 기존 파일들... -->
+        
+                <!-- ⭐ 여기 넣기 -->
                 <div class="file-item secret-file" onclick="openSecret('Z-SHADOW')">
                     <strong>[FILE–Z-SHADOW]</strong><br>
                     <span>비공개 의뢰 — 섀도우 프로토콜</span><br>
@@ -433,6 +461,7 @@ body {
             </div>
         </section>
         
+
         <div class="file-item" onclick="openFile('K584')">
             <strong>[FILE–K584]</strong><br>
             <span>제목: 존재하되 존재하지 않는 자</span><br>
@@ -451,7 +480,7 @@ body {
             <strong>[FILE–N777]</strong><br>
             <span>제목: 네온 신호 탈취 사건</span><br>
             <span>의뢰자: <b>PULSEWALKER-Δ13</b></span><br>
-            <span>상태: <span style="color:#55ff77">SUCCESS</span></span>
+            <span>상태: <span style="color:#ffaa00">PENDING</span></span>
         </div>
 
         <div class="file-item" onclick="openFile('H021')">
@@ -465,22 +494,28 @@ body {
             <strong>[FILE–R530]</strong><br>
             <span>제목: 검은 연기의 경로</span><br>
             <span>의뢰자: <b>???</b></span><br>
-            <span>상태: <span style="color: #55ff77;">SUCCESS</span></span>
+            <span>상태: <span style="color:#55ff77;">SUCCESS</span></span>
         </div>
 
         <div class="file-item" onclick="openFile('X002')">
             <strong>[FILE–X002]</strong><br>
             <span>제목: 사고 원점 추적</span><br>
             <span>의뢰자: <b>???</b></span><br>
-            <span>상태: <span style="color: #ffaa00;">PENDING</span></span>
+            <span>상태: <span style="color:#ffaa00;">PENDING</span></span>
         </div>
 
         <div class="file-item" onclick="openFile('V913')">
             <strong>[FILE–V913]</strong><br>
             <span>제목: 합성 기억 제조 공정 추적</span><br>
             <span>의뢰자: <b>???</b></span><br>
-            <span>상태: <span style="color: #ff0033;">FAILED</span></span>
+            <span>상태: <span style="color:#ff0033;">FAILED</span></span>
         </div>
+
+        <div class="file-item" onclick="openFile('D404')">
+            <strong>[FILE–D404]</strong><br>
+            <span>제목: 존재할 수 없는 존재</span><br>
+            <span>의뢰자: <b>???</b></span><br>
+            <span>상태: <span style="color:#ff0033;">FAILED</span></span>
 
         <div class="file-item hidden-file" id="hidden-file" onclick="openFile('Z0??')">
             <strong>[FILE–Z0??]</strong><br>
@@ -489,13 +524,18 @@ body {
             <span>상태: <span style="color:#ff00ff">?????</span></span>
         </div>
         
+
     </div>
 </section>
 
+<!-- FILE POPUP -->
 <div id="file-popup" onclick="closeFile()">
     <div id="file-data"></div>
 </div>
 
+<!-- =========================== -->
+<!-- MAP -->
+<!-- =========================== -->
 <section id="map">
     <h1 class="neon">Back Alley Sector Map</h1>
     <div class="panel">
@@ -511,14 +551,20 @@ body {
   </div>
 </section>
 
-<script>
 
+<script>
+// ===========================
+// NAVIGATION
+// ===========================
 function nav(id){
     document.getElementById(id).scrollIntoView({ behavior: "smooth" });
     document.querySelectorAll(".key-btn").forEach(btn => btn.classList.remove("active"));
     event.target.classList.add("active");
 }
 
+// ===========================
+// STAFF POPUP
+// ===========================
 const staffProfiles = {
     gw1: {name:"GHOSTWIRE-01", role:"Memory Hacker", description:"데이터를 훔치고, 기억 흔적을 조작하는 전문가."},
     gw2: {name:"GHOSTWIRE-02", role:"Trace Cleaner", description:"모든 로그와 흔적을 지우는 침묵의 그림자."},
@@ -534,6 +580,12 @@ function openStaff(id){
 }
 function closeStaff(){ document.getElementById("staff-popup").style.display="none"; }
 
+// ===========================
+// FILE POPUP
+// ===========================
+/* ===========================
+   ENCRYPTED FILES — NEW DATA
+   =========================== */
    const filesData = {
     "K584": {
         title: "존재하되 존재하지 않는 자",
@@ -606,6 +658,9 @@ function openFile(id){
 }
 function closeFile(){ document.getElementById("file-popup").style.display="none"; }
 
+// ===========================
+// MAP GRID & PUZZLE
+// ===========================
 const mapGrid = document.getElementById("map-grid");
 const mapInfo = document.getElementById("map-info");
 let selectionSequence = [];
@@ -623,7 +678,7 @@ function selectMap(i){
                       "C1 - 신원 세탁소","C2 - 비인가 드론 정비소","C3 - 폐기 신경 임플란트 상점","C4 - 암호화 화폐 환전소","C5 - 비밀 정보 중개소","C6 - 그림자 네트워크 노드",
                       "D1 - 불법 감시 장비 상점","D2 - 기억 칩 리퍼브 샵","D3 - 신경 인터페이스 바이어스 포인트","D4 - 데이터 브로커 연락처","D5 - 암호화 메시지 릴레이","D6 - 비인가 사이버웨어 딜러",
                       "E1 - 폐기 전자 부품 시장","E2 - 신원 위장 서비스","E3 - 불법 소프트웨어 유통점","E4 - 기억 삭제 서비스","E5 - 암호화 통신 장비 상점","E6 - 그림자 브로커 지점",
-                      "F1 - 비밀 거래 장소","F2 - 불법 네트워크 접속점","F3 - 신경 링크 업그레이드 샵","F4 - 데이터 복구 서비스","F5 - 암호화 화폐 채굴장","F6 - 미확인 구역"];
+                      "F1 - 비밀 거래 장소","F2 - 불법 네트워크 접속점","F3 - 신경 링크 업그레이드 샵","F4 - 데이터 복구 서비스","F5 - 암호화 화폐 채굴장","F6 - 폐기 사이버웨어 시장"];
     mapInfo.innerText = infoList[i] || "미확인 구역";
 
     selectionSequence.push(i);
@@ -635,6 +690,9 @@ function selectMap(i){
     }
 }
 
+// ===========================
+// REQUEST TERMINAL
+// ===========================
 function sendRequest(){
     const input = document.getElementById("request-input").value.trim();
     const output = document.getElementById("terminal-output");
@@ -642,13 +700,66 @@ function sendRequest(){
     output.innerHTML = `<p style="color:#55ff77">[TERMINAL] 암호화된 요청이 전송되었습니다.</p>`;
     document.getElementById("request-input").value="";
 }
+
+// filesData 그대로 유지하면서 아래 코드 추가
+function generateFileID() {
+    return "U" + Math.floor(100 + Math.random() * 900); // U234 형식
+}
+
+function sendRequest() {
+    const name = document.getElementById('request-input').value.trim();
+    const content = document.getElementById('request-content').value.trim();
+    const output = document.getElementById('terminal-output');
+
+    if (!name || !content) {
+        output.innerHTML = "<span style='color:#ff5555'>[ERROR] 모든 필드를 입력하세요.</span>";
+        return;
+    }
+
+    // 파일 ID 자동 생성
+    const newID = generateFileID();
+
+    // filesData에 새 데이터 추가
+    filesData[newID] = {
+        title: `사용자 의뢰 — ${name}`,
+        content: content,
+        status: "RECEIVED"
+    };
+
+    // FILES 섹션에 새로운 file-item 생성
+    const filesList = document.getElementById("files-list");
+    const newFile = document.createElement("div");
+    newFile.className = "file-item";
+    newFile.innerHTML = `
+        <strong>[FILE–${newID}]</strong><br>
+        <span>의뢰자: <b>${name}</b></span><br>
+        <span>상태: <span style="color:#ffaa00">RECEIVED</span></span>
+    `;
+    newFile.onclick = () => openFile(newID);
+    filesList.prepend(newFile); // 최신 의뢰가 위로 올라오게
+
+    // 터미널 효과 출력
+    output.innerHTML = `<span style="color:#55ff77">[SUCCESS] 의뢰가 접수되었습니다 — FILE–${newID}</span>`;
+
+    // 입력창 초기화
+    document.getElementById('request-input').value = "";
+    document.getElementById('request-content').value = "";
+}
+
+
 </script>
 
 <canvas id="neonFog"></canvas>
 
+<!-- =========================== -->
+<!-- SECRET REQUEST INTERFACE MODULE -->
+<!-- (독립 모듈 형태로 삽입 가능) -->
+<!-- =========================== -->
 
 <style>
-    
+    /* =========================== */
+    /* STATUS-BASED FILE EFFECTS   */
+    /* =========================== */
     .file-success {
       border-color: #55ff77;
       animation: successScan 2.2s linear infinite;
@@ -729,7 +840,10 @@ function sendRequest(){
       50% { opacity: .25; }
       100% { opacity: .1; }
     }
-
+    
+    /* =========================== */
+    /* SECRET POPUP EFFECT         */
+    /* =========================== */
     .secret-popup {
       animation: secretReveal 0.7s ease forwards;
     }
@@ -738,7 +852,8 @@ function sendRequest(){
       40% { filter: blur(4px) brightness(0.6); opacity: .5; }
       100% { filter: blur(0) brightness(1); opacity: 1; }
     }
-
+    
+    /* Glitchy title */
     .secret-title {
       font-size: 1.6em;
       color: #ff66ff;
@@ -750,10 +865,12 @@ function sendRequest(){
       100% { text-shadow: 2px 1px #ff00ff, -2px -1px #00ffff; }
     }
 
+    /* 모든 요소 기본 커서 제거 */
 * {
     cursor: none !important;
 }
 
+/* 글리치 커서 */
 #glitchCursor {
     position: fixed;
     width: 24px;
@@ -777,11 +894,11 @@ body {
     margin: 0;
     font-family: 'Gowun Dodum', sans-serif;
     background-image: url("/mnt/data/A_digital_illustration_in_a_cyberpunk_art_style_de.png");
-    background-size: cover;  
-    background-position: center;  
-    background-repeat: no-repeat;    
-    background-attachment: fixed;  
-    background-color: #081026;       
+    background-size: cover;           /* 화면 전체에 꽉 차게 */
+    background-position: center;      /* 중앙 정렬 */
+    background-repeat: no-repeat;     /* 반복 안함 */
+    background-attachment: fixed;     /* 스크롤해도 고정된 배경 */
+    background-color: #081026;        /* 로딩 전에 어두운 색 */
     color: white;
   }
 
@@ -795,9 +912,10 @@ body {
   background: #000;
   color: #fff;
   font-family: "Gowun Dodum", sans-serif;
-  height: 200vh;
+  height: 200vh; /* 스크롤 가능하게 */
 }
 
+/* 비 효과 Canvas */
 #rain {
   position: fixed;
   top: 0;
@@ -808,6 +926,7 @@ body {
   z-index: 10;
 }
 
+/* 첫 화면 */
 .hero {
   height: 100vh;
   display: flex;
@@ -825,6 +944,7 @@ body {
   text-shadow: 0 0 15px #0ff;
 }
 
+/* 도시 섹션 */
 .city {
   height: 100vh;
   background: url('cyberpunk-city.jpg') center/cover no-repeat fixed;
@@ -839,6 +959,7 @@ body {
     pointer-events: none;
     z-index: -1;
 
+    /* 기본 색 */
     background: linear-gradient(135deg, #220044, #000000);
     mix-blend-mode: screen;
     opacity: 0.55;
@@ -846,7 +967,7 @@ body {
 }
 
 .parallax {
-  background-image: url('/mnt/data/IMG_0671.jpeg');
+  background-image: url('/mnt/data/IMG_0671.jpeg'); /* 이미지 경로 */
   height: 600px;
   background-attachment: fixed;
   background-position: center;
@@ -882,6 +1003,7 @@ body {
   margin-top: 10px;
 }
 
+/* 네온 깜빡임 효과 */
 @keyframes neonFlicker {
   0%, 18%, 22%, 25%, 53%, 57%, 100% {
     opacity: 1;
@@ -912,7 +1034,7 @@ body {
   position: absolute;
   width: 1px;
   height: 80px;
-  background: rgba(0, 255, 255, 0.5);
+  background: rgba(0, 255, 255, 0.5); /* 사이버펑크 네온 청록 */
   filter: blur(1px);
   animation: fall linear infinite;
 }
@@ -928,6 +1050,7 @@ body {
   color: black;
 }
 
+/* Firefox 전용 */
 ::-moz-selection {
   background: white;
   color: black;
@@ -939,14 +1062,21 @@ body {
   font-style: normal;
 }
 
+
     </style>
     
+    
+    <!-- =========================== -->
+    <!-- SECRET FILE POPUP TEMPLATE -->
+    <!-- =========================== -->
     <div id="secret-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.88); justify-content:center; align-items:center; z-index:99999;">
       <div id="secret-content" class="secret-popup" style="background:rgba(40,0,50,0.9); padding:25px; border:2px solid #ff00ff; width:50%; border-radius:10px; text-align:center; color:white; font-family:Gowun Dodum;"></div>
     </div>
     
     <script>
-
+    /* =========================== */
+    /* SECRET FILE DATA TEMPLATE  */
+    /* =========================== */
     const secretFiles = {
       "Z-SHADOW": {
         title: "비공개 의뢰 — 섀도우 프로토콜",
@@ -954,7 +1084,10 @@ body {
         status: "CLASSIFIED"
       }
     };
-
+    
+    /* =========================== */
+    /* SECRET FILE POPUP FUNCTION */
+    /* =========================== */
     function openSecret(id){
       const data = secretFiles[id];
       const popup = document.getElementById("secret-popup");
@@ -1000,21 +1133,25 @@ function nav(id, el){
     el.classList.add("active");
 }
 
+// ===========================
+// SCROLL-BASED BACKGROUND COLOR SHIFT
+// ===========================
 window.addEventListener("scroll", () => {
     const scrollRatio = window.scrollY / (document.body.scrollHeight - window.innerHeight);
 
     // 0 ~ 1 사이 값
-    const r1 = Math.floor(20 + scrollRatio * 120);   
+    const r1 = Math.floor(20 + scrollRatio * 120);   // 보라 → 사이언
     const g1 = Math.floor(0 + scrollRatio * 150);
     const b1 = Math.floor(80 + scrollRatio * 100);
 
-    const r2 = Math.floor(0 + scrollRatio * 80);     
+    const r2 = Math.floor(0 + scrollRatio * 80);     // 검정 → 네온블루
     const g2 = Math.floor(0 + scrollRatio * 80);
     const b2 = Math.floor(0 + scrollRatio * 180);
 
     document.getElementById("scroll-bg").style.background =
         `linear-gradient(135deg, rgb(${r1},${g1},${b1}), rgb(${r2},${g2},${b2}))`;
 });
+
 
     </script>
     
@@ -1032,7 +1169,7 @@ window.addEventListener("scroll", () => {
 <script>
   const rainContainer = document.querySelector('.rain');
 
-  for (let i = 0; i < 120; i++) { 
+  for (let i = 0; i < 120; i++) {  // 빗줄기 개수 조절
     const drop = document.createElement('div');
     drop.classList.add('raindrop');
     
@@ -1043,6 +1180,7 @@ window.addEventListener("scroll", () => {
 
     rainContainer.appendChild(drop);
   }
+
 </script>
 
 </body>
