@@ -1,1187 +1,567 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🖤A Shadow Broker's Office🖤</title>
-
-<style>
-body {
-    margin: 0;
-    font-family: 'Gowun Dodum', sans-serif;
-    background: linear-gradient(135deg, #200a68, #000000, #4b62ca);
-    background-size: 300% 300%;
-    animation: bgShift 12s ease infinite;
-    color: white;
-    overflow-x: hidden;
-}
-
-@keyframes bgShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-section {
-    min-height: 70vh;
-    padding: 100px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.neon {
-    font-size: 2.8em;
-    color: #ff00f7;
-    text-shadow: 0 0 14px #ff00f7, 0 0 35px #ff00f6;
-}
-
-.panel {
-    width: 80%;
-    max-width: 850px;
-    background: rgba(255,255,255,0.06);
-    border: 1.5px solid #00ffe1;
-    padding: 30px;
-    border-radius: 10px;
-    backdrop-filter: blur(6px);
-    box-shadow: 0 0 20px #00ffe144;
-    margin-top: 30px;
-}
-
-#keycard-menu {
-    position: fixed;
-    top: 50%;
-    left: 25px;
-    transform: translateY(-50%);
-    z-index: 1000;
-}
-
-.key-btn {
-    display: block;
-    padding: 10px 18px;
-    border: 2px solid #00faff;
-    background: rgba(0,0,0,0.4);
-    margin: 10px 0;
-    cursor: pointer;
-    color: #00faff;
-    transition: 0.2s;
-}
-
-.key-btn:hover { background: rgba(0,255,255,0.25); }
-.key-btn.active {
-    border-color: #ff00f7;
-    color: #ff00f7;
-    text-shadow: 0 0 8px #ff00f7;
-    animation: pulse 1.2s infinite;
-}
-
-@keyframes pulse {
-    0% { box-shadow: 0 0 8px #ff00f7; }
-    50% { box-shadow: 0 0 18px #ff00f7; }
-    100% { box-shadow: 0 0 8px #ff00f7; }
-}
-
-/* ---------------------- STAFF ---------------------- */
-.staff-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 25px;
-}
-
-.staff-card {
-    border: 1.5px solid #00ffe1;
-    padding: 20px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 8px;
-    box-shadow: 0 0 12px #00ffe155;
-    cursor: pointer;
-}
-
-/* ---------------------- FILES ---------------------- */
-.file-item {
-    position: relative;
-    overflow: hidden;
-    padding: 12px 15px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid #ff00f7;
-    margin: 8px 0;
-    border-radius: 5px;
-    font-family: 'Gowun Dodum', sans-serif;
-    color: #ffbfff;
-    transition: all 0.25s ease;
-    cursor: pointer;
-}
-
-.file-item:hover {
-    background: rgba(255,0,255,0.15);
-    box-shadow: 0 0 12px #ff00ff;
-    transform: translateX(4px);
-}
-
-.file-item::after {
-    content: '';
-    position: absolute;
-    top: -20%;
-    left: -10%;
-    width: 120%;
-    height: 40%;
-    background: linear-gradient(90deg, rgba(255,0,255,0.3), rgba(0,255,255,0.3), rgba(255,0,255,0.3));
-    transform: skewX(-20deg);
-    animation: glitchDrop 2s infinite;
-}
-
-@keyframes glitchDrop {
-    0% { top: -20%; opacity: 0; }
-    10% { opacity: 1; }
-    50% { top: 100%; opacity: 0; }
-    100% { top: 100%; opacity: 0; }
-}
-
-.hidden-file {
-  display:none;
-  color:#ff00ff; 
-  border:1px dashed #ff00ff;
-  animation: glitch 1s infinite;
-}
-
-/* ---------------------- MAP ---------------------- */
-.map-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 40px);
-    gap: 6px;
-    margin-top: 25px;
-}
-
-.map-cell {
-    width: 40px;
-    height: 40px;
-    border: 1px solid #00ffe1;
-    background: rgba(255,255,255,0.04);
-    cursor: pointer;
-}
-.map-cell:hover { background: rgba(0,255,255,0.2); }
-
-#map-info { margin-top: 20px; color: #ffb4ff; }
-
-/* ---------------------- REQUEST ---------------------- */
-textarea, input {
-    width: 100%;
-    padding: 12px;
-    margin: 8px 0;
-    background: rgba(255,255,255,0.08);
-    border: 1.5px solid #ff00f7;
-    color: #fff;
-    border-radius: 6px;
-    font-size: 1em;
-}
-
-button {
-    margin-top: 10px;
-    padding: 12px 25px;
-    font-size: 1em;
-    border: 2px solid #00ffe1;
-    background: transparent;
-    color: #00ffe1;
-    cursor: pointer;
-}
-
-button:hover { background: rgba(0,255,255,0.2); }
-button:active {
-    box-shadow: 0 0 15px #00ffe1 inset;
-    transform: scale(0.98);
-    transition: 0.1s;
-}
-
-/* ---------------------- POPUP ---------------------- */
-#staff-popup, #file-popup {
-    display:none;
-    position:fixed;
-    top:0; left:0;
-    width:100%; height:100%;
-    background: rgba(0,0,0,0.85);
-    justify-content:center;
-    align-items:center;
-    z-index:9999;
-}
-
-#staff-data, #file-data {
-    background: rgba(30,10,40,0.95);
-    border: 1px solid #ff00f7;
-    padding: 25px;
-    width: 50%;
-    text-align:center;
-    border-radius:8px;
-    color:#fff;
-    animation: glitch 1s infinite;
-}
-
-@keyframes glitch {
-    0% { text-shadow: 2px 2px #ff00f7; }
-    50% { text-shadow: -2px -2px #00ffe1; }
-    100% { text-shadow: 2px -2px #ff00f7; }
-}
-
-/* ---------------------- EFFECTS ---------------------- */
-span[style*="#55ff77"] { animation: pulse 1.6s infinite; }
-@keyframes pulse {
-  0% { text-shadow: 0 0 2px #55ff77; }
-  50% { text-shadow: 0 0 9px #55ff77; }
-  100% { text-shadow: 0 0 2px #55ff77; }
-}
-
-span[style*="#ffaa00"] { animation: blink 1s infinite; }
-@keyframes blink { 50% { opacity:0.4; } 100% { opacity:1; } }
-
-body::after {
-  content:"";
-  position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  pointer-events:none;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(255,255,255,0.03),
-    rgba(255,255,255,0.03) 1px,
-    transparent 1px,
-    transparent 2px
-  );
-  opacity:0.07;
-  animation: flicker 0.2s infinite;
-}
-
-@keyframes flicker { 0% { opacity:0.05; } 50% { opacity:0.15; } 100% { opacity:0.07; } }
-
-#neonFog {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    opacity: 0.32;
-}
-
-body{
-    cursor: pointer;
-    .glitch-chunk {
-    position: fixed;
-    width: 14px;
-    height: 14px;
-    background: linear-gradient(45deg, #ff00ff, #00fff2);
-    opacity: 0.75;
-    mix-blend-mode: screen;
-    pointer-events: none;
-    filter: blur(2px);
-    animation: chunkGlitch 0.25s linear forwards;
-}
-
-@keyframes chunkGlitch {
-    0% { 
-        transform: translate(0, 0) scale(1);
-        opacity: 0.9;
-        filter: blur(0px);
-    }
-    30% {
-        transform: translate(-4px, 3px) scale(1.3);
-        opacity: 0.7;
-        filter: blur(1px);
-    }
-    60% {
-        transform: translate(3px, -4px) scale(1.7);
-        opacity: 0.4;
-        filter: blur(2px);
-    }
-    100% { 
-        transform: translate(0, 0) scale(2.2);
-        opacity: 0;
-        filter: blur(3px);
-    }
-}}
-.glitch-chunk {
-    position: fixed;
-    width: 14px;
-    height: 14px;
-    background: linear-gradient(45deg, #ff00ff, #00fff2);
-    opacity: 0.75;
-    mix-blend-mode: screen;
-    pointer-events: none;
-    filter: blur(2px);
-    animation: chunkGlitch 0.25s linear forwards;
-}
-
-@keyframes chunkGlitch {
-    0% { 
-        transform: translate(0, 0) scale(1);
-        opacity: 0.9;
-        filter: blur(0px);
-    }
-    30% {
-        transform: translate(-4px, 3px) scale(1.3);
-        opacity: 0.7;
-        filter: blur(1px);
-    }
-    60% {
-        transform: translate(3px, -4px) scale(1.7);
-        opacity: 0.4;
-        filter: blur(2px);
-    }
-    100% { 
-        transform: translate(0, 0) scale(2.2);
-        opacity: 0;
-        filter: blur(3px);
-    }
-}
-
-/* 진짜 커서 숨기기 */
-html, body {
-    cursor: none;
-}
-
-/* 글리치 덩어리 커서 */
-#glitchCursor {
-    position: fixed;
-    width: 24px;
-    height: 24px;
-    background: radial-gradient(circle, #00fff0 0%, #ff00ff 60%);
-    border-radius: 50%;
-    pointer-events: none;
-    mix-blend-mode: screen;
-    filter: blur(3px);
-    transform: translate(-50%, -50%);
-    animation: glitchPulse 0.15s infinite;
-}
-
-@keyframes glitchPulse {
-    0%   { transform: translate(-50%, -50%) scale(1); filter: blur(2px); }
-    50%  { transform: translate(-49%, -51%) scale(1.3); filter: blur(4px); }
-    100% { transform: translate(-51%, -48%) scale(1); filter: blur(3px); }
-}
-
-body {
-  font-family: "Gowun Dodum", sans-serif;
-}
-
-
-</style>
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap');
-</style>
-
-</head>
-
-<body>
-
-    <div id="scroll-bg"></div>
-
-    <div id="glitchCursor"></div>
-
-    <audio id="hover-sound" src="hover.mp3" preload="auto"></audio>
-    <audio id="glitch-sound" src="glitch.mp3" preload="auto"></audio>
-    
-<!-- =========================== -->
-<!-- KEYCARD FIXED MENU -->
-<!-- =========================== -->
-<div id="keycard-menu">
-    <div class="key-btn" onclick="nav('hero')">HOME</div>
-    <div class="key-btn" onclick="nav('staff')">STAFF</div>
-    <div class="key-btn" onclick="nav('request')">REQUEST</div>
-    <div class="key-btn" onclick="nav('files')">FILES</div>
-    <div class="key-btn" onclick="nav('map')">MAP</div>
-</div>
-
-<!-- =========================== -->
-<!-- HERO -->
-<!-- =========================== -->
-<section id="hero">
-    <h1 class="neon">A shadow broker's office</h1>
-    <p>도시의 가장 어두운 틈에서 움직이는 그림자 브로커 사무소.</p>
-    <p>우리는 감시망 아래서 포착되지 않는 일을 처리한다.</p>
-</section>
-
-<!-- =========================== -->
-<!-- STAFF -->
-<!-- =========================== -->
-<section id="staff">
-    <h1 class="neon">STAFF — CODENAMES</h1>
-    <div class="panel staff-grid">
-        <div class="staff-card" onclick="openStaff('gw1')">
-            <h3>GHOSTWIRE-01</h3>
-            <p>정보 거래와 의뢰 판독 담당</p>
-        </div>
-        <div class="staff-card" onclick="openStaff('gw2')">
-            <h3>PORTRIFT-42</h3>
-            <p>데이터 운반과 감시망 우회</p>
-        </div>
-        <div class="staff-card" onclick="openStaff('gw3')">
-            <h3>SPECTRENODE-A</h3>
-            <p>위험 분석 비인가 Analyst</p>
-        </div>
-    </div>
-</section>
-
-<!-- STAFF POPUP -->
-<div id="staff-popup" onclick="closeStaff()">
-    <div id="staff-data"></div>
-</div>
-
-<!-- =========================== -->
-<!-- REQUEST -->
-<!-- =========================== -->
-<section id="request">
-    <h1 class="neon">의뢰 접수 시스템</h1>
-    <div class="panel">
-        <input type="text" id="request-input" placeholder="의뢰자 코드네임">
-        <textarea id="request-content" rows="6" placeholder="의뢰 내용을 입력하세요"></textarea>
-        <button onclick="sendRequest()">전송</button>
-        <div id="terminal-output" s tyle="margin-top:15px;"></div>
-    </div>
-</section>
-
-
-<!-- =========================== -->
-<!-- FILES -->
-<!-- =========================== -->
-<section id="files">
-    <h1 class="neon">Encrypted Files</h1>
-    <div class="panel" id="files-list">
-
-        <section id="files">
-            <div class="panel" id="files-list">
-        
-                <!-- 기존 파일들... -->
-        
-                <!-- ⭐ 여기 넣기 -->
-                <div class="file-item secret-file" onclick="openSecret('Z-SHADOW')">
-                    <strong>[FILE–Z-SHADOW]</strong><br>
-                    <span>비공개 의뢰 — 섀도우 프로토콜</span><br>
-                    <span>의뢰자: <b>UNKNOWN SIGNAL</b></span><br>
-                    <span>상태: <span style="color:#ff55ff">CLASSIFIED</span></span>
-                </div>
-        
-            </div>
-        </section>
-        
-
-        <div class="file-item" onclick="openFile('K584')">
-            <strong>[FILE–K584]</strong><br>
-            <span>제목: 존재하되 존재하지 않는 자</span><br>
-            <span>의뢰자: <b>신원 불명</b></span><br>
-            <span>상태: <span style="color:#ff2222">FAILED</span></span>
-        </div>
-
-        <div class="file-item" onclick="openFile('C901')">
-            <strong>[FILE–C901]</strong><br>
-            <span>제목: 익명 신분세탁</span><br>
-            <span>의뢰자: <b>LAMINAR-9</b></span><br>
-            <span>상태: <span style="color:#55ff77">SUCCESS</span></span>
-        </div>
-
-        <div class="file-item" onclick="openFile('N777')">
-            <strong>[FILE–N777]</strong><br>
-            <span>제목: 네온 신호 탈취 사건</span><br>
-            <span>의뢰자: <b>PULSEWALKER-Δ13</b></span><br>
-            <span>상태: <span style="color:#ffaa00">PENDING</span></span>
-        </div>
-
-        <div class="file-item" onclick="openFile('H021')">
-            <strong>[FILE–H021]</strong><br>
-            <span>제목: 사라지는 신원 루프</span><br>
-            <span>의뢰자: <b>NULLFRAME-0X</b></span><br>
-            <span>상태: <span style="color:#ff2222">FAILED</span></span>
-        </div>
-
-        <div class="file-item" onclick="openFile('R530')">
-            <strong>[FILE–R530]</strong><br>
-            <span>제목: 검은 연기의 경로</span><br>
-            <span>의뢰자: <b>???</b></span><br>
-            <span>상태: <span style="color:#55ff77;">SUCCESS</span></span>
-        </div>
-
-        <div class="file-item" onclick="openFile('X002')">
-            <strong>[FILE–X002]</strong><br>
-            <span>제목: 사고 원점 추적</span><br>
-            <span>의뢰자: <b>???</b></span><br>
-            <span>상태: <span style="color:#ffaa00;">PENDING</span></span>
-        </div>
-
-        <div class="file-item" onclick="openFile('V913')">
-            <strong>[FILE–V913]</strong><br>
-            <span>제목: 합성 기억 제조 공정 추적</span><br>
-            <span>의뢰자: <b>???</b></span><br>
-            <span>상태: <span style="color:#ff0033;">FAILED</span></span>
-        </div>
-
-        <div class="file-item" onclick="openFile('D404')">
-            <strong>[FILE–D404]</strong><br>
-            <span>제목: 존재할 수 없는 존재</span><br>
-            <span>의뢰자: <b>???</b></span><br>
-            <span>상태: <span style="color:#ff0033;">FAILED</span></span>
-
-        <div class="file-item hidden-file" id="hidden-file" onclick="openFile('Z0??')">
-            <strong>[FILE–Z0??]</strong><br>
-            <span>제목: 기록되지 않은 의뢰</span><br>
-            <span>의뢰자: <b>UNKNOWN</b></span><br>
-            <span>상태: <span style="color:#ff00ff">?????</span></span>
-        </div>
-        
-
-    </div>
-</section>
-
-<!-- FILE POPUP -->
-<div id="file-popup" onclick="closeFile()">
-    <div id="file-data"></div>
-</div>
-
-<!-- =========================== -->
-<!-- MAP -->
-<!-- =========================== -->
-<section id="map">
-    <h1 class="neon">Back Alley Sector Map</h1>
-    <div class="panel">
-        <div class="map-grid" id="map-grid"></div>
-        <div id="map-info">선택된 구역 없음</div>
-    </div>
-</section>
-
-<section class="parallax">
-  <div class="overlay-text">
-    <h1>WELCOME TO THE GRID</h1>
-    <p>Cyber UI Interface System</p>
-  </div>
-</section>
-
-
-<script>
-// ===========================
-// NAVIGATION
-// ===========================
-function nav(id){
-    document.getElementById(id).scrollIntoView({ behavior: "smooth" });
-    document.querySelectorAll(".key-btn").forEach(btn => btn.classList.remove("active"));
-    event.target.classList.add("active");
-}
-
-// ===========================
-// STAFF POPUP
-// ===========================
-const staffProfiles = {
-    gw1: {name:"GHOSTWIRE-01", role:"Memory Hacker", description:"데이터를 훔치고, 기억 흔적을 조작하는 전문가."},
-    gw2: {name:"GHOSTWIRE-02", role:"Trace Cleaner", description:"모든 로그와 흔적을 지우는 침묵의 그림자."},
-    gw3: {name:"GHOSTWIRE-03", role:"Data Phantom", description:"서버 속에서 사라지고 나타나며 정보를 수집."}   
-};
-
-function openStaff(id){
-    const staff = staffProfiles[id];
-    const popup = document.getElementById("staff-popup");
-    const content = document.getElementById("staff-data");
-    content.innerHTML = `<h2>${staff.name}</h2><p><strong>Role:</strong> ${staff.role}</p><p>${staff.description}</p><p style="font-size:0.8em;color:#55ff77">Click anywhere to close</p>`;
-    popup.style.display="flex";
-}
-function closeStaff(){ document.getElementById("staff-popup").style.display="none"; }
-
-// ===========================
-// FILE POPUP
-// ===========================
-/* ===========================
-   ENCRYPTED FILES — NEW DATA
-   =========================== */
-   const filesData = {
-    "K584": {
-        title: "존재하되 존재하지 않는 자",
-        content: "대상 존재를 유지하되 외부 기록—행동 로그, CCTV, 시민 데이터베이스에서 완전 삭제하는 임무.",
-        status: "FAILED"
-    },
-    "C901": {
-        title: "익명 신분세탁",
-        content: "디지털 ID 폐기 후 새로운 시민권 생성. 뉴로-시그너처 재지정 완료.",
-        status: "SUCCESS"
-    },
-    "Z0??": {
-        title: "기록되지 않은 의뢰",
-        content: "권한 없음. 내용이 고강도 양자 암호화 상태.",
-        status: "???"
-    },
-    "N777": {
-        title: "네온 신호 탈취 사건",
-        content: "도시 전력망 일부가 '맥박 신호'로 변조됨. 의뢰인은 이 신호가 비밀 집단의 연락망이라 주장하며, 신호 원점을 역추적하길 요청함.",
-        status: "PENDING"
-    },
-    "H021": {
-        title: "사라지는 신원 루프",
-        content: "한 시민의 디지털 신분이 7일 주기로 초기화됨. 시스템 심층 루프 의심. 루프 생성자의 정체를 추적하라는 의뢰.",
-        status: "FAILED"
-    },
-    "R530": {
-        title: "검은 연기의 경로",
-        content: "폐공장에서 발생하는 '학습된 연기 패턴'이 무기 밀매 루트를 은폐 중. 드론 감시망을 우회할 새로운 경로 설계 요청.",
-        status: "SUCCESS"
-    },
-    "X002": {
-        title: "사고 원점 추적",
-        content: "도심 중심부에서 발생한 집단 신경 오류. 불법 신경 링크 실험으로 추정되며, 네트워크 소스 추적 의뢰.",
-        status: "PENDING"
-    },
-    "V913": {
-        title: "합성 기억 제조 공정 추적",
-        content: "여러 시민에게 동일한 조작 기억이 주입됨. 기억 제조소의 생산점을 추적해달라는 요청.",
-        status: "FAILED"
-    },
-    "D404": {
-        title: "존재할 수 없는 존재",
-        content: "데이터 그리드 내 존재하지 않아야 할 유령 노드가 감지됨. 추적하면 사라지고, 사라지면 재출현하는 스펙트럼 서버.",
-        status: "FAILED"
-    }
-};
-
-function openFile(id){
-    const popup = document.getElementById("file-popup");
-    const content = document.getElementById("file-data");
-    const file = filesData[id];
-
-    content.innerHTML = `
-        <p style="color:#00ffe1; font-family:'Gowun Dodum', sans-serif;">
-            [DECRYPTING FILE–${id}…]
-        </p>
-        <p style="color:#ffaa00; font-family:'Gowun Dodum', sans-serif;">■■■□□ 43%</p>
-    `;
-    popup.style.display = "flex";
-
-    setTimeout(() => {
-        content.innerHTML = `
-            <h2>${id} — ${file.title}</h2>
-            <p>${file.content}</p>
-            <p>Status: <span style="color:#ff00ff">${file.status}</span></p>
-            <p style="font-size:0.8em;color:#ffaa00">Click anywhere to close</p>
-        `;
-    }, 800);
-}
-function closeFile(){ document.getElementById("file-popup").style.display="none"; }
-
-// ===========================
-// MAP GRID & PUZZLE
-// ===========================
-const mapGrid = document.getElementById("map-grid");
-const mapInfo = document.getElementById("map-info");
-let selectionSequence = [];
-
-for(let i=0;i<36;i++){
-    const cell = document.createElement("div");
-    cell.className="map-cell";
-    cell.onclick=()=>selectMap(i);
-    mapGrid.appendChild(cell);
-}
-
-function selectMap(i){
-    const infoList = ["A1 - 네온 파츠 블랙마켓","A2 - 사각지대 감시장소","A3 - 폐기 메모리 드랍존","A4 - 불법 신경 링크 지점","A5 - 암호화 통신 허브","A6 - 그림자 브로커 연락소",
-                      "B1 - 데이터 해킹 포인트","B2 - 익명 거래 구역","B3 - 불법 개조 워크숍","B4 - 기억 조작 클리닉","B5 - 암시장 진입로","B6 - 위장 카페",
-                      "C1 - 신원 세탁소","C2 - 비인가 드론 정비소","C3 - 폐기 신경 임플란트 상점","C4 - 암호화 화폐 환전소","C5 - 비밀 정보 중개소","C6 - 그림자 네트워크 노드",
-                      "D1 - 불법 감시 장비 상점","D2 - 기억 칩 리퍼브 샵","D3 - 신경 인터페이스 바이어스 포인트","D4 - 데이터 브로커 연락처","D5 - 암호화 메시지 릴레이","D6 - 비인가 사이버웨어 딜러",
-                      "E1 - 폐기 전자 부품 시장","E2 - 신원 위장 서비스","E3 - 불법 소프트웨어 유통점","E4 - 기억 삭제 서비스","E5 - 암호화 통신 장비 상점","E6 - 그림자 브로커 지점",
-                      "F1 - 비밀 거래 장소","F2 - 불법 네트워크 접속점","F3 - 신경 링크 업그레이드 샵","F4 - 데이터 복구 서비스","F5 - 암호화 화폐 채굴장","F6 - 폐기 사이버웨어 시장"];
-    mapInfo.innerText = infoList[i] || "미확인 구역";
-
-    selectionSequence.push(i);
-    if(selectionSequence.length>4) selectionSequence.shift();
-    const secretCode = [11,4,22,30];
-    if(secretCode.every((v,idx)=>v===selectionSequence[idx])){
-        document.getElementById("hidden-file").style.display="block";
-        mapInfo.innerText = "숨겨진 의뢰 파일 해금!";
-    }
-}
-
-// ===========================
-// REQUEST TERMINAL
-// ===========================
-function sendRequest(){
-    const input = document.getElementById("request-input").value.trim();
-    const output = document.getElementById("terminal-output");
-    if(!input){ output.innerText="입력값이 비어 있습니다."; return; }
-    output.innerHTML = `<p style="color:#55ff77">[TERMINAL] 암호화된 요청이 전송되었습니다.</p>`;
-    document.getElementById("request-input").value="";
-}
-
-// filesData 그대로 유지하면서 아래 코드 추가
-function generateFileID() {
-    return "U" + Math.floor(100 + Math.random() * 900); // U234 형식
-}
-
-function sendRequest() {
-    const name = document.getElementById('request-input').value.trim();
-    const content = document.getElementById('request-content').value.trim();
-    const output = document.getElementById('terminal-output');
-
-    if (!name || !content) {
-        output.innerHTML = "<span style='color:#ff5555'>[ERROR] 모든 필드를 입력하세요.</span>";
-        return;
-    }
-
-    // 파일 ID 자동 생성
-    const newID = generateFileID();
-
-    // filesData에 새 데이터 추가
-    filesData[newID] = {
-        title: `사용자 의뢰 — ${name}`,
-        content: content,
-        status: "RECEIVED"
-    };
-
-    // FILES 섹션에 새로운 file-item 생성
-    const filesList = document.getElementById("files-list");
-    const newFile = document.createElement("div");
-    newFile.className = "file-item";
-    newFile.innerHTML = `
-        <strong>[FILE–${newID}]</strong><br>
-        <span>의뢰자: <b>${name}</b></span><br>
-        <span>상태: <span style="color:#ffaa00">RECEIVED</span></span>
-    `;
-    newFile.onclick = () => openFile(newID);
-    filesList.prepend(newFile); // 최신 의뢰가 위로 올라오게
-
-    // 터미널 효과 출력
-    output.innerHTML = `<span style="color:#55ff77">[SUCCESS] 의뢰가 접수되었습니다 — FILE–${newID}</span>`;
-
-    // 입력창 초기화
-    document.getElementById('request-input').value = "";
-    document.getElementById('request-content').value = "";
-}
-
-
-</script>
-
-<canvas id="neonFog"></canvas>
-
-<!-- =========================== -->
-<!-- SECRET REQUEST INTERFACE MODULE -->
-<!-- (독립 모듈 형태로 삽입 가능) -->
-<!-- =========================== -->
-
-<style>
-    /* =========================== */
-    /* STATUS-BASED FILE EFFECTS   */
-    /* =========================== */
-    .file-success {
-      border-color: #55ff77;
-      animation: successScan 2.2s linear infinite;
-    }
-    @keyframes successScan {
-      0% { box-shadow: 0 0 10px #55ff77; }
-      50% { box-shadow: 0 0 20px #55ffaa; }
-      100% { box-shadow: 0 0 10px #55ff77; }
-    }
-    
-    .file-pending {
-      border-color: #ffaa00;
-      animation: pendingBlink 1.2s steps(2, jump-none) infinite;
-    }
-    @keyframes pendingBlink {
-      0% { opacity: 1; }
-      50% { opacity: 0.35; }
-      100% { opacity: 1; }
-    }
-    
-    .file-failed {
-      border-color: #ff0033;
-      animation: failedGlitch 0.35s infinite;
-    }
-    @keyframes failedGlitch {
-      0% { transform: translateX(0); }
-      20% { transform: translateX(-2px); }
-      40% { transform: translateX(2px); }
-      60% { transform: translateX(-1px); }
-      80% { transform: translateX(1px); }
-      100% { transform: translateX(0); }
-    }
-    
-    /* =========================== */
-    /* SECRET / CLASSIFIED FILE   */
-    /* =========================== */
-    .secret-file {
-      background: rgba(255,0,255,0.18);
-      border: 2px solid #ff00ff;
-      box-shadow: 0 0 18px #ff00ffaa;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .secret-file::before {
-      content: "CLASSIFIED";
-      position: absolute;
-      top: 8px;
-      right: -10px;
-      font-size: 0.75em;
-      padding: 3px 10px;
-      background: #ff00ff99;
-      border: 1px solid #ff66ff;
-      transform: rotate(10deg);
-      color: white;
-      font-family: 'Gowun Dodum';
-      text-shadow: 0 0 4px #ff00ff;
-    }
-    
-    .secret-file::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: repeating-linear-gradient(
-        0deg,
-        rgba(255,0,255,0.06),
-        rgba(255,0,255,0.06) 1px,
-        transparent 1px,
-        transparent 3px
-      );
-      animation: scanlines 0.25s linear infinite;
-    }
-    @keyframes scanlines {
-      0% { opacity: .1; }
-      50% { opacity: .25; }
-      100% { opacity: .1; }
-    }
-    
-    /* =========================== */
-    /* SECRET POPUP EFFECT         */
-    /* =========================== */
-    .secret-popup {
-      animation: secretReveal 0.7s ease forwards;
-    }
-    @keyframes secretReveal {
-      0% { filter: blur(7px) brightness(0.3); opacity: 0; }
-      40% { filter: blur(4px) brightness(0.6); opacity: .5; }
-      100% { filter: blur(0) brightness(1); opacity: 1; }
-    }
-    
-    /* Glitchy title */
-    .secret-title {
-      font-size: 1.6em;
-      color: #ff66ff;
-      animation: glitchTitle 0.9s infinite;
-    }
-    @keyframes glitchTitle {
-      0% { text-shadow: -2px 0 #ff00ff, 2px 0 #00ffff; }
-      50% { text-shadow: -1px -1px #ff00ff, 1px 1px #00ffff; }
-      100% { text-shadow: 2px 1px #ff00ff, -2px -1px #00ffff; }
-    }
-
-    /* 모든 요소 기본 커서 제거 */
-* {
-    cursor: none !important;
-}
-
-/* 글리치 커서 */
-#glitchCursor {
-    position: fixed;
-    width: 24px;
-    height: 24px;
-    background: radial-gradient(circle, #00fff0 0%, #ff00ff 60%);
-    border-radius: 50%;
-    pointer-events: none;
-    mix-blend-mode: screen;
-    filter: blur(3px);
-    transform: translate(-50%, -50%);
-    animation: glitchPulse 0.15s infinite;
-}
-
-@keyframes glitchPulse {
-    0%   { transform: translate(-50%, -50%) scale(1); filter: blur(2px); }
-    50%  { transform: translate(-49%, -51%) scale(1.3); filter: blur(4px); }
-    100% { transform: translate(-51%, -48%) scale(1); filter: blur(3px); }
-}
-
-body {
-    margin: 0;
-    font-family: 'Gowun Dodum', sans-serif;
-    background-image: url("/mnt/data/A_digital_illustration_in_a_cyberpunk_art_style_de.png");
-    background-size: cover;           /* 화면 전체에 꽉 차게 */
-    background-position: center;      /* 중앙 정렬 */
-    background-repeat: no-repeat;     /* 반복 안함 */
-    background-attachment: fixed;     /* 스크롤해도 고정된 배경 */
-    background-color: #081026;        /* 로딩 전에 어두운 색 */
-    color: white;
-  }
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  background: #000;
-  color: #fff;
-  font-family: "Gowun Dodum", sans-serif;
-  height: 200vh; /* 스크롤 가능하게 */
-}
-
-/* 비 효과 Canvas */
-#rain {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 10;
-}
-
-/* 첫 화면 */
-.hero {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(#020202, #0d0d0d);
-  z-index: 1;
-  text-align: center;
-}
-
-.hero h1 {
-  font-size: 4rem;
-  letter-spacing: 4px;
-  text-shadow: 0 0 15px #0ff;
-}
-
-/* 도시 섹션 */
-.city {
-  height: 100vh;
-  background: url('cyberpunk-city.jpg') center/cover no-repeat fixed;
-  filter: brightness(0.8) saturate(1.5);
-}
-
-#scroll-bg {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: -1;
-
-    /* 기본 색 */
-    background: linear-gradient(135deg, #220044, #000000);
-    mix-blend-mode: screen;
-    opacity: 0.55;
-    transition: background 0.15s linear;
-}
-
-.parallax {
-  background-image: url('/mnt/data/IMG_0671.jpeg'); /* 이미지 경로 */
-  height: 600px;
-  background-attachment: fixed;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.overlay-text {
-  text-align: center;
-  color: cyan;
-  font-family: 'Gowun Dodum', sans-serif;
-  animation: neonFlicker 2.5s infinite;
-  text-shadow:
-    0 0 5px cyan,
-    0 0 10px cyan,
-    0 0 20px cyan,
-    0 0 40px #00ffff,
-    0 0 80px #00ffff;
-}
-
-.overlay-text h1 {
-  font-size: 3.5rem;
-  margin: 0;
-  letter-spacing: 3px;
-}
-
-.overlay-text p {
-  font-size: 1.3rem;
-  margin-top: 10px;
-}
-
-/* 네온 깜빡임 효과 */
-@keyframes neonFlicker {
-  0%, 18%, 22%, 25%, 53%, 57%, 100% {
-    opacity: 1;
-    text-shadow:
-      0 0 5px cyan,
-      0 0 10px cyan,
-      0 0 20px cyan,
-      0 0 40px #00ffff,
-      0 0 80px #00ffff;
-  }
-  20%, 24%, 55% {
-    opacity: 0.4;
-    text-shadow: none;
-  }
-}
-
-.rain {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.raindrop {
-  position: absolute;
-  width: 1px;
-  height: 80px;
-  background: rgba(0, 255, 255, 0.5); /* 사이버펑크 네온 청록 */
-  filter: blur(1px);
-  animation: fall linear infinite;
-}
-
-@keyframes fall {
-  to {
-    transform: translateY(100vh);
-  }
-}
-
-::selection {
-  background: white;
-  color: black;
-}
-
-/* Firefox 전용 */
-::-moz-selection {
-  background: white;
-  color: black;
-}
-
-.gowun-dodum-regular {
-  font-family: "Gowun Dodum", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-}
-
-
-    </style>
-    
-    
-    <!-- =========================== -->
-    <!-- SECRET FILE POPUP TEMPLATE -->
-    <!-- =========================== -->
-    <div id="secret-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.88); justify-content:center; align-items:center; z-index:99999;">
-      <div id="secret-content" class="secret-popup" style="background:rgba(40,0,50,0.9); padding:25px; border:2px solid #ff00ff; width:50%; border-radius:10px; text-align:center; color:white; font-family:Gowun Dodum;"></div>
-    </div>
-    
-    <script>
-    /* =========================== */
-    /* SECRET FILE DATA TEMPLATE  */
-    /* =========================== */
-    const secretFiles = {
-      "Z-SHADOW": {
-        title: "비공개 의뢰 — 섀도우 프로토콜",
-        content: "도시 전역에 동시다발적으로 발생한 '검은 패킷'에 대한 기밀 추적 의뢰. 기록되지 않은 백도어 신호가 감지됨.",
-        status: "CLASSIFIED"
+import React, { useEffect, useRef, useState } from 'react'
+import { motion } from 'framer-motion'
+import { Mail, Lock, List, Home, MapPin, Zap, Key, EyeOff } from 'lucide-react'
+
+/*
+OverCity 2098 — Broker Nexus (full extension)
+- 이 문서는 기존 코드에 '살을 붙이는' 방식으로 확장되었습니다.
+- 새로 추가된 주요 기능:
+  1) 로컬 브로커 계정 등록/해시 저장 (Web Crypto 기반 비밀번호 해싱)
+  2) 로그인/토큰 발급(로컬) — 실제 백엔드 연동용 mock API와 API 스펙 주석 포함
+  3) 클라이언트 측 AES-GCM 암호화/복호화 유지
+  4) 홈 화면 시각·사운드 효과 추가 (스캔라인, 노이즈, 글리치 텍스트, 저주파 허밍)
+  5) 글리치(GlitchText) 컴포넌트로 제목 및 중요 텍스트 곳곳에 글리치 효과 적용
+  6) 의뢰(타이핑 스타일) 내용을 일반인이 남긴 의뢰문처럼 구체화
+  7) 비밀 팝업을 단독 사용자(SECRET_OWNER)만 접근할 수 있게 수정
+  8) 배포 가이드 / 백엔드 API 스펙 주석 추가
+
+주의: 이 파일은 데모·로컬용입니다. 실제 운영 전 보안 감사를 반드시 수행하세요.
+*/
+
+// CONFIG
+const SECRET_OWNER = 'raven' // 이 계정이 로그인하면 비밀 팝업이 보입니다. 요청에 따라 '한 사람만' 접근 가능하도록 변경했습니다.
+
+export default function OverCityApp(){
+  const [route, setRoute] = useState('home')
+  const [query, setQuery] = useState('')
+
+  // --- Auth state (로컬 사용자 관리) ---
+  const [users, setUsers] = useState(()=> JSON.parse(localStorage.getItem('oc_users') || '{}'))
+  const [loggedIn, setLoggedIn] = useState(()=> JSON.parse(localStorage.getItem('oc_logged')) || {})
+  const [authModalOpen, setAuthModalOpen] = useState(false)
+  const [credentials, setCredentials] = useState({ user: '', pass: '' })
+  const [secretUnlocked, setSecretUnlocked] = useState(false)
+
+  // --- Domain data ---
+  const [jobs, setJobs] = useState(expandedJobs)
+  const [intel, setIntel] = useState(expandedIntel)
+  const [mapZones, setMapZones] = useState(expandedMap)
+  const [items, setItems] = useState(sampleItems)
+  const [wallet, setWallet] = useState(()=> Number(localStorage.getItem('oc_wallet')) || 5000)
+  const [selectedJob, setSelectedJob] = useState(null)
+  const [secureMessage, setSecureMessage] = useState('')
+  const [noiseOn, setNoiseOn] = useState(true)
+  const audioCtxRef = useRef(null)
+  const oscRef = useRef(null)
+
+  useEffect(()=>{ localStorage.setItem('oc_wallet', String(wallet)) },[wallet])
+  useEffect(()=>{ localStorage.setItem('oc_users', JSON.stringify(users)) },[users])
+  useEffect(()=>{ localStorage.setItem('oc_logged', JSON.stringify(loggedIn)) },[loggedIn])
+
+  useEffect(()=>{
+    // secret popup unlocked when SECRET_OWNER is logged in
+    setSecretUnlocked(Boolean(loggedIn[SECRET_OWNER]))
+  },[loggedIn])
+
+  // --- WebAudio: 저주파 허밍 (선택적) ---
+  useEffect(()=>{
+    if(noiseOn){
+      try{
+        const AudioCtx = window.AudioContext || window.webkitAudioContext
+        audioCtxRef.current = audioCtxRef.current || new AudioCtx()
+        const ctx = audioCtxRef.current
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.type = 'sine'
+        osc.frequency.value = 40 // 저주파
+        gain.gain.value = 0.004
+        osc.connect(gain)
+        gain.connect(ctx.destination)
+        osc.start()
+        oscRef.current = { osc, gain }
+      }catch(e){ /* 사파리 등 일부 브라우저는 사용자 상호작용 필요 */ }
+    }else{
+      if(oscRef.current){
+        try{ oscRef.current.osc.stop(); oscRef.current = null }catch(e){}
       }
-    };
-    
-    /* =========================== */
-    /* SECRET FILE POPUP FUNCTION */
-    /* =========================== */
-    function openSecret(id){
-      const data = secretFiles[id];
-      const popup = document.getElementById("secret-popup");
-      const content = document.getElementById("secret-content");
-    
-      content.innerHTML = `
-        <h2 class="secret-title">${data.title}</h2>
-        <p style="margin-top:15px;">${data.content}</p>
-        <p style="margin-top:20px; color:#ff55ff;">STATUS: ${data.status}</p>
-        <p style="margin-top:15px; font-size:0.75em; color:#ffaaee;">(Click anywhere to close)</p>
-      `;
-    
-      popup.style.display = "flex";
     }
-    
-    function closeSecret(){
-      document.getElementById("secret-popup").style.display = "none";
+    return ()=>{
+      if(oscRef.current){ try{ oscRef.current.osc.stop() }catch(e){} }
     }
-    
-    document.getElementById("secret-popup").addEventListener("click", closeSecret);
+  },[noiseOn])
 
-     const glitchCursor = document.getElementById("glitchCursor");
-
-document.addEventListener("mousemove", (e) => {
-    glitchCursor.style.left = e.pageX + "px";
-    glitchCursor.style.top = e.pageY + "px";
-});    
-
-document.addEventListener("mousemove", (e) => {
-    glitchCursor.style.left = e.clientX + "px";
-    glitchCursor.style.top = e.clientY + "px";
-});
-
-document.addEventListener("mousemove", (e) => {
-    glitchCursor.style.left = e.buttonX + "px";
-    glitchCursor.style.top = e.buttonY + "px";
-});
-
-
-function nav(id, el){
-    document.getElementById(id).scrollIntoView({ behavior: "smooth" });
-    document.querySelectorAll(".key-btn").forEach(btn => btn.classList.remove("active"));
-    el.classList.add("active");
-}
-
-// ===========================
-// SCROLL-BASED BACKGROUND COLOR SHIFT
-// ===========================
-window.addEventListener("scroll", () => {
-    const scrollRatio = window.scrollY / (document.body.scrollHeight - window.innerHeight);
-
-    // 0 ~ 1 사이 값
-    const r1 = Math.floor(20 + scrollRatio * 120);   // 보라 → 사이언
-    const g1 = Math.floor(0 + scrollRatio * 150);
-    const b1 = Math.floor(80 + scrollRatio * 100);
-
-    const r2 = Math.floor(0 + scrollRatio * 80);     // 검정 → 네온블루
-    const g2 = Math.floor(0 + scrollRatio * 80);
-    const b2 = Math.floor(0 + scrollRatio * 180);
-
-    document.getElementById("scroll-bg").style.background =
-        `linear-gradient(135deg, rgb(${r1},${g1},${b1}), rgb(${r2},${g2},${b2}))`;
-});
-
-
-    </script>
-    
-    <div class="file-item secret-file" onclick="openSecret('Z-SHADOW')">
-        <strong>[FILE–Z-SHADOW]</strong><br>
-        <span>비공개 의뢰 — 섀도우 프로토콜</span><br>
-        <span>의뢰자: <b>UNKNOWN SIGNAL</b></span><br>
-        <span>상태: <span style="color:#ff55ff">CLASSIFIED</span></span>
-    </div>
-
-<div class="key-btn" onclick="nav('hero', this)">HOME</div>
-
-<div class="rain"></div>
-
-<script>
-  const rainContainer = document.querySelector('.rain');
-
-  for (let i = 0; i < 120; i++) {  // 빗줄기 개수 조절
-    const drop = document.createElement('div');
-    drop.classList.add('raindrop');
-    
-    drop.style.left = Math.random() * 100 + "vw";
-    drop.style.animationDuration = (Math.random() * 0.5 + 0.5) + "s";
-    drop.style.animationDelay = Math.random() * 5 + "s";
-    drop.style.opacity = Math.random();
-
-    rainContainer.appendChild(drop);
+  // ---------- Web Crypto helpers (비밀번호 해시용 + AES-GCM) ----------
+  async function hashPassword(password, salt){
+    const enc = new TextEncoder()
+    const baseKey = await window.crypto.subtle.importKey('raw', enc.encode(password), {name:'PBKDF2'}, false, ['deriveBits'])
+    const derived = await window.crypto.subtle.deriveBits({ name: 'PBKDF2', salt: enc.encode(salt), iterations: 200000, hash: 'SHA-256' }, baseKey, 256)
+    const hashArr = new Uint8Array(derived)
+    return btoa(String.fromCharCode(...hashArr))
   }
 
-</script>
+  async function registerBroker(user, password){
+    if(!user || !password) return false
+    if(users[user]) return false
+    const salt = Math.random().toString(36).slice(2,12)
+    const hash = await hashPassword(password, salt)
+    setUsers(u => ({ ...u, [user]: { salt, hash, created: Date.now() } }))
+    return true
+  }
 
-</body>
-</html>
+  async function verifyBroker(user, password){
+    const rec = users[user]
+    if(!rec) return false
+    const hash = await hashPassword(password, rec.salt)
+    return hash === rec.hash
+  }
+
+  // AES helpers preserved
+  async function deriveKey(password, salt){
+    const enc = new TextEncoder()
+    const keyMat = await window.crypto.subtle.importKey('raw', enc.encode(password), {name:'PBKDF2'}, false, ['deriveKey'])
+    const key = await window.crypto.subtle.deriveKey({name:'PBKDF2', salt: enc.encode(salt), iterations: 250000, hash:'SHA-256'}, keyMat, {name:'AES-GCM', length:256}, true, ['encrypt','decrypt'])
+    return key
+  }
+
+  async function encryptAES(text, password){
+    const iv = window.crypto.getRandomValues(new Uint8Array(12))
+    const salt = window.crypto.getRandomValues(new Uint8Array(16))
+    const saltB = Array.from(salt).map(n=>String.fromCharCode(n)).join('')
+    const saltStr = btoa(saltB)
+    const key = await deriveKey(password, saltStr)
+    const enc = new TextEncoder()
+    const cipher = await window.crypto.subtle.encrypt({name:'AES-GCM', iv}, key, enc.encode(text))
+    const cArr = new Uint8Array(cipher)
+    const ivStr = btoa(String.fromCharCode(...iv))
+    const cipherStr = btoa(String.fromCharCode(...cArr))
+    return `${saltStr}:${ivStr}:${cipherStr}`
+  }
+
+  async function decryptAES(pack, password){
+    try{
+      const [saltStr, ivStr, cipherStr] = pack.split(':')
+      const ivB = atob(ivStr).split('').map(c=>c.charCodeAt(0))
+      const cipherB = atob(cipherStr).split('').map(c=>c.charCodeAt(0))
+      const key = await deriveKey(password, saltStr)
+      const plain = await window.crypto.subtle.decrypt({name:'AES-GCM', iv: new Uint8Array(ivB)}, key, new Uint8Array(cipherB))
+      return new TextDecoder().decode(plain)
+    }catch(e){
+      return null
+    }
+  }
+
+  // ---------- Auth flows (register / login using hashed passwords) ----------
+  async function handleRegister(){
+    const u = prompt('등록할 브로커 아이디를 입력하세요 (예: raven)')
+    const p = prompt('패스워드를 입력하세요')
+    if(!u||!p) return alert('입력 필요')
+    const ok = await registerBroker(u,p)
+    if(ok) alert('등록 완료 — 로컬 저장. 테스트용 계정입니다.')
+    else alert('이미 존재하거나 실패')
+  }
+
+  async function handleLogin(){
+    const u = prompt('브로커 아이디')
+    const p = prompt('패스워드')
+    if(!u||!p) return
+    const ok = await verifyBroker(u,p)
+    if(ok){
+      const token = await encryptAES(JSON.stringify({ user: u, ts: Date.now() }), p)
+      setLoggedIn(l => ({ ...l, [u]: token }))
+      alert('로그인 성공')
+      setAuthModalOpen(false)
+    }else alert('로그인 실패')
+  }
+
+  function logoutUser(user){
+    setLoggedIn(l => { const c = { ...l }; delete c[user]; return c })
+  }
+
+  // ---------- Market ----------
+  function buyItem(id){
+    const it = items.find(i=>i.id===id)
+    if(!it) return
+    if(wallet < it.price){ alert('잔액 부족'); return }
+    setWallet(w => w - it.price)
+    setItems(items.map(i => i.id===id ? { ...i, stock: i.stock-1 } : i))
+    // 로컬 구매 로그
+    const p = JSON.parse(localStorage.getItem('oc_purchases') || '[]')
+    p.push({ id: it.id, name: it.name, time: Date.now() })
+    localStorage.setItem('oc_purchases', JSON.stringify(p))
+    alert(`구매 완료: ${it.name}`)
+  }
+
+  // ---------- Mock backend API (스펙 포함) ----------
+  /*
+    백엔드 연동을 위해 아래 함수를 참고하세요.
+    - apiRegisterBroker(user, pass) -> POST /api/brokers/register { user, salt, hash } (권장: 서버에서 salt+hash 생성)
+    - apiLogin(user, password) -> POST /api/brokers/login { user, proof } -> returns JWT
+    - apiFetchJobs() -> GET /api/jobs -> returns jobs array
+    - apiCreateJob(payload) -> POST /api/jobs
+
+    로컬에서 테스트할 땐 현재 registerBroker / verifyBroker 를 사용하세요.
+  */
+
+  async function apiFetchJobs(){
+    // 실제 서비스에서는 fetch('/api/jobs') ...
+    return new Promise(res=> setTimeout(()=> res(expandedJobs), 300))
+  }
+
+  // ---------- UI helpers ----------
+  const filteredJobs = jobs.filter(j => (j.title + j.tags.join(' ') + j.client + j.status + j.desc).toLowerCase().includes(query.toLowerCase()))
+
+  // ---------- Render ----------
+  return (
+    <div className={`min-h-screen bg-gradient-to-b from-zinc-900 via-stone-900 to-black text-zinc-100 relative overflow-hidden`}> 
+
+      {/* Global visual noise & scanlines */}
+      <style>{`
+        @keyframes glitch-anim { 0% { transform: translate(0,0); } 20% { transform: translate(-2px,0); } 40% { transform: translate(2px,0); } 60% { transform: translate(-1px,0); } 100% { transform: translate(0,0); } }
+        .scanlines { background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 100% 4px; }
+        .glitch-wrap { position: relative; display: inline-block }
+        .glitch-wrap .glitch { position: absolute; left:0; top:0; } 
+        .glitch-red { clip-path: inset(0 0 60% 0); transform: translate(1px, -1px); opacity: .85; animation: glitch-anim 1.6s linear infinite; }
+        .glitch-blue { clip-path: inset(60% 0 0 0); transform: translate(-1px, 1px); opacity: .85; animation: glitch-anim 1.2s linear infinite; }
+      `}</style>
+
+      <div className="pointer-events-none fixed inset-0 mix-blend-screen opacity-16 scanlines" />
+      <div className="pointer-events-none fixed inset-0 bg-[url('/_oc_noise.png')] opacity-10" />
+
+      <header className="max-w-6xl mx-auto p-6 flex items-center justify-between z-10 relative">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-500 rounded-2xl shadow-2xl flex items-center justify-center transform -skew-x-6">🕶️</div>
+          <div>
+            <GlitchText className="text-2xl font-bold tracking-tight" text={'OverCity 2098 — Broker Nexus'} />
+            <p className="text-sm text-zinc-400">은밀한 의뢰, 안전한 연결 — 로그? 우리는 그런 걸 모른다.</p>
+          </div>
+        </div>
+
+        <nav className="flex gap-3 items-center">
+          <NavButton icon={<Home size={16} />} active={route==='home'} onClick={()=>setRoute('home')}>Home</NavButton>
+          <NavButton icon={<List size={16} />} active={route==='jobs'} onClick={()=>setRoute('jobs')}>Jobs <span className="ml-1 text-xs text-zinc-400">({jobs.length})</span></NavButton>
+          <NavButton icon={<Zap size={16} />} active={route==='intel'} onClick={()=>setRoute('intel')}>Intel</NavButton>
+          <NavButton icon={<MapPin size={16} />} active={route==='map'} onClick={()=>setRoute('map')}>Map</NavButton>
+          <NavButton icon={<Mail size={16} />} active={route==='contact'} onClick={()=>setRoute('contact')}>Contact</NavButton>
+
+          <div className="ml-2 flex items-center gap-2">
+            <button onClick={()=>setAuthModalOpen(true)} className="px-3 py-2 rounded-lg border border-zinc-700 text-sm flex items-center gap-2">{Object.keys(loggedIn).length? '브로커' : '로그인'} <Key size={14} /></button>
+            <button onClick={()=>setNoiseOn(n=>!n)} className="px-2 py-2 rounded-lg border text-xs">사운드</button>
+          </div>
+        </nav>
+      </header>
+
+      <main className="max-w-6xl mx-auto px-6 pb-20 relative z-10">
+        {route === 'home' && (
+          <section>
+            <Hero wallet={wallet} />
+
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+              <Card title="브로커 프로필" desc="프로필을 설정하고, 신뢰 점수를 쌓으세요. (로컬 저장)" />
+              <Card title="암시장" desc="아이템 라인업과 구매. 익명 트랜잭션은 실험적입니다." />
+              <Card title="연결 포털" desc="의뢰 등록과 직접 연결 -- 익명 옵션 포함." />
+              <Card title="비밀 팝업" desc={`오직 ${SECRET_OWNER}만 접근 가능한 비밀 공간.`} />
+            </div>
+
+            <section className="mt-8 p-6 rounded-2xl bg-gradient-to-br from-zinc-850 to-zinc-900 border border-zinc-800 backdrop-blur-md">
+              <h3 className="text-lg font-semibold"><GlitchText text={'최근 활동'} className={'inline-block'} /></h3>
+              <p className="text-sm text-zinc-400 mt-2">사람들이 우리에게 남긴 의뢰(샘플) 및 현재 오픈된 의뢰를 보여줍니다.</p>
+
+              <div className="mt-4 grid md:grid-cols-3 gap-4">
+                <div className="p-4 bg-zinc-900 rounded-xl border">
+                  <h4 className="font-semibold">총 완료 의뢰</h4>
+                  <div className="text-3xl font-bold mt-2">{jobs.filter(j=>j.status==='completed').length}</div>
+                  <p className="text-xs text-zinc-500 mt-1">과거 의뢰 통계</p>
+                </div>
+                <div className="p-4 bg-zinc-900 rounded-xl border">
+                  <h4 className="font-semibold">오픈 의뢰</h4>
+                  <div className="text-3xl font-bold mt-2">{jobs.filter(j=>j.status==='open').length}</div>
+                  <p className="text-xs text-zinc-500 mt-1">현재 접수 가능한 의뢰</p>
+                </div>
+                <div className="p-4 bg-zinc-900 rounded-xl border">
+                  <h4 className="font-semibold">지갑</h4>
+                  <div className="text-3xl font-bold mt-2">{wallet} creds</div>
+                  <p className="text-xs text-zinc-500 mt-1">현금성 크레딧</p>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <h4 className="font-semibold">최근 의뢰(사용자 제출 양식 예시)</h4>
+                <div className="mt-3 space-y-3">
+                  {jobs.slice(0,6).map(j => (
+                    <div key={j.id} className="p-3 bg-zinc-850 rounded-lg border border-zinc-800">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="font-semibold"><GlitchText text={j.title} /></div>
+                          <div className="text-xs text-zinc-400">{j.location} · 보상: {j.reward} · 상태: {j.status}</div>
+                        </div>
+                        <div className="text-xs text-zinc-500">{j.client}</div>
+                      </div>
+                      <p className="mt-2 text-sm text-zinc-300">{j.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </section>
+          </section>
+        )}
+
+        {route === 'jobs' && (
+          <section className="mt-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">의뢰 목록</h2>
+              <div className="flex items-center gap-2">
+                <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="검색: 해킹, 잠입, 배달..." className="bg-zinc-800 px-3 py-2 rounded-lg text-sm outline-none" />
+              </div>
+            </div>
+
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              {filteredJobs.map(job => (
+                <motion.div whileHover={{ y: -6 }} key={job.id} className={`p-4 bg-zinc-850 rounded-2xl border ${job.status==='open'? 'border-emerald-600/30' : 'border-zinc-800'}`}>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="font-bold text-lg"><GlitchText text={job.title} /></h3>
+                      <p className="text-xs text-zinc-400">클라이언트: {job.client} · 보상: {job.reward} creds · 상태: {job.status}</p>
+                      <div className="mt-2 flex gap-2 flex-wrap">
+                        {job.tags.map(t => <span key={t} className="text-xs px-2 py-1 bg-zinc-800 rounded-full">{t}</span>)}
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <button onClick={()=>setSelectedJob(job)} className="px-3 py-1 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 text-black text-sm">보기</button>
+                      {job.status==='open' && <button onClick={async ()=>{ const pw = prompt('암호를 입력하세요 (수신자와 공유)'); if(!pw) return; const enc = await encryptAES('Accept:'+job.id, pw); setSecureMessage(enc); setRoute('contact')}} className="px-3 py-1 rounded-lg border border-zinc-700 text-sm">수락(암호화)</button>}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {selectedJob && (
+              <div className="mt-6 p-4 bg-zinc-900 rounded-xl border border-zinc-800">
+                <h3 className="font-semibold">의뢰 상세 — {selectedJob.title}</h3>
+                <p className="text-sm text-zinc-300 mt-2">{selectedJob.desc}</p>
+                <p className="text-xs text-zinc-500 mt-2">위치: {selectedJob.location} · 단계: {selectedJob.difficulty}</p>
+                <div className="mt-3 flex gap-2">
+                  {selectedJob.status==='open' && <button onClick={async ()=>{ const pw = prompt('암호를 입력하세요 (로컬 키)'); if(!pw) return; const enc = await encryptAES('Accept:'+selectedJob.id, pw); setSecureMessage(enc); setRoute('contact')}} className="px-3 py-1 rounded-lg bg-gradient-to-br from-emerald-500 to-green-400 text-black">실행</button>}
+                  <button onClick={()=>setSelectedJob(null)} className="px-3 py-1 rounded-lg border border-zinc-700">닫기</button>
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+
+        {route === 'intel' && (
+          <section className="mt-6">
+            <h2 className="text-xl font-semibold">실시간 인텔</h2>
+            <div className="mt-4 space-y-3">
+              {intel.map(i => (
+                <article key={i.id} className="p-3 bg-zinc-850 rounded-lg border border-zinc-800 backdrop-blur-sm">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="font-semibold">{i.title}</h4>
+                      <p className="text-xs text-zinc-400">{i.time} · 신뢰도: {i.trust}</p>
+                    </div>
+                    <div className="text-xs px-2 py-1 bg-zinc-800 rounded">#{i.tag}</div>
+                  </div>
+                  <p className="mt-2 text-sm text-zinc-300">{i.body}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {route === 'map' && (
+          <section className="mt-6">
+            <h2 className="text-xl font-semibold">오버시티 지도</h2>
+            <div className="mt-4 grid md:grid-cols-3 gap-4">
+              {mapZones.map(z => (
+                <div key={z.id} className="p-4 bg-zinc-850 rounded-xl border border-zinc-800 transform hover:scale-105 transition-transform">
+                  <h3 className="font-semibold">{z.name}</h3>
+                  <p className="text-xs text-zinc-400">레벨: {z.level} · 주의: {z.hazard}</p>
+                  <p className="mt-2 text-sm text-zinc-300">{z.desc}</p>
+                  <p className="mt-2 text-xs text-zinc-500">핵심 포인트: {z.key}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {route === 'contact' && (
+          <section className="mt-6 max-w-2xl">
+            <h2 className="text-xl font-semibold">보안 채널</h2>
+            <p className="text-sm text-zinc-400 mt-1">메시지는 클라이언트에서 실제 AES-GCM으로 암호화됩니다. 비밀번호는 로컬에서만 사용됩니다.</p>
+
+            <div className="mt-4 p-4 bg-zinc-850 rounded-xl border border-zinc-800">
+              <label className="text-xs text-zinc-400">보낼 메시지</label>
+              <textarea value={secureMessage} onChange={e=>setSecureMessage(e.target.value)} className="w-full mt-2 bg-zinc-800 p-3 rounded-lg text-sm h-28"></textarea>
+
+              <div className="mt-3 flex gap-2">
+                <button onClick={async ()=>{ const pw = prompt('암호 입력 (수신자와 공유)'); if(!pw) return; const enc = await encryptAES(secureMessage || 'ping', pw); navigator.clipboard?.writeText(enc); alert('암호화된 페이로드가 클립보드에 복사되었습니다.') }} className="px-3 py-2 rounded-lg bg-gradient-to-br from-indigo-600 to-violet-500 text-black flex items-center gap-2">암호화 & 복사 <Lock size={14} /></button>
+                <button onClick={async ()=>{ const pack = prompt('복호화할 페이로드를 붙여넣으세요'); const pw = prompt('암호 입력'); if(!pack||!pw) return; const dec = await decryptAES(pack, pw); if(!dec) alert('복호화 실패'); else setSecureMessage(dec)}} className="px-3 py-2 rounded-lg border">복호화</button>
+                <button onClick={()=>{setSecureMessage('')}} className="px-3 py-2 rounded-lg border">지우기</button>
+              </div>
+
+              <div className="mt-4 text-xs text-zinc-500">팁: 메시지 앞에 Accept:JOB_ID 를 붙이면 내부 워크플로우가 트리거됩니다.</div>
+            </div>
+
+            <div className="mt-6 p-4 bg-zinc-900 rounded-xl border">
+              <h4 className="font-semibold">아이템 마켓</h4>
+              <p className="text-xs text-zinc-400 mt-1">구매한 아이템은 로컬에 저장됩니다. (데모)</p>
+              <div className="mt-3 grid md:grid-cols-2 gap-3">
+                {items.map(it => (
+                  <div key={it.id} className="p-3 bg-zinc-850 rounded-lg border flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold">{it.name}</div>
+                      <div className="text-xs text-zinc-400">{it.desc}</div>
+                      <div className="text-xs text-zinc-500 mt-1">재고: {it.stock}</div>
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                      <div className="font-bold">{it.price} creds</div>
+                      <button disabled={it.stock<=0} onClick={()=>buyItem(it.id)} className="px-3 py-1 rounded-lg bg-gradient-to-br from-rose-500 to-orange-400 text-black text-sm">구매</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Secret popup — 이제 SECRET_OWNER (예: raven) 계정만 접근 가능 */}
+        {secretUnlocked && (
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="fixed right-6 bottom-6 z-50 p-4 bg-black/70 border border-emerald-600 rounded-xl backdrop-blur-md">
+            <div className="flex items-center gap-2">
+              <div className="text-sm font-semibold">SECRET — 브로커 전용</div>
+              <button onClick={()=>{navigator.clipboard?.writeText(JSON.stringify({ vault: 'protocol keys', time: Date.now() })); alert('비밀 데이터 클립보드 저장(데모)')}} className="px-2 py-1 rounded bg-emerald-600 text-black text-xs">클립</button>
+            </div>
+            <div className="text-xs text-zinc-400 mt-2">이 공간은 {SECRET_OWNER} 전용입니다. 외부 노출 금지.</div>
+          </motion.div>
+        )}
+
+      </main>
+
+      <footer className="max-w-6xl mx-auto p-6 text-center text-xs text-zinc-500 z-10 relative">© 2098 OverCity Broker Nexus · 운영팀은 정부 감시를 즐겨하지 않습니다.</footer>
+
+      {/* Auth modal (브로커 관리) */}
+      {authModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-60">
+          <div className="absolute inset-0 bg-black/70" onClick={()=>setAuthModalOpen(false)} />
+          <motion.div initial={{ scale: .95, opacity:0 }} animate={{ scale:1, opacity:1 }} className="relative z-50 w-full max-w-xl p-6 bg-zinc-900 border border-zinc-800 rounded-xl">
+            <h3 className="font-semibold text-lg">브로커 계정 관리 (로컬)</h3>
+            <p className="text-xs text-zinc-400 mt-1">등록/로그인/로그아웃을 테스트하세요. (데모용 로컬 저장)</p>
+
+            <div className="mt-4 grid grid-cols-1 gap-3">
+              <div className="flex gap-2">
+                <button onClick={handleRegister} className="px-3 py-2 rounded bg-emerald-600 text-black">브로커 등록</button>
+                <button onClick={handleLogin} className="px-3 py-2 rounded bg-rose-500 text-black">브로커 로그인</button>
+                <button onClick={()=>{ if(confirm('모두 로그아웃하시겠습니까?')) setLoggedIn({}) }} className="px-3 py-2 rounded border">로그아웃(모두)</button>
+              </div>
+
+              <div className="text-xs text-zinc-400">현재 등록된 브로커: {Object.keys(users).join(', ') || '없음'}</div>
+              <div className="text-xs text-zinc-400">현재 로그인: {Object.keys(loggedIn).join(', ') || '없음'}</div>
+            </div>
+
+            <div className="mt-4 text-xs text-zinc-500">주의: 이 데모는 로컬 암호화/저장을 사용합니다. 실사용 전 보안 감사를 권장합니다.</div>
+          </motion.div>
+        </div>
+      )}
+
+    </div>
+  )
+}
+
+// ---------- Small UI components ----------
+function NavButton({ children, icon, active, onClick }){
+  return (
+    <button onClick={onClick} className={`flex items-center gap-2 px-3 py-2 rounded-lg ${active? 'bg-zinc-800 border border-zinc-700': 'hover:bg-zinc-900'}`}>
+      <span className="opacity-90">{icon}</span>
+      <span className="text-sm">{children}</span>
+    </button>
+  )
+}
+
+function GlitchText({ text, className }){
+  // 글리치 효과: 원본 + 레이어(빨강/파랑)
+  return (
+    <span className={`glitch-wrap ${className || ''}`} style={{ position: 'relative' }}>
+      <span style={{ position:'relative' }}>{text}</span>
+      <span className="glitch glitch-red" aria-hidden>{text}</span>
+      <span className="glitch glitch-blue" aria-hidden>{text}</span>
+    </span>
+  )
+}
+
+function Hero({ wallet }){
+  return (
+    <section className="mt-2 p-6 rounded-2xl bg-gradient-to-br from-zinc-850 to-zinc-900 border border-zinc-800 backdrop-blur-sm scanlines">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-bold"><GlitchText text={'OverCity — 뒷골목에선 우리는 법보다 빠르다'} /></h2>
+          <p className="text-zinc-400 mt-2">의뢰 접수 · 익명 연결 · 실시간 인텔. 브로커로서 필요한 모든 도구를 한 곳에.</p>
+          <div className="mt-3 text-xs text-zinc-500">경고: 정부 감시는 늘어났습니다. 은밀하게 행동하세요.</div>
+        </div>
+        <div className="flex gap-2 items-center">
+          <div className="text-xs text-zinc-400">지갑</div>
+          <div className="px-3 py-2 rounded-2xl bg-zinc-800 border">{wallet} creds</div>
+          <button className="px-4 py-2 rounded-2xl bg-gradient-to-br from-rose-500 to-orange-400 text-black">의뢰 올리기</button>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function Card({ title, desc }){
+  return (
+    <div className="p-4 bg-zinc-850 rounded-2xl border border-zinc-800">
+      <h4 className="font-semibold">{title}</h4>
+      <p className="text-sm text-zinc-400 mt-2">{desc}</p>
+    </div>
+  )
+}
+
+// ----- Expanded sample data: 사용자 제출 양식 스타일로 의뢰문을 구체화 -----
+const expandedJobs = [
+  { id: 'H-1001', title: "헬릭스 로그 정리 — '제발 부탁해요'", client: '김. (개인)', reward: 8000, tags: ['clean','forensics'], location: 'Mid-Arcology 3F', difficulty: 'Medium', desc: '"제 실수로 연구소 접속 흔적이 남았어요. 아이들 때문에 소란 피우기 싫습니다. 로그에서 제 흔적을 지워주세요." — 개인 의뢰인', status: 'completed' },
+  { id: 'H-1002', title: "블랙셰도우 잠입 — '가족을 구해주세요'", client: '익명', reward: 15000, tags: ['infiltrate','stealth'], location: 'Lower Docks', difficulty: 'High', desc: '"배송차로 위장해서 구역에 들어가야 합니다. 내부에서 특정 봉투를 회수해야 해요. 치명상은 절대 안 됩니다." — 익명', status: 'completed' },
+
+  // 오픈된 의뢰 — 일반인이 남긴 느낌으로 구체화
+  { id: 'J-9001', title: "데이터 스키밍 — 연구소 로그 (긴급)", client: '익명(연구원)', reward: 12000, tags: ['hack','stealth'], location: 'Mid-Arcology 7F', difficulty: 'High', desc: '"저는 해당 연구소의 내부 연구원이지만 내부 고발자입니다. 특정 프로젝트의 로그(2098-09 ~ 2098-11)를 외부로 빼낼 수 있나요? 증거가 필요합니다. 네트워크로 접근 가능하지만 모니터링이 심해요."', status: 'open' },
+
+  { id: 'J-9002', title: "스페셜 패키지 배달 — '급합니다'", client: '소형 갱', reward: 2300, tags: ['delivery','fast'], location: 'Neon Market, Sector 3', difficulty: 'Low', desc: '"정해진 시간(23:10-23:30)에 A→B 지점으로 패키지 전달. 겉으로 보기엔 음식 배달처럼. 감시가 낮은 시간대입니다. 차량 제공 가능."', status: 'open' },
+
+  { id: 'J-9003', title: "아이언 포겟 — 표적 회수 (민감)", client: '기업청부', reward: 48000, tags: ['extraction','high-risk'], location: 'Corporate Spire 12', difficulty: 'Very High', desc: '"회사의 내부 컨택에서 표적을 안전하게 데려오길 원함. 비치명적 제압 권장. 경호원 다수, 권한 토큰이 필요할 수도 있음."', status: 'open' },
+
+  { id: 'J-9101', title: "스마트 센서 교란 — 이벤트", client: '언더넷 포럼', reward: 9000, tags: ['electronic','timing'], location: 'Neon Market', difficulty: 'Medium', desc: '"시장 구역 A의 센서가 30초 동안 멈춰야 합니다. 상인들이 일시적으로 진열을 바꿀 수 있도록 교란 스크립트 배포 필요."', status: 'open' },
+
+  { id: 'J-9102', title: "은색 패스 위조 — 출입 허가", client: '소매상', reward: 4200, tags: ['forge','low-risk'], location: 'Lower Docks', difficulty: 'Low', desc: '"임시 출입증이 필요합니다. 단기간(4시간) 유효한 출입 패스로, OCR 검증을 우회할 수 있어야 합니다. 사진 및 최소 정보 제공 가능."', status: 'open' },
+
+  { id: 'J-9201', title: "잃어버린 녹음 회수 — 엄마의 목소리", client: '최. (일반)', reward: 3000, tags: ['recovery','sensitive'], location: 'Old Subway', difficulty: 'Low', desc: '"지하철 폐쇄역 근처에서 녹음파일을 잃어버렸어요. 제게 중요한 대화가 들어있습니다. 데이터 복구가 가능할까요? 플러그나 물리적 접근 둘 다 가능합니다."', status: 'open' },
+]
+
+const expandedIntel = [
+  { id: 'I-1', title: '시내 CCTV 루트 재조정', time: '2098-11-18 02:12', trust: 'B+', tag: 'surveillance', body: '중앙 통제실이 새 스케줄을 배포 — 과거 루트와 차이 있음. 야간 패턴 주의.' },
+  { id: 'I-2', title: '블루버드 드론 배치', time: '2098-11-20 21:04', trust: 'A-', tag: 'aerial', body: '특정 구역 상공에 감시 드론이 늘어남. 전자전 장비 보유 가능.' },
+  { id: 'I-3', title: '큐브 노드 재배치', time: '2098-11-21 01:30', trust: 'A', tag: 'network', body: '기업 노드들이 트래픽 우회 경로를 설정 — 특정 구간에 레이턴시 급증.' },
+]
+
+const expandedMap = [
+  { id: 'Z-1', name: 'Neon Market', level: 2, hazard: 'medium', desc: '상점과 암시장 혼재. 감시 빈도는 낮음.', key: '후미 골목의 상자 창고 — 교환 포인트' },
+  { id: 'Z-2', name: 'Mid-Arcology', level: 5, hazard: 'high', desc: '고층 연구/기업 구역. 보안 레이어가 빽빽함.', key: '보안 엘리베이터 루트가 핵심' },
+  { id: 'Z-3', name: 'Lower Docks', level: 3, hazard: 'variable', desc: '배후 거래와 소규모 갱 활동. 야간이 활발함.', key: '컨테이너 사이 은밀한 통로' },
+  { id: 'Z-4', name: 'Old Subway', level: 2, hazard: 'low', desc: '인적이 드문 지하 통로 — 전자 감시 구멍이 많음.', key: '폐쇄역 플랫폼 B' },
+  { id: 'Z-5', name: 'Corporate Spire', level: 6, hazard: 'very high', desc: '기업 핵심 구역 — 접근시 허가 필요.', key: '옥상 통신 노드' },
+]
+
+const sampleItems = [
+  { id: 'IT-1', name: '시그널 스크램블러', desc: '단시간 드론/감시와 통신 차단', price: 1800, stock: 3 },
+  { id: 'IT-2', name: 'Temp ID Chip', desc: '임시 출입증 에뮬레이터', price: 950, stock: 8 },
+  { id: 'IT-3', name: 'EMP 팩(소형)', desc: '전자기 펄스로 비휘발성 장비 마비', price: 4200, stock: 1 },
+]
+
+/*
+Deployment guide (간단 요약)
+1) Vite + React 설치 (추천):
+   - npm create vite@latest overcity -- --template react
+   - cd overcity && npm install
+   - Tailwind 설정: tailwindcss init + postcss + autoprefixer, index.css에 Tailwind 지시문 추가
+   - npm install framer-motion lucide-react
+2) 파일 복사: 이 파일을 src/OverCityApp.jsx 로 저장 후 App.jsx에서 import
+3) 빌드/배포: npm run build -> Netlify/Cloudflare Pages에 배포
+
+Backend API notes (간단 스펙)
+- POST /api/register { user } -> returns salt and server-side hash storage (server should never accept plain passwords)
+- POST /api/login { user, proof } -> returns JWT
+- GET /api/jobs -> returns list of jobs (with fields id,title,desc,client,reward,status)
+- POST /api/jobs -> create new job (authenticated)
+- POST /api/purchase -> charge and record purchase (authenticated)
+
+보안 권장사항: 서버 측에서 password hashing(scrypt/argon2), rate-limiting, TLS, HSM/Key management 적용
+*/
