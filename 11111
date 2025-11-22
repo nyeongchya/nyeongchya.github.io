@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>NeoRivere 2098 - Obsidian Directive</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-0: #050509;
+      --bg-1: #0b0b12;
+      --panel: rgba(15, 16, 25, 0.88);
+      --panel-soft: rgba(15, 16, 25, 0.7);
+      --neon-cyan: #33f6ff;
+      --neon-pink: #ff4ecf;
+      --neon-emerald: #3cffb5;
+      --neon-purple: #b56bff;
+      --text: #f4f6ff;
+      --muted: #9aa0c2;
+      --danger: #ff5370;
+      --warn: #ffd76a;
+      --shadow-strong: 0 0 40px rgba(0, 0, 0, 0.75);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: "Gowun Dodum", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top, #1b1740 0%, #050509 55%, #000000 100%);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      background-size: 200% 200%;
+      animation: bgShift 22s ease-in-out infinite;
+    }
+
+    @keyframes bgShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ===== HEADER / NAV ===== */
+    header.site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+      background: linear-gradient(90deg, rgba(5,5,10,0.88), rgba(5,5,15,0.7));
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .nav-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 18px;
+      gap: 12px;
+    }
+
+    .nav-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .nav-brand-main {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .nav-pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.15);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nav-pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle, var(--neon-emerald), transparent);
+      box-shadow: 0 0 12px rgba(60,255,181,0.9);
+    }
+
+    nav.main-nav {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      font-size: 13px;
+    }
+    nav.main-nav a {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 11px;
+    }
+    nav.main-nav a:hover,
+    nav.main-nav a.active {
+      border-color: rgba(255,255,255,0.18);
+      color: var(--neon-cyan);
+      background: radial-gradient(circle at top, rgba(51,246,255,0.15), transparent 60%);
+    }
+
+    .nav-toggle {
+      display: none;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 20px;
+    }
+
+    /* ===== GENERIC SECTIONS ===== */
+
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 32px 18px 60px;
+    }
+
+    section {
+      margin-bottom: 72px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .section-title {
+      font-size: 28px;
+      margin: 0 0 8px 0;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .section-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0 0 16px 0;
+      line-height: 1.7;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.4fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 900px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .nav-toggle {
+        display: block;
+      }
+      nav.main-nav {
+        display: none;
+        position: absolute;
+        right: 18px;
+        top: 46px;
+        flex-direction: column;
+        background: rgba(5,5,12,0.96);
+        padding: 10px;
+        border-radius: 12px;
+        box-shadow: var(--shadow-strong);
+      }
+      nav.main-nav.open {
+        display: flex;
+      }
+    }
+
+    /* ===== HERO ===== */
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.2fr);
+      gap: 28px;
+      align-items: center;
+      margin-bottom: 80px;
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .hero-text h1 {
+      font-size: 36px;
+      margin: 0 0 8px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .hero-text h1 span.accent {
+      color: var(--neon-cyan);
+    }
+    .hero-kicker {
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .hero-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 18px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      border-radius: 999px;
+      padding: 9px 16px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: transparent;
+      color: var(--text);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn.primary {
+      background: radial-gradient(circle at top left, var(--neon-cyan), var(--neon-purple));
+      color: #050509;
+      border-color: transparent;
+      box-shadow: 0 0 18px rgba(99,255,255,0.55);
+    }
+
+    .btn.secondary {
+      background: rgba(10,10,20,0.6);
+    }
+
+    .btn.micro {
+      padding: 5px 10px;
+      font-size: 10px;
+    }
+
+    .hero-sidenote {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    .hero-sidenote span.dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--danger);
+      box-shadow: 0 0 10px rgba(255,83,112,0.9);
+    }
+
+    .hero-card {
+      background: var(--panel);
+      border-radius: 20px;
+      padding: 16px 16px 18px;
+      box-shadow: var(--shadow-strong);
+      border: 1px solid rgba(255,255,255,0.12);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(51,246,255,0.18), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(255,78,207,0.16), transparent 55%);
+      opacity: 0.9;
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    .hero-card-inner {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 110px minmax(0, 1fr);
+      gap: 14px;
+      align-items: center;
+    }
+
+    .avatar-ring {
+      width: 100px;
+      height: 100px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,0.16);
+      padding: 4px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, rgba(51,246,255,0.25), rgba(0,0,0,0.9));
+    }
+
+    .avatar-ring::after {
+      content:"";
+      position:absolute;
+      inset:-40%;
+      border-radius:inherit;
+      background:
+        conic-gradient(from 180deg, transparent 0deg, rgba(255,255,255,0.2) 80deg, transparent 120deg, rgba(180,120,255,0.35) 180deg, transparent 220deg);
+      mix-blend-mode: screen;
+      opacity: 0.65;
+      animation: spin 10s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .avatar-img {
+      position: relative;
+      z-index: 1;
+      width: 90px;
+      height: 90px;
+      border-radius: 999px;
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      /* 여기 이미지 경로를 셀레르니아 일러스트로 교체하면 됨 */
+      background-image: url("C:\Users\admin\Desktop\직박구리\NeoRivere 2098\네오리베르 설정집 v1.0\셀레르니아\증사\셀레르니아.png");
+      filter: drop-shadow(0 0 8px rgba(0,0,0,0.8));
+    }
+
+    .hero-card-name {
+      font-size: 16px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .hero-card-role {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 8px;
+    }
+    .hero-card-text {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .hero-card-tags {
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-top:10px;
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:0.09em;
+    }
+    .hero-card-tag {
+      padding:3px 7px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.18);
+      background:rgba(0,0,0,0.35);
+    }
+
+    /* ===== PANELS / CARDS ===== */
+
+    .panel {
+      background: var(--panel-soft);
+      border-radius: var(--radius-lg);
+      padding: 18px 16px 18px;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: var(--shadow-strong);
+    }
+
+    .panel + .panel {
+      margin-top: 24px;
+    }
+
+    /* SECTION HEADER */
+
+    .section-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    .section-header-right {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+    }
+
+    .caption {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+      line-height: 1.6;
+    }
+
+    /* ===== ORG / RULES ===== */
+
+    .org-grid {
+      display:grid;
+      grid-template-columns:minmax(0,1.8fr) minmax(0,2.1fr);
+      gap:16px;
+    }
+
+    @media (max-width: 900px) {
+      .org-grid { grid-template-columns: 1fr; }
+    }
+
+    .rule-list {
+      list-style:none;
+      padding:0;
+      margin:0;
+      font-size:13px;
+      color:var(--muted);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .rule-list li::before {
+      content:"▸";
+      color:var(--neon-cyan);
+      margin-right:6px;
+    }
+
+    .org-roles {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+      gap:10px;
+      margin-top:6px;
+      font-size:12px;
+    }
+
+    .chip {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.18);
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+    }
+    .chip-dot {
+      width:7px;
+      height:7px;
+      border-radius:999px;
+      background:var(--neon-emerald);
+      box-shadow:0 0 10px rgba(60,255,181,0.9);
+    }
+
+    /* ===== JOBS ===== */
+
+    .nd-contract-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+      gap:10px;
+      margin-bottom:14px;
+    }
+    .nd-contract-card{
+      position:relative;
+      padding:12px;
+      border-radius:var(--radius-md);
+      background:rgba(3,3,10,0.9);
+      border:1px solid rgba(255,255,255,0.1);
+      font-size:13px;
+      overflow:hidden;
+    }
+    .nd-contract-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:radial-gradient(circle at top,rgba(51,246,255,0.16),transparent 60%);
+      opacity:0.9;
+      mix-blend-mode:soft-light;
+      pointer-events:none;
+    }
+    .nd-contract-inner{
+      position:relative;
+      z-index:1;
+    }
+
+    .nd-contract-rank{
+      font-size:11px;
+      letter-spacing:0.12em;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+    .nd-contract-title{
+      font-weight:600;
+      margin-bottom:5px;
+    }
+    .nd-contract-body{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+    .nd-contract-meta{
+      font-size:11px;
+      color:var(--muted);
+      margin-top:6px;
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+
+    .nd-rank-s{
+      border-color:rgba(255,78,207,0.7);
+      box-shadow:0 0 18px rgba(255,78,207,0.5);
+    }
+    .nd-rank-a{
+      border-color:rgba(51,246,255,0.7);
+    }
+    .nd-rank-c{
+      border-style:dashed;
+      border-color:rgba(255,255,255,0.22);
+    }
+
+    .jobs-filters {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:10px;
+      margin-bottom:10px;
+      font-size:11px;
+    }
+    .btn-filter.active {
+      border-color:var(--neon-cyan);
+      color:var(--neon-cyan);
+    }
+
+    #job-search {
+      background:rgba(5,5,12,0.9);
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.16);
+      padding:7px 12px;
+      color:var(--text);
+      font-size:12px;
+      min-width:160px;
+    }
+    #job-search::placeholder {
+      color:rgba(154,160,194,0.7);
+    }
+
+    .jobs-list {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:10px;
+      margin-top:6px;
+    }
+    .job-card{
+      border-radius:var(--radius-md);
+      background:rgba(3,3,10,0.96);
+      border:1px solid rgba(255,255,255,0.12);
+      padding:10px 11px 11px;
+      font-size:13px;
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+    }
+    .job-header{
+      display:flex;
+      justify-content:space-between;
+      gap:6px;
+      align-items:flex-start;
+    }
+    .job-title{
+      font-weight:600;
+      font-size:13px;
+    }
+    .badge{
+      font-size:10px;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      padding:2px 7px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.2);
+    }
+    .badge-rank-s{ border-color:var(--danger); color:var(--danger);}
+    .badge-rank-a{ border-color:var(--neon-cyan); color:var(--neon-cyan);}
+    .badge-rank-b{ border-color:var(--warn); color:var(--warn);}
+    .badge-status-open{ border-color:var(--neon-emerald); color:var(--neon-emerald);}
+    .badge-status-accepted{ border-color:var(--neon-purple); color:var(--neon-purple);}
+    .badge-status-completed{ border-color:rgba(255,255,255,0.5); color:var(--muted);}
+
+    .job-body{
+      color:var(--muted);
+      line-height:1.45;
+      margin-top:3px;
+    }
+    .job-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-top:4px;
+      font-size:11px;
+      color:var(--muted);
+    }
+    .job-meta span{
+      opacity:0.9;
+    }
+
+    /* ===== INTEL ===== */
+
+    .nd-intel-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:10px;
+      margin-top:8px;
+    }
+
+    .nd-intel-card{
+      padding:11px 12px 12px;
+      border-radius:var(--radius-md);
+      background:rgba(3,3,12,0.95);
+      border:1px solid rgba(255,255,255,0.1);
+      font-size:13px;
+      position:relative;
+      overflow:hidden;
+    }
+    .nd-intel-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:radial-gradient(circle at top right,rgba(181,107,255,0.2),transparent 60%);
+      mix-blend-mode:soft-light;
+      opacity:0.9;
+      pointer-events:none;
+    }
+    .nd-intel-inner{
+      position:relative;
+      z-index:1;
+    }
+    .nd-intel-top{
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      align-items:flex-start;
+    }
+    .nd-intel-title{
+      font-weight:600;
+      margin-bottom:2px;
+    }
+    .nd-intel-meta{
+      font-size:11px;
+      color:var(--muted);
+    }
+    .nd-intel-tag{
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      padding:2px 6px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.2);
+    }
+    .intel-tag-confirmed{ border-color:var(--neon-emerald); color:var(--neon-emerald);}
+    .intel-tag-partial{ border-color:var(--warn); color:var(--warn);}
+    .intel-tag-rumor{ border-color:var(--neon-purple); color:var(--neon-purple);}
+    .nd-intel-body{
+      margin-top:6px;
+      color:var(--muted);
+      line-height:1.55;
+    }
+
+    /* ===== MAP ===== */
+
+    .map-layout{
+      display:grid;
+      grid-template-columns:minmax(0,1.7fr) minmax(0,2fr);
+      gap:16px;
+    }
+    @media (max-width: 900px) {
+      .map-layout{ grid-template-columns:1fr; }
+    }
+
+    .map-detail{
+      border-radius:var(--radius-md);
+      background:rgba(3,3,12,0.96);
+      border:1px solid rgba(255,255,255,0.12);
+      padding:12px 13px;
+      font-size:13px;
+    }
+    .map-detail-name{
+      font-size:15px;
+      font-weight:600;
+      margin-bottom:4px;
+    }
+    .map-detail-level{
+      font-size:11px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+    .map-detail-desc{
+      color:var(--muted);
+      margin-bottom:6px;
+      line-height:1.6;
+    }
+    .map-detail-key{
+      font-size:12px;
+      color:var(--neon-emerald);
+    }
+
+    .map-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+      gap:10px;
+    }
+    .zone-card{
+      padding:10px;
+      border-radius:var(--radius-md);
+      background:rgba(3,3,12,0.92);
+      border:1px solid rgba(255,255,255,0.12);
+      font-size:12px;
+      cursor:pointer;
+      transition:transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+    }
+    .zone-card:hover{
+      transform:translateY(-2px);
+      box-shadow:0 0 18px rgba(51,246,255,0.4);
+      border-color:var(--neon-cyan);
+    }
+    .zone-card.active{
+      border-color:var(--neon-emerald);
+      box-shadow:0 0 18px rgba(60,255,181,0.5);
+    }
+    .zone-name{
+      font-weight:600;
+      margin-bottom:3px;
+    }
+    .zone-meta{
+      font-size:11px;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+    .zone-key{
+      font-size:12px;
+      color:var(--muted);
+      opacity:0.9;
+    }
+
+    footer {
+      border-top:1px solid rgba(255,255,255,0.08);
+      padding:18px;
+      font-size:11px;
+      color:var(--muted);
+      text-align:center;
+      background:rgba(5,5,10,0.96);
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="nav-inner">
+      <div class="nav-brand">
+        <div class="nav-brand-main">NEORIVERE // 2098</div>
+        <div>OBSIDIAN DIRECTIVE &middot; SHADOW BROKER NETWORK</div>
+      </div>
+
+      <div class="nav-pill">
+        <span class="nav-pill-dot"></span>
+        <span>STATUS: ONLINE // CELERNEA PRESENT</span>
+      </div>
+
+      <button class="nav-toggle" aria-label="Toggle navigation" id="navToggle">☰</button>
+
+      <nav class="main-nav" id="mainNav">
+        <a href="#top" class="active">HOME</a>
+        <a href="#about">ORG</a>
+        <a href="#jobs">JOBS</a>
+        <a href="#intel">INTEL</a>
+        <a href="#map">MAP</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-text">
+        <div class="hero-kicker">shadow brokerage interface // intranet mock</div>
+        <h1 id="hero-title"><span class="accent">NEORIVERE</span> / OBSIDIAN DIRECTIVE</h1>
+        <p class="hero-desc">
+          네오리베르의 뒷세계를 장악한 그림자 브로커 네트워크.
+          <strong>셀레르니아</strong>가 운영하는 이 사무소는
+          돈, 정보, 그리고 빚을 한꺼번에 사고판다. <br />
+          보안국의 기록에는 존재하지 않는 도시의 진짜 지도가,
+          이 인터페이스 안에서만 열려 있다.
+        </p>
+
+        <div class="hero-actions">
+          <button class="btn primary" data-scroll="#jobs">브로커 접속</button>
+          <button class="btn secondary" data-scroll="#intel">인텔 열람</button>
+        </div>
+
+        <div class="hero-sidenote">
+          <span class="dot"></span>
+          <span>보안국 감시 레벨: <strong>2 / 5</strong> &middot; 접속 로그는 Celernea 개인 서버에만 보관됩니다.</span>
+        </div>
+      </div>
+
+      <aside class="hero-card" aria-label="Celernea Profile">
+        <div class="hero-card-inner">
+          <div class="avatar-ring">
+            <div class="avatar-img"></div>
+          </div>
+          <div>
+            <div class="hero-card-name">CELERNEA</div>
+            <div class="hero-card-role">director // prime broker</div>
+            <div class="hero-card-text">
+              활달하게 웃으면서도, 속마음은 늘 몇 수 앞을 계산하고 있는
+              네오리베르 최상위 브레인. <br />
+              몸에는 개조 하나 없지만, 머리 하나로 이 도시의 판도를 뒤집는다.
+            </div>
+            <div class="hero-card-tags">
+              <span class="hero-card-tag">laughing tyrant</span>
+              <span class="hero-card-tag">non-augmented</span>
+              <span class="hero-card-tag">citywide access</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- ORG / ABOUT -->
+    <section id="about">
+      <div class="section-label">about the office</div>
+      <h2 class="section-title">Obsidian Directive</h2>
+      <p class="section-sub">
+        표면적으로는 존재하지 않는 이름. 그러나 네오리베르의 모든 거래와 사건 뒤에는,
+        늘 이 사무소의 연산 결과가 숨어 있다. <br />
+        아래 내용은 <strong>브로커 교육용 내부 노트</strong>로, 외부 유출 시 즉시 계약 파기 및 추방이다.
+      </p>
+
+      <div class="panel org-grid">
+        <div>
+          <h3 style="margin:0 0 6px;font-size:15px;">셀레르니아의 브로커 규칙</h3>
+          <ul class="rule-list">
+            <li>정보는 사람보다 오래 산다. 사람을 믿기 전에, 로그를 먼저 본다.</li>
+            <li>의뢰인의 얼굴보다, 의뢰 뒤에 숨은 <strong>두 번째 질문</strong>을 찾아라.</li>
+            <li>우리 손으로 기록을 남겼다면, 그 기록은 언젠가 무기가 된다.</li>
+            <li>돈, 인텔, 빚. 셋 중 하나만 받는 계약은 손해다.</li>
+            <li>셀레르니아가 웃으면서 “재밌네”라고 말하면, 그 의뢰는 이미 되돌릴 수 없다.</li>
+          </ul>
+
+          <p class="caption" style="margin-top:10px;">
+            ※ 규칙 위반 시, 벌점은 <strong>Favors(빚)</strong>로 누적되며,
+            일정 수치를 넘기면 “정리 대상”으로 분류된다.
+          </p>
+        </div>
+
+        <div>
+          <h3 style="margin:0 0 6px;font-size:15px;">역할 구조</h3>
+          <p class="caption">
+            각 포지션은 공식 호칭 외에, 셀레르니아가 붙인 별명을 하나씩 가진다.
+            아래는 외부에 공개된 버전이다.
+          </p>
+          <div class="org-roles">
+            <div>
+              <div class="chip">
+                <span class="chip-dot"></span>
+                director
+              </div>
+              <p class="caption">
+                <strong>셀레르니아</strong>. 모든 계약의 최종 승인권자.
+                도시 전체를 하나의 보드게임처럼 다룬다.
+              </p>
+            </div>
+            <div>
+              <div class="chip">
+                <span class="chip-dot"></span>
+                broker
+              </div>
+              <p class="caption">
+                의뢰를 받아 구조를 설계하는 중간 관리자.
+                “웃는 중개인”들이라고 불린다.
+              </p>
+            </div>
+            <div>
+              <div class="chip">
+                <span class="chip-dot"></span>
+                runner
+              </div>
+              <p class="caption">
+                직접 발을 움직이는 현장 요원.
+                네온 비에 젖은 골목을 가장 많이 걷는 사람들.
+              </p>
+            </div>
+            <div>
+              <div class="chip">
+                <span class="chip-dot"></span>
+                archivist
+              </div>
+              <p class="caption">
+                로그, 영상, 계좌 흐름을 모아 정리하는 기록담당.
+                미래의 흉기를 차곡차곡 쌓는 사람들.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JOBS -->
+    <section id="jobs">
+      <div class="section-label">contracts</div>
+      <h2 class="section-title">의뢰 랭크 & 실시간 게시판</h2>
+      <p class="section-sub">
+        아래 정보는 네오리베르 전역에서 올라온 의뢰들을
+        <strong>옵시디언 디렉티브 기준</strong>으로 정리한 것. <br />
+        랭크가 높을수록 보상은 커지지만, 도시 전체에 남는 상처도 깊어진다.
+      </p>
+
+      <div class="panel">
+        <div class="section-header">
+          <div>
+            <h3 style="margin:0 0 4px;font-size:15px;">랭크 개요</h3>
+            <p class="caption">
+              S는 도시급 재앙, A는 핵심 인프라, B 이하는 뒷골목 생활 밀착형 의뢰다.
+            </p>
+          </div>
+        </div>
+
+        <div class="nd-contract-grid">
+          <div class="nd-contract-card nd-rank-s">
+            <div class="nd-contract-inner">
+              <div class="nd-contract-rank">S-RANK // black ops</div>
+              <div class="nd-contract-title">도시 구조를 뒤흔드는 의뢰</div>
+              <div class="nd-contract-body">
+                정권 교체, 대규모 네트워크 마비, 고위 인물 제거.
+                실패하면 네오리베르 지도가 통째로 갈아엎어진다.
+              </div>
+              <div class="nd-contract-meta">
+                <span>권장 인원: 셀 단위 3~5인</span>
+                <span>보상: 상상 이상 + 영구 빚 면제</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="nd-contract-card nd-rank-a">
+            <div class="nd-contract-inner">
+              <div class="nd-contract-rank">A-RANK // core ops</div>
+              <div class="nd-contract-title">기업 스파이 & 핵심 자산 탈취</div>
+              <div class="nd-contract-body">
+                타워 침투, 실험체 회수, 주요 회선 장악 등
+                도시의 심장을 조용히 쥐어짜는 작업들.
+              </div>
+              <div class="nd-contract-meta">
+                <span>권장 인원: 2~3인</span>
+                <span>보상: 수만 creds + 인텔 독점권</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="nd-contract-card nd-rank-c">
+            <div class="nd-contract-inner">
+              <div class="nd-contract-rank">B/C-RANK // street ops</div>
+              <div class="nd-contract-title">생활 밀착형 뒷골목 의뢰</div>
+              <div class="nd-contract-body">
+                실종 파일 수거, 위험 구역 배달, 소규모 보안 교란.
+                신입 브로커들의 손과 발을 길들이는 데 쓰인다.
+              </div>
+              <div class="nd-contract-meta">
+                <span>권장 인원: 1~2인</span>
+                <span>보상: 수백~수천 creds + Favors</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <h3 style="margin:0;font-size:15px;">실시간 게시 의뢰</h3>
+          <div class="section-header-right">
+            <input id="job-search" type="search" placeholder="검색: 해킹, 잠입, 네온 마켓..." />
+            <div class="jobs-filters">
+              <button class="btn secondary micro btn-filter active" data-status="all">전체</button>
+              <button class="btn secondary micro btn-filter" data-status="open">오픈</button>
+              <button class="btn secondary micro btn-filter" data-status="accepted">진행중</button>
+              <button class="btn secondary micro btn-filter" data-status="completed">완료</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="jobs-list" id="jobs-list" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- INTEL -->
+    <section id="intel">
+      <div class="section-label">intel feed</div>
+      <h2 class="section-title">네오리베르 실시간 인텔</h2>
+      <p class="section-sub">
+        루머, 감시 로그, 내부 회의록 조각들. <br />
+        셀레르니아가 <strong>“유효하다”고 판단한 것만</strong> 이 피드에 남는다.
+      </p>
+
+      <div class="panel">
+        <div class="nd-intel-grid" id="intel-list"></div>
+      </div>
+    </section>
+
+    <!-- MAP -->
+    <section id="map">
+      <div class="section-label">city sectors</div>
+      <h2 class="section-title">NeoRivere Unofficial Map</h2>
+      <p class="section-sub">
+        보안국이 사용하는 공식 지도에는 없는, <strong>옵시디언 디렉티브 전용</strong> 구역 분류. <br />
+        각 섹터를 클릭하면 셀레르니아의 코멘트와 위험도를 볼 수 있다.
+      </p>
+
+      <div class="panel map-layout">
+        <div class="map-detail">
+          <div class="map-detail-name" id="map-detail-name">NeoRivere Overview</div>
+          <div class="map-detail-level" id="map-detail-level">
+            위험도 / 감시 강도
+          </div>
+          <div class="map-detail-desc" id="map-detail-desc">
+            오른쪽의 섹터 카드 중 하나를 선택하면, 이 위치에 대한 내부 브리핑이 표시됩니다.
+          </div>
+          <div class="map-detail-key" id="map-detail-key">
+            핵심 포인트: 도시 전체를 네트워크로 보고 움직일 것.
+          </div>
+        </div>
+
+        <div class="map-grid" id="map-grid"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    NEORIVERE // OBSIDIAN DIRECTIVE MOCK INTERFACE · 모든 로그는 셀레르니아 개인 서버에 암호화 저장됩니다.
+  </footer>
+
+  <script>
+    // ===== 작은 헬퍼 =====
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => document.querySelectorAll(sel);
+
+    // ===== 데이터: Jobs, Intel, Map Zones =====
+
+    const jobs = [
+      {
+        title: "보안국 중앙 노드 7분 블랙아웃",
+        rank: "S",
+        status: "open",
+        zone: "Upper Grid",
+        danger: "★★★★★",
+        reward: "120,000 creds + 인텔 독점권 + Favor 2",
+        summary: "보안국 타워 중앙 회선을 7분간 끊어, 특정 회의록을 삭제할 수 있는 창을 연다.",
+        note: "셀레르니아 직접 관여 시 보상 2배. 실패 시 조직 실존이 공식 기록에 남을 수 있음."
+      },
+      {
+        title: "네온 마켓 구역 세력 재조정",
+        rank: "A",
+        status: "accepted",
+        zone: "Underveil",
+        danger: "★★★★☆",
+        reward: "상권 지분 17% + 월 인텔 공급",
+        summary: "세 개의 상인 패거리를 하나의 이름 아래로 묶어, 조공 구조를 만들 것.",
+        note: "피는 적게, 공포는 충분히. 직접 명의 사용 금지."
+      },
+      {
+        title: "유령 서버 접속 로그 확보",
+        rank: "A",
+        status: "open",
+        zone: "Old Circuit",
+        danger: "★★★★☆",
+        reward: "50,000 creds + Ghost Key 1",
+        summary: "소문만 무성한 '유령 서버' 접속 흔적을 확보하고, 키워드를 추출한다.",
+        note: "접속에 성공하면 즉시 로그를 끊고 보고. 오래 머물수록 되돌릴 수 없는 흔적이 남는다."
+      },
+      {
+        title: "Outskirt Slabs 무기창고 목록화",
+        rank: "B",
+        status: "open",
+        zone: "Outskirt Slabs",
+        danger: "★★★☆☆",
+        reward: "8,000 creds + 지역 브로커 Favors",
+        summary: "슬럼 내부 비공식 무기고 위치와 종류를 전수조사, 데이터화한다.",
+        note: "무기 거래 개입 금지. 관찰과 기록만 수행."
+      },
+      {
+        title: "스트리트 브로커 'Mira' 신뢰도 검증",
+        rank: "C",
+        status: "completed",
+        zone: "Underveil",
+        danger: "★☆☆☆☆",
+        reward: "2,000 creds + 평가 리포트",
+        summary: "3건의 소규모 의뢰를 의도적으로 흘려, 보고 내용과 실제 결과를 비교한다.",
+        note: "보고서 정확도 97%. 셀레르니아 개인 코멘트: \"장난감으로 써도 되겠다.\""
+      },
+      {
+        title: "폐 서버 타워 내부 기록 구조화",
+        rank: "B",
+        status: "accepted",
+        zone: "Old Circuit",
+        danger: "★★★☆☆",
+        reward: "12,000 creds + 암호화 로그 일부 권한",
+        summary: "붕괴 직전의 아카이브 서버에서 잔여 데이터를 긁어와, 타임라인별로 정리한다.",
+        note: "Archivist 주도 작업. 러너 동행 필수."
+      }
+    ];
+
+    const intelFeed = [
+      {
+        title: "보안국, 'Obsidian Directive' 실존 재조사",
+        tag: "확인됨",
+        tagClass: "intel-tag-confirmed",
+        time: "2098-07-13 / 내부 회의록 발췌",
+        trust: "92%",
+        body: "비공개 회의에서 '검은 결정(Obsidian)'이라는 키워드가 반복 노출. 조직의 거점을 찾기보다는 도시 전체에 퍼진 정보망을 끊는 방향으로 논의 중이다."
+      },
+      {
+        title: "Underveil, 공개 인텔 장터 시험 운영",
+        tag: "부분 확인",
+        tagClass: "intel-tag-partial",
+        time: "2098-07-11 / 스트리트 브로커 \"Mira\"",
+        trust: "73%",
+        body: "소형 브로커들이 연합해, 누구나 입찰할 수 있는 '정보 경매'를 시도하는 중. 성공 시 상위 브로커들의 가격 정책에 영향을 줄 가능성이 있음."
+      },
+      {
+        title: "유령 서버 접속 메시지: \"Celernea is watching\"",
+        tag: "미확인 루머",
+        tagClass: "intel-tag-rumor",
+        time: "2098-07-09 / 떠돌이 해커 다수 진술",
+        trust: "41%",
+        body: "물리 위치가 추적되지 않는 노드에 접속 시, 모든 로그에 동일한 문장이 남는다고 함. 셀레르니아는 관련 질문에 대해 '내가 쓴 문장은 아니다'라고만 답했다."
+      },
+      {
+        title: "Black Docks, 보안국의 비공식 단속 계획",
+        tag: "부분 확인",
+        tagClass: "intel-tag-partial",
+        time: "2098-07-08 / 전직 보안국 요원 \"Ashfall\"",
+        trust: "68%",
+        body: "밀수선 루트를 한 번에 정리하기 위해, '사고처럼 보이는 사고'를 준비 중이라는 보고. 정확한 날짜와 방식은 아직 불명."
+      },
+      {
+        title: "Upper Grid 회선 일부, 이미 우리 손에 있음",
+        tag: "확인됨",
+        tagClass: "intel-tag-confirmed",
+        time: "2098-07-02 / 내부 로그",
+        trust: "100%",
+        body: "도시 상층의 공용 데이터 센터 백업 회선 다수가, 수년 전부터 옵시디언 디렉티브 소유로 전환 완료. 보안국은 아직 이를 모르는 것으로 보임."
+      }
+    ];
+
+    const mapZones = [
+      {
+        id: "upper",
+        name: "Upper Grid",
+        level: "2",
+        hazard: "안정 / 고감시",
+        desc: "유리 다리와 공중 빌딩으로 이루어진 상층 구역. 합법 기업과 공용 데이터 센터가 모여 있지만, 백업 회선 상당수를 우리가 쥐고 있다.",
+        key: "“웃으면서 놀 수 있는 놀이터.” – C"
+      },
+      {
+        id: "underveil",
+        name: "Underveil",
+        level: "3",
+        hazard: "변동 / 중감시",
+        desc: "지상 아래로 내려가는 계단형 반지하 도시. 밀수, 불법 개조, 인텔 장터가 한데 섞여 있으며, 괴담과 루머의 절반은 여기서 시작된다.",
+        key: "스트리트 브로커 'Mira'가 관리 중."
+      },
+      {
+        id: "docks",
+        name: "Black Docks",
+        level: "4",
+        hazard: "불안정 / 저감시",
+        desc: "밤이 되면 바다보다 드론 불빛이 더 많이 보이는 항만. 모든 밀수선이 한 번은 들르는 관문으로, 보안국이 가장 먼저 지우고 싶어하는 구역.",
+        key: "“폭발음이 들리면, 이미 늦은 거다.” – C"
+      },
+      {
+        id: "oldcircuit",
+        name: "Old Circuit",
+        level: "???",
+        hazard: "미확인 / 무감시",
+        desc: "옛 서버 타워와 폐 공장이 남아 있는 유령 공단. 망가진 회로 사이에 여전히 살아 있는 오래된 데이터가 숨어 있다.",
+        key: "유령 서버 출처 후보 1순위."
+      },
+      {
+        id: "outskirt",
+        name: "Outskirt Slabs",
+        level: "4",
+        hazard: "위험 / 저감시",
+        desc: "도시 끝 콘크리트 판 위의 임시 거주 지구. 공식 인구 통계에 잡히지 않는 사람들과 무기고들이 섞여 있다.",
+        key: "“우리가 완전히 통제할 수 없는 유일한 변수.” – C"
+      }
+    ];
+
+    // ===== RENDER: JOBS =====
+    function renderJobs(filterStatus = "all", searchText = "") {
+      const listEl = document.getElementById("jobs-list");
+      if (!listEl) return;
+
+      const term = searchText.trim().toLowerCase();
+
+      const filtered = jobs.filter(job => {
+        if (filterStatus !== "all" && job.status !== filterStatus) return false;
+        if (!term) return true;
+        const blob = `${job.title} ${job.zone} ${job.summary} ${job.note}`.toLowerCase();
+        return blob.includes(term);
+      });
+
+      listEl.innerHTML = "";
+
+      if (!filtered.length) {
+        const empty = document.createElement("div");
+        empty.textContent = "조건에 맞는 의뢰가 없습니다. 필터를 조정해보세요.";
+        empty.style.fontSize = "12px";
+        empty.style.color = "var(--muted)";
+        listEl.appendChild(empty);
+        return;
+      }
+
+      filtered.forEach(job => {
+        const card = document.createElement("article");
+        card.className = "job-card";
+
+        // rank badge
+        let rankClass = "";
+        if (job.rank === "S") rankClass = "badge-rank-s";
+        else if (job.rank === "A") rankClass = "badge-rank-a";
+        else rankClass = "badge-rank-b";
+
+        let statusClass = "";
+        if (job.status === "open") statusClass = "badge-status-open";
+        else if (job.status === "accepted") statusClass = "badge-status-accepted";
+        else statusClass = "badge-status-completed";
+
+        const statusLabel =
+          job.status === "open"
+            ? "오픈"
+            : job.status === "accepted"
+            ? "진행중"
+            : "완료";
+
+        card.innerHTML = `
+          <div class="job-header">
+            <div>
+              <div class="job-title">${job.title}</div>
+              <div class="job-meta">
+                <span>${job.zone}</span>
+                <span>위험도 ${job.danger}</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;">
+              <span class="badge ${rankClass}">RANK ${job.rank}</span>
+              <span class="badge ${statusClass}">${statusLabel}</span>
+            </div>
+          </div>
+          <div class="job-body">${job.summary}</div>
+          <div class="job-meta" style="margin-top:6px;">
+            <span>보상: ${job.reward}</span>
+          </div>
+          <div class="job-meta">
+            <span style="opacity:0.8;">메모: ${job.note}</span>
+          </div>
+        `;
+
+        listEl.appendChild(card);
+      });
+    }
+
+    // ===== RENDER: INTEL =====
+    function renderIntel() {
+      const listEl = document.getElementById("intel-list");
+      if (!listEl) return;
+
+      listEl.innerHTML = "";
+
+      intelFeed.forEach(item => {
+        const card = document.createElement("article");
+        card.className = "nd-intel-card";
+
+        card.innerHTML = `
+          <div class="nd-intel-inner">
+            <div class="nd-intel-top">
+              <div>
+                <div class="nd-intel-title">${item.title}</div>
+                <div class="nd-intel-meta">${item.time} · 신뢰도 ${item.trust}</div>
+              </div>
+              <div class="nd-intel-tag ${item.tagClass}">${item.tag}</div>
+            </div>
+            <div class="nd-intel-body">${item.body}</div>
+          </div>
+        `;
+
+        listEl.appendChild(card);
+      });
+    }
+
+    // ===== RENDER: MAP =====
+    function renderMap() {
+      const gridEl = document.getElementById("map-grid");
+      if (!gridEl) return;
+
+      const nameEl = document.getElementById("map-detail-name");
+      const levelEl = document.getElementById("map-detail-level");
+      const descEl = document.getElementById("map-detail-desc");
+      const keyEl = document.getElementById("map-detail-key");
+
+      function setDetail(zone) {
+        if (!zone) return;
+        if (nameEl) nameEl.textContent = zone.name;
+        if (levelEl) levelEl.textContent = `위험도 레벨 ${zone.level} · 상태: ${zone.hazard}`;
+        if (descEl) descEl.textContent = zone.desc;
+        if (keyEl) keyEl.textContent = `핵심 포인트: ${zone.key}`;
+      }
+
+      gridEl.innerHTML = "";
+      mapZones.forEach((zone, index) => {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "zone-card";
+        card.dataset.id = zone.id;
+        card.innerHTML = `
+          <div class="zone-name">${zone.name}</div>
+          <div class="zone-meta">레벨 ${zone.level} · ${zone.hazard}</div>
+          <div class="zone-key">${zone.desc}</div>
+        `;
+
+        card.addEventListener("click", () => {
+          $$(".zone-card").forEach(z => z.classList.remove("active"));
+          card.classList.add("active");
+          setDetail(zone);
+        });
+
+        gridEl.appendChild(card);
+
+        // 첫 번째 항목 기본 선택
+        if (index === 0) {
+          card.classList.add("active");
+          setDetail(zone);
+        }
+      });
+    }
+
+    // ===== NAV / SCROLL =====
+    function setupNav() {
+      const navToggle = $("#navToggle");
+      const mainNav = $("#mainNav");
+      if (navToggle && mainNav) {
+        navToggle.addEventListener("click", () => {
+          mainNav.classList.toggle("open");
+        });
+      }
+
+      // nav 링크 클릭 시 active 업데이트 + 부드러운 스크롤
+      $$("#mainNav a").forEach(link => {
+        link.addEventListener("click", (e) => {
+          const href = link.getAttribute("href");
+          if (href && href.startsWith("#")) {
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+              target.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+            $$("#mainNav a").forEach(a => a.classList.remove("active"));
+            link.classList.add("active");
+            mainNav.classList.remove("open");
+          }
+        });
+      });
+
+      // Hero 버튼 스크롤
+      $$("[data-scroll]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const targetSel = btn.getAttribute("data-scroll");
+          if (!targetSel) return;
+          const target = document.querySelector(targetSel);
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+    }
+
+    // ===== JOB FILTER / SEARCH =====
+    function setupJobControls() {
+      const searchInput = $("#job-search");
+      const filterButtons = $$(".btn-filter");
+      let currentStatus = "all";
+      let currentSearch = "";
+
+      if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+          currentSearch = e.target.value || "";
+          renderJobs(currentStatus, currentSearch);
+        });
+      }
+
+      filterButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          filterButtons.forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentStatus = btn.dataset.status || "all";
+          renderJobs(currentStatus, currentSearch);
+        });
+      });
+
+      renderJobs(currentStatus, currentSearch);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      setupNav();
+      setupJobControls();
+      renderIntel();
+      renderMap();
+    });
+  </script>
+</body>
+</html>
