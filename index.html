@@ -3130,17 +3130,23 @@ function closeUiPopup(){
   </div>
 
   <!-- Broker Profile Popup -->
-  <div id="brokerModal" class="popup modal-center" style="
-  width: 420px;
-  max-width: 90vw;
-  padding: 24px;
-  background: rgba(0,0,0,0.9);
-  border: 1px solid var(--neon-cyan);
-  border-radius: 12px;
-  box-shadow: 0 0 22px rgba(0,255,255,0.5), 0 0 10px rgba(255,0,160,0.4);
-  display: none;
-  backdrop-filter: blur(6px);
-  ">
+<div id="brokerModal" class="popup" style="
+position: fixed;
+/* 화면 왼쪽 상단 고정 위치 */
+left: 40px;
+top: 90px;
+transform: none;
+width: 420px;
+max-width: 90vw;
+padding: 24px;
+background: rgba(0,0,0,0.9);
+border: 1px solid var(--neon-cyan);
+border-radius: 12px;
+box-shadow: 0 0 22px rgba(0,255,255,0.5), 0 0 10px rgba(255,0,160,0.4);
+display: none;
+z-index: 999;
+backdrop-filter: blur(6px);
+">
   
 <h2 class="glitch" data-text="Broker Profile">Broker Profile</h2>
 
