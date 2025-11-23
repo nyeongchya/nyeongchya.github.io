@@ -276,7 +276,9 @@ body {
 .sideColumn::before {
   content:
   "【네오리베르 광역 감시망 안내】\A\A"
-  "▶ 현상수배 대상: RAVEN (위험등급: BLACK)\A"
+  "▶ NSC: 도시 상층 통합 감시 위원회 — 공식 기록에는 존재하지 않는다고 명시됨\A"
+  "▶ NMC: 네오리베르 유지·관리단 — 야간 정비 중 비인가 구조물 은폐 보고 다수\A\A"
+  "▶ 현상수배 대상: 셀레르니아 (위험등급: BLACK)\A"
   "   - 네트워크 침투 14회 기록\A"
   "   - 불법 AI 로딩 3건\A"
   "   - 전자 감시 우회 27회 적발\A\A"
@@ -285,6 +287,7 @@ body {
   "▶ 시스템 경고: 패킷 손실률 72%\A"
   "▶ 오류: NODE-33C 연결 실패 ███\A"
   "▶ 로그 누락 감지: TIME_STAMP_CORRUPTED%%%\A"
+  "▶ NSC 내부 채널 노이즈: \"…NMC 야간 루트를 다시 확인해 봐…\"\A"
   "▶ 메시지 재구성 중 ▒▒▒▒▒▒▒▒▒▒▒▒▒\A"
   "▶ 암흑전파 수신: '…거기 누구냐…?'\A\A"
   "▶ TIP: 감시 드론은 4초 간격으로 궤도를 변경함\A"
@@ -443,7 +446,10 @@ body.scanlines {
    ========================= */
    #loading-screen {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;  /* 화면 높이 딱 맞게 */
   background:
     radial-gradient(circle at top, #19001f 0%, #03030a 55%);
   display: flex;
@@ -454,6 +460,7 @@ body.scanlines {
   font-family: "Gowun Dodum", sans-serif;
   transition: opacity 0.4s ease;
 }
+
 
 #loading-screen .loading-inner {
   max-width: 420px;
@@ -681,6 +688,18 @@ body.scanlines {
   line-height:1.45;
 }
 
+/* Intel 구역 하이라이트 / 디밍 */
+.nd-intel-card.intel-highlight {
+  border-color: rgba(0, 255, 255, 0.8);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.55);
+  transform: translateY(-3px);
+}
+
+.nd-intel-card.intel-dim {
+  opacity: 0.35;
+  filter: grayscale(0.2);
+}
+
 /* Map Layout + Detail */
 .nd-map-layout{
   display:grid;
@@ -842,10 +861,13 @@ body.scanlines {
 /* ==== 섹션 이동 ROUTING 오버레이 ==== */
 #routeOverlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;  /* 화면 높이 기준으로 꽉 채우기 */
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: center;   /* 세로 중앙 */
+  justify-content: center; /* 가로 중앙 */
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.35s ease;
@@ -854,6 +876,7 @@ body.scanlines {
     rgba(0, 0, 0, 0.75) 0%,
     rgba(0, 0, 0, 0.96) 55%);
 }
+
 
 #routeOverlayInner {
   padding: 18px 26px;
@@ -1149,6 +1172,69 @@ body.scanlines {
     max-height:220px;
   }
 }
+/* ===== 사무소 인물 브리핑 카드 ===== */
+.staff-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.staff-card {
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 0 16px rgba(0,255,255,0.08);
+  font-size: 13px;
+}
+
+.staff-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.staff-name {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.staff-role {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.staff-tagline {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--neon-emerald);
+}
+
+.staff-body {
+  margin-top: 6px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.staff-meta {
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.staff-pill {
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,255,255,0.45);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 
   </style>
 </head>
@@ -1282,6 +1368,86 @@ body.scanlines {
             <div id="recent-list" class="list"></div>
           </div>
         </div>
+
+        <div style="margin-top:16px" class="panel">
+          <h3><span class="glitch" data-text="사무소 인물 브리핑">사무소 인물 브리핑</span></h3>
+          <p class="small">
+            옵시디언 디렉티브의 핵심 인물들.  
+            외부 기록에는 남지 않는, 네오리베르 뒷골목의 진짜 주인들이다.
+          </p>
+
+          <div class="staff-grid">
+            <!-- 셀레르니아 -->
+            <article class="staff-card">
+              <div class="staff-header">
+                <div>
+                  <div class="staff-name">셀레르니아</div>
+                  <div class="staff-role">Obsidian Directive 대표 · 메인 브로커</div>
+                </div>
+                <div class="staff-pill">LV.BLACK · ROOT ACCESS</div>
+              </div>
+              <div class="staff-tagline">
+                “도시의 모든 비밀은, 결국 내 책상 위로 모인다.”
+              </div>
+              <div class="staff-body">
+                네오리베르 뒷세계의 최상위 권력.  
+                감시망의 빈 틈, 사람들의 약점, 데이터 흐름의 방향까지
+                머릿속에 지도처럼 그려두고 움직인다.
+              </div>
+              <div class="staff-meta">
+                <span>전문 분야: 정보 브로커링 / 네트워크 조작</span>
+                <span>위험도: ★★★★★</span>
+              </div>
+            </article>
+
+            <!-- NSB 출신 소년 서포터 -->
+            <article class="staff-card">
+              <div class="staff-header">
+                <div>
+                  <div class="staff-name">코드네임: 스캐너</div>
+                  <div class="staff-role">전 NSB 감시국 · 서포터</div>
+                </div>
+                <div class="staff-pill">AGE: LATE TEEN</div>
+              </div>
+              <div class="staff-tagline">
+                “원래는 너희를 감시하라고 배웠는데, 이제는 같이 도망치는 쪽이 더 재밌어.”
+              </div>
+              <div class="staff-body">
+                10대 후반의 소년. 원래 NSB 소속 감시국 분석 요원이었지만  
+                너무 많은 것을 알아버린 탓에 “올드 채널”로 버려졌다.  
+                그때 셀레르니아가 손을 내밀어 사무소로 데려왔다.
+              </div>
+              <div class="staff-meta">
+                <span>역할: 감시망 패턴 분석 / 로그 조작</span>
+                <span>신뢰도: ★★★★☆</span>
+              </div>
+            </article>
+
+            <!-- 셀레르니아 호위무사 -->
+            <article class="staff-card">
+              <div class="staff-header">
+                <div>
+                  <div class="staff-name">코드네임: 블레이드</div>
+                  <div class="staff-role">사무소 전속 호위무사</div>
+                </div>
+                <div class="staff-pill">CLOSE·COMBAT</div>
+              </div>
+              <div class="staff-tagline">
+                “지워야 할 건 데이터만이 아니다.”
+              </div>
+              <div class="staff-body">
+                말수가 적고, 기록도 거의 남아있지 않은 인물.  
+                네온 골목 끝에서 소문처럼만 들리던 “검은 호위자”와 동일 인물이라는 설이 있다.  
+                의뢰가 실패 직전으로 치달을 때, 마지막에 판을 수습하는 역할.
+              </div>
+              <div class="staff-meta">
+                <span>역할: 근접전 / VIP 보호 / 회수</span>
+                <span>목격 기록: 극히 희박</span>
+              </div>
+            </article>
+          </div>
+        </div>
+
       </section>
 
       <!-- JOBS -->
@@ -1471,8 +1637,8 @@ body.scanlines {
                           style="width:100%;background:transparent;border:1px solid rgba(255,255,255,0.08);padding:6px 8px;border-radius:8px;color:var(--text);font-size:12px;">
                     <option value="사무소 직원">사무소 직원</option>
                     <option value="의뢰인">의뢰인</option>
-                    <option value="보안국">보안국 · 감시망</option>
-                    <option value="기타">기타/테스트</option>
+                    <option value="보안국">NSC · 감시망</option>
+                    <option value="기타">NMC</option>
                   </select>
       
                   <textarea id="contact-input"
@@ -1606,6 +1772,78 @@ const intel = [
     trust: "?",
     tag: "glitch",
     body: "<span class='glitch' data-text='데이터 손상'>데이터 손상</span>: 감시 네트워크가 비정상 루프를 생성 중."
+  },
+  {
+    id: "I-1",
+    title: "시내 CCTV 루트 재조정",
+    time: "2098-11-18 02:12",
+    trust: "B+",
+    tag: "surveillance",
+    body: "중앙 통제실이 새 스케줄을 배포 — 과거 루트와 다른 회전 주기. 야간에 감시 사각이 사라진 구간이 있음."
+  },
+  {
+    id: "I-2",
+    title: "블루버드 드론 배치",
+    time: "2098-11-20 21:04",
+    trust: "A-",
+    tag: "aerial",
+    body: "특정 상공에 감시 드론이 늘어남. 일부 기체는 전자전 장비를 탑재한 것으로 추정됨."
+  },
+  {
+    id: "I-3",
+    title: "큐브 노드 재배치",
+    time: "2098-11-21 01:30",
+    trust: "A",
+    tag: "network",
+    body: "기업 노드들이 트래픽 우회 경로를 설정. 특정 구간에서 레이턴시 급증, 데이터 덤프 시도 가능성."
+  },
+  {
+    id: "I-4",
+    title: "정체불명 통신 신호",
+    time: "2098-11-22 05:20",
+    trust: "C+",
+    tag: "signal",
+    body: "도시 동부에서 비인가 주파수 탐지. 짧고 반복되는 패턴이며, 구형 NMC 장비에서 쓰던 포맷과 유사하다는 보고."
+  },
+  {
+    id: "I-5",
+    title: "갱단 간 충돌 발생",
+    time: "2098-11-22 13:44",
+    trust: "B",
+    tag: "gang",
+    body: "Chrome Jungles 인근에서 무장 갱단 충돌. NMC 차량이 현장을 스쳐 지나갔지만, 공식 기록에서는 제외됨."
+  },
+  {
+    id: "I-6",
+    title: "기업 스파이 포착",
+    time: "2098-11-23 01:02",
+    trust: "A",
+    tag: "corp",
+    body: "Corporate Spire 내부에서 내부자 의심 인물 감지. NSC 쪽에서 로그 일부를 회수했으나, 이름 칸만 검게 마스킹됨."
+  },
+  {
+    id: "I-7",
+    title: "지하철 노드 권한 상승 시도",
+    time: "2098-11-23 02:50",
+    trust: "A-",
+    tag: "network",
+    body: "Old Subway 네트워크에서 비인가 루트 권한 요청 발생. 요청자 태그: 'OBSIDIAN-DIR', 처리 결과: 수동으로 차단됨."
+  },
+  {
+    id: "I-8",
+    title: "NSC 내부 채널 로그 조각 유출",
+    time: "2098-11-23 04:12",
+    trust: "A",
+    tag: "NSC",
+    body: "NSC 내부 채널에서 잘려 나간 로그 조각이 언더넷에 떠돌고 있음. 수신자 칸에 '셀레르니아'라는 문자열이 남아 있으나, 위에 검은 블록이 겹쳐져 있음."
+  },
+  {
+    id: "I-9",
+    title: "NMC 야간 정비 루트 이상",
+    time: "2098-11-23 05:33",
+    trust: "B+",
+    tag: "NMC",
+    body: "NMC 정비반이 Ghost Alley와 Lower Docks 사이 구간을 반복 순회. 공식 정비 일정에는 없는 루트로, 무엇인가를 숨기거나 회수 중일 가능성이 높음."
   }
 ];
 
@@ -1686,6 +1924,41 @@ const defaultContactLog = [
     kind:'enemy',
     time:'2098-11-23 00:12',
     body:'…NEORIVERE NODE 접속 기록 탐지…\n신원: 비식별. 태그: "셀레르니아" (비공식 코드네임). 분석 대기 중.'
+  },
+  {
+    id: "L-5",
+    timestamp: "2098-11-22 03:14",
+    from: "SYSTEM // UNDERNET ROUTER",
+    channel: "[SYS//NEORIVERE-ROUTER]",
+    body: "NSC 메인 노드가 하층 언더넷에서 비인가 브로커 세션을 탐지했습니다. 수신자 태그: '셀레르니아'. 라우팅 테이블 수동 수정으로 추적이 실패했다는 기록만 남겨졌습니다."
+  },
+  {
+    id: "L-6",
+    timestamp: "2098-11-22 03:40",
+    from: "NSC-KID",
+    channel: "[STAFF//NSC-KID]",
+    body: "보스, NSC 상층 로그 일부를 빼 왔어요. NMC 야간 정비 루트랑 겹치는 시간대에만 CCTV가 동시에 3대씩 눈을 감아요. 이건 우연이 아니에요. 필요하면 원본 로그도 올려둘게요."
+  },
+  {
+    id: "L-7",
+    timestamp: "2098-11-22 04:02",
+    from: "NMC 현장 정비반",
+    channel: "[NMC-FIELD-03]",
+    body: "공식 보고서는 NSC 쪽으로만 올라가니까, 여기에는 진짜 상황을 남겨둘게요. Ghost Alley 배선 뒤에서 누군가 설치해 둔 비인가 라인을 발견했는데, 추적 태그에 'OBSIDIAN-DIR'가 찍혀 있었어요. 우린 못 본 걸로 하겠습니다."
+  },
+  {
+    id: "L-8",
+    timestamp: "2098-11-22 04:33",
+    from: "익명 의뢰자",
+    channel: "[CLIENT//ANON]",
+    body: "NMC 정비 일정이 업데이트되기 전에 움직여야 해요. NSC가 제 가족을 '보호 대상'으로 올려버렸습니다. 그 말은 곧 감시 대상이라는 뜻이거든요. 접선 시간과 장소는 제가 지정하는 대로, 단 한 번만."
+  },
+  {
+    id: "L-9",
+    timestamp: "2098-11-22 05:10",
+    from: "OLD CH. 기록 조각",
+    channel: "[OLD-CHANNEL//FRAGMENT]",
+    body: "…NSC 가동 전, NMC가 처음으로 도시 하층을 봉인하던 날 남겨진 로그입니다. '셀레르니아, 네가 이 도시의 마지막 백업이 될 거야.' 라는 문장만 남고 나머지는 전부 검게 태워졌습니다."
   }
 ];
 
@@ -1934,6 +2207,11 @@ function renderIntel(){
   intel.forEach(i=>{
     const el = document.createElement('article'); 
     el.className = 'nd-intel-card';
+
+    // 🔹 나중에 하이라이트에 사용할 태그/ID 저장
+    el.dataset.id = i.id;
+    el.dataset.tag = (i.tag || '').toLowerCase();
+
     el.innerHTML = `
       <div class="nd-intel-top">
         <div>
@@ -1950,6 +2228,56 @@ function renderIntel(){
   });
 }
 
+// 🔍 특정 구역 이름에 맞는 인텔 카드 하이라이트
+function highlightIntelForZone(zoneName) {
+  const cards = document.querySelectorAll('#intel-list .nd-intel-card');
+  if (!cards.length) return;
+
+  // 전체 초기화
+  cards.forEach(card => {
+    card.classList.remove('intel-highlight', 'intel-dim');
+  });
+
+  if (!zoneName) return;
+
+  const key = zoneName.toLowerCase();
+  let anyHit = false;
+
+  cards.forEach(card => {
+    const title = (card.querySelector('.nd-intel-title')?.textContent || '').toLowerCase();
+    const body  = (card.querySelector('.nd-intel-body')?.textContent  || '').toLowerCase();
+    const tag   = (card.dataset.tag || '').toLowerCase();
+
+    // 🔹 간단한 매칭 룰:
+    //  - 본문/제목에 구역 이름이 들어가거나
+    //  - 구역 이름에 맞는 태그가 있을 때 매칭
+    let hit = false;
+
+    if (title.includes(key) || body.includes(key)) {
+      hit = true;
+    } else {
+      // 약간의 수동 매핑 (네오리베르 설정 반영)
+      if (zoneName === 'Old Subway' && tag === 'network') hit = true;
+      if (zoneName === 'Corporate Spire' && (tag === 'corp' || tag === 'NSC')) hit = true;
+      if (zoneName === 'Ghost Alley' && (tag === 'NMC' || tag === 'gang')) hit = true;
+      if (zoneName === 'Lower Docks' && (tag === 'NMC' || tag === 'gang')) hit = true;
+    }
+
+    if (hit) {
+      card.classList.add('intel-highlight');
+      anyHit = true;
+    } else {
+      card.classList.add('intel-dim');
+    }
+  });
+
+  // 매칭되는 게 하나도 없으면 그냥 원상복구 (너무 허전하면)
+  if (!anyHit) {
+    cards.forEach(card => {
+      card.classList.remove('intel-highlight', 'intel-dim');
+    });
+  }
+}
 
 function renderMap(){
   const grid = $('#map-grid'); 
@@ -1992,6 +2320,7 @@ function renderMap(){
       void holoBox.offsetWidth;
       holoBox.classList.add('pulse');
     }
+    highlightIntelForZone(z.name);
   }
 
 
@@ -2478,13 +2807,22 @@ window.addEventListener('load', () => {
   const loader = document.getElementById('loading-screen');
   if (!loader) return;
 
+  // 🔒 로딩 중에는 스크롤 잠그기
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+
   setTimeout(() => {
     loader.style.opacity = '0';
     setTimeout(() => {
       loader.remove();
+
+      // 🔓 로딩 끝나면 다시 스크롤 풀기
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
     }, 400);
-  }, 2500); // 5초 로딩
+  }, 2500); // 2.5초 로딩
 });
+
 
 // =======================
 // World Ticker (상단 상태 로그 회전)
@@ -2519,7 +2857,7 @@ setInterval(rotateWorldLog, 12000);   // 12초마다 도시 상태 갱신
 // 사이드 알림: 약간 딜레이 후 주기적으로 표시
 setTimeout(() => {
   spawnSideAlert();
-  setInterval(spawnSideAlert, 10000);  // 12초마다 하나씩
+  setInterval(spawnSideAlert, 9000);  // 12초마다 하나씩
 }, 5000);
 
 /* switch view on load */
@@ -2532,6 +2870,16 @@ window._oc = { jobs, intel, mapZones, items, state, encryptAES, decryptAES };
    Side floating alert logic
    ========================= */
    const sideAlertPool = [
+   {
+    title: "NSC-KID // CELERENIA",
+    body: "보안국 분류: NSC-KID-R0\n상태: 최우선 감시 및 교전 회피 권고.\n비고: ‘옵시디언 디렉티브’와 직접 연관.",
+    tag: "HIGH PRIORITY"
+  },
+  {
+    title: "SYS·ALERT",
+    body: "예상치 못한 패킷 군집 감지.\n하층 노드에서 비인가 트래픽 발생.",
+    tag: "MONITORING"
+  },
   {
     title: "OFFICE // DIRECTOR",
     body: "셀레르니아: \"의뢰 문구에 감정 섞지 마. 기록은 항상 차갑게.\"",
@@ -2576,6 +2924,56 @@ window._oc = { jobs, intel, mapZones, items, state, encryptAES, decryptAES };
     tittle: "STAFF CHAT",
     body: "로비 직원: \"사장님.. 기물 파손은 좀 참아주세요..\"",
     tag: "OFFICE LIFE"
+  },
+  {
+    tittle: "GUARD // BODYGUARD",
+    body: "아이기스: \"마스터. 분명 안다친다고 했으면서...\"",
+    tag: "STATIONED"
+  },
+  {
+    title: "NSC·OVERRIDE",
+    body: "NSC 상층 콘솔에서 하층 감시 규칙을 재정의했습니다.\n기존 우회 루트 일부가 더 이상 안전하지 않습니다.",
+    tag: "NSC ROUTE"
+  },
+  {
+    title: "NMC NIGHT ROUTE",
+    body: "NMC 야간 정비반이 Ghost Alley → Lower Docks 구간을 반복 순회 중.\n공식 정비 일정과 일치하지 않는 루트입니다.",
+    tag: "NMC PATROL"
+  },
+  {
+    title: "WANTED // RAVEN",
+    body: "네트워크 침투 시도 로그 14건.\n최근 활동 구역: Holo·District / Lower Docks.",
+    tag: "THREAT LV. B+"
+  },
+  {
+    title: "TRACE WARNING",
+    body: "역추적 시도 가능성 감지.\n같은 채널에서 오래 머무르지 마십시오.",
+    tag: "RECOMMEND: HOP NODE"
+  },
+  {
+    title: "OBSIDIAN·DIR PING",
+    body: "옵시디언 디렉티브 내부 채널로 미확인 패킷 도착.\n수신자 태그: \"셀레르니아\" — 발신자는 마스킹됨.",
+    tag: "INTERNAL"
+  },
+  {
+    title: "BLACK MARKET PING",
+    body: "신규 장비 입고: Ghost·Router.\n일시적으로 가격 변동 감지.",
+    tag: "MARKET FEED"
+  },
+  {
+    title: "CCTV ROUTE UPDATE",
+    body: "상단 구역 카메라 회전 주기 변경.\nNSC 로그 기준, 같은 구역이 두 번 겹쳐 촬영되는 구간 발견.",
+    tag: "SURVEILLANCE"
+  },
+  {
+    title: "UNKNOWN SIGNAL",
+    body: "동부 구역에서 반복 신호 수신:\n\"…거기 누구냐…?\"\nNMC 구형 장비에서 쓰던 포맷과 유사.",
+    tag: "GLITCH FEED"
+  },
+  {
+    title: "OLD·CH FRAGMENT",
+    body: "OLD CHANNEL에서 복원된 로그 조각:\n\"…도시 백업 권한을 셀레르니아에게 이전…\"\n이후 데이터는 전부 태워졌습니다.",
+    tag: "ARCHIVE"
   }
 ];
 
