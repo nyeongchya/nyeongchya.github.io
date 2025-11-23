@@ -324,6 +324,16 @@ body::after {
   opacity:0.25;
 }
 
+.spark {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--neon-blue);
+  box-shadow: 0 0 12px var(--neon-blue);
+  animation: sparkFade .4s ease-out forwards;
+}
+
 @keyframes sparkFade {
   from { transform: scale(1); opacity:1; }
   to   { transform: scale(2.3); opacity:0; }
@@ -1069,87 +1079,6 @@ body.scanlines {
   }
 }
 
-/* ===== Contact: 셀레르니아 통신 허브 ===== */
-.contact-layout{
-  margin-top:12px;
-  display:flex;
-  gap:14px;
-  align-items:flex-start;
-  flex-wrap:wrap;
-}
-.contact-composer{
-  flex:1;
-  min-width:240px;
-}
-.contact-log-panel{
-  flex:1.3;
-  min-width:260px;
-  max-height:260px;
-  padding:10px;
-  border-radius:12px;
-  background:rgba(0,0,0,0.45);
-  border:1px solid rgba(255,255,255,0.06);
-  overflow-y:auto;
-}
-.contact-log-title{
-  font-size:14px;
-  font-weight:600;
-}
-.contact-log-caption{
-  font-size:11px;
-  color:var(--muted);
-}
-.contact-log-list{
-  margin-top:8px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  font-size:12px;
-}
-.contact-log-entry{
-  padding:8px 10px;
-  border-radius:8px;
-  background:rgba(0,0,0,0.55);
-  border:1px solid rgba(0,255,255,0.18);
-}
-.contact-log-meta{
-  display:flex;
-  justify-content:space-between;
-  gap:8px;
-  margin-bottom:4px;
-  font-size:11px;
-  color:var(--muted);
-}
-.contact-log-from{
-  font-weight:600;
-  color:var(--neon-emerald);
-}
-.contact-log-to{
-  opacity:0.9;
-}
-.contact-log-kind{
-  margin-left:4px;
-  font-size:10px;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  color:var(--muted);
-}
-.contact-log-body{
-  white-space:pre-line;
-  color:var(--text);
-}
-.contact-log-empty{
-  font-size:12px;
-  color:var(--muted);
-  opacity:0.9;
-}
-
-@media (max-width:900px){
-  .contact-log-panel{
-    max-height:220px;
-  }
-}
-
   </style>
 </head>
 
@@ -1453,74 +1382,25 @@ body.scanlines {
             </section>
       
 
-            <!-- CONTACT -->
-            <section id="contact" class="panel" style="display:none">
-              <h2>셀레르니아 통신 허브</h2>
-              <p class="small">
-                이 채널은 네오리베르의 주인인 <strong>셀레르니아</strong>만 접근 가능한 비공개 통신 로그입니다.
-                사무소 직원, 의뢰인, 보안국의 적들이 남긴 메모를 한 곳에서 관리합니다.
-              </p>
-      
-              <div class="contact-layout">
-                <!-- 셀레르니아가 메모 남기는 쪽 -->
-                <div class="contact-composer">
-                  <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">
-                    대상
-                  </div>
-                  <select id="contact-recipient"
-                          style="width:100%;background:transparent;border:1px solid rgba(255,255,255,0.08);padding:6px 8px;border-radius:8px;color:var(--text);font-size:12px;">
-                    <option value="사무소 직원">사무소 직원</option>
-                    <option value="의뢰인">의뢰인</option>
-                    <option value="보안국">보안국 · 감시망</option>
-                    <option value="기타">기타/테스트</option>
-                  </select>
-      
-                  <textarea id="contact-input"
-                            placeholder="남길 메모를 적으세요. (예: Ghost Alley 순찰 보고, 의뢰자에게 답장 등)"
-                            style="margin-top:8px;width:100%;height:120px;background:transparent;border:1px solid rgba(255,255,255,0.06);padding:10px;border-radius:8px;color:var(--text);font-size:13px;"></textarea>
-      
-                  <div style="margin-top:8px;display:flex;gap:8px;">
-                    <button id="contact-send" class="btn micro">메모 기록</button>
-                    <button id="contact-clear" class="btn secondary micro">입력 지우기</button>
-                  </div>
-      
-                  <div style="margin-top:6px;font-size:11px;color:var(--muted);">
-                    ※ 이 로그는 <strong>현재 브라우저에만 로컬 저장</strong>됩니다. 새로고침해도 유지됩니다.
-                  </div>
-                </div>
-      
-                <!-- 오른쪽: 로그 창 -->
-                <div class="contact-log-panel">
-                  <div class="contact-log-header">
-                    <div class="contact-log-title">최근 대화 로그</div>
-                    <div class="contact-log-caption">
-                      사무소 직원, 의뢰인, 보안국 쪽에서 셀레르니아에게 남긴 메시지가 정리됩니다.
-                    </div>
-                  </div>
-      
-                  <div id="contact-log" class="contact-log-list">
-                    <!-- JS로 채워짐 -->
-                  </div>
-                </div>
-              </div>
-      
-              <!-- 🔐 기존 암호화 도구는 '고급 기능'으로 접어두기 (버튼/ID 유지) -->
-              <details style="margin-top:14px;font-size:12px;color:var(--muted);">
-                <summary style="cursor:pointer;">
-                  고급 기능: 실험용 암호화 도구 열기
-                </summary>
-                <div style="margin-top:8px;display:flex;gap:12px;align-items:flex-start;">
-                  <textarea id="payload"
-                            placeholder="실험용 암호화 메시지..."
-                            style="width:100%;height:100px;background:transparent;border:1px solid rgba(255,255,255,0.04);padding:10px;border-radius:8px;color:var(--text);"></textarea>
-                  <div style="display:flex;flex-direction:column;gap:6px;min-width:120px;">
-                    <button id="encryptBtn" class="btn micro">암호화 & 복사</button>
-                    <button id="decryptBtn" class="btn secondary micro">복호화</button>
-                    <button id="clearPayload" class="btn secondary micro">지우기</button>
-                  </div>
-                </div>
-              </details>
-            </section>      
+      <!-- CONTACT -->
+      <section id="contact" class="panel" style="display:none">
+        <h2>보안 채널</h2>
+        <p class="small">메시지는 클라이언트 측 AES-GCM으로 암호화됩니다. 비밀번호는 로컬에서만 사용하세요.</p>
+
+        <div style="margin-top:12px;display:flex;gap:12px;align-items:flex-start">
+          <div style="flex:1">
+            <textarea id="payload" placeholder="보낼 메시지..." style="width:100%;height:120px;background:transparent;border:1px solid rgba(255,255,255,0.04);padding:10px;border-radius:8px;color:var(--text)"></textarea>
+            <div style="margin-top:8px;display:flex;gap:8px">
+              <button id="encryptBtn" class="btn micro">암호화 & 복사</button>
+              <button id="decryptBtn" class="btn secondary micro">복호화</button>
+              <button id="clearPayload" class="btn secondary micro">지우기</button>
+            </div>
+            <div style="margin-top:8px;color:var(--muted);font-size:12px">
+              팁: 메시지 앞에 <code>Accept:JOB_ID</code>를 붙이면 내부 워크플로우가 트리거됩니다.
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- MARKET -->
       <section id="Market" class="panel" style="display:none">
@@ -1654,53 +1534,6 @@ const items = [
   { id: 'IT-18', name: '섀도우 캡슐',         desc: '몸에 부착하는 단시간 열 신호 차단 캡슐',price: 3700, stock: 5 },
 ];
 
-const defaultContactLog = [
-  {
-    id:'L-1',
-    from:'사무소 직원 · NSC 출신 서포터',
-    to:'셀레르니아',
-    kind:'staff',
-    time:'2098-11-22 03:14',
-    body:'보안국 내부망에서 옵시디언 디렉티브 관련 키워드가 계속 뜨고 있어요. 로그는 최대한 지웠는데, 패턴이 좀 이상합니다.'
-  },
-  {
-    id:'L-2',
-    from:'의뢰인 · "엄마의 목소리" 의뢰자',
-    to:'셀레르니아',
-    kind:'client',
-    time:'2098-11-22 09:47',
-    body:'지하철 폐쇄역 근처에서 녹음 파일을 찾았다는 연락, 잘 받았습니다. 제 쪽 기록은 약속대로 모두 지워 주세요.'
-  },
-  {
-    id:'L-3',
-    from:'사무소 호위무사',
-    to:'셀레르니아',
-    kind:'staff',
-    time:'2098-11-22 18:01',
-    body:'오늘 밤 Ghost Alley 구역은 평소보다 조용합니다. 대신 하늘에 도는 드론 수가 조금 늘었습니다.'
-  },
-  {
-    id:'L-4',
-    from:'[보안국 감시 로그 조각]',
-    to:'셀레르니아',
-    kind:'enemy',
-    time:'2098-11-23 00:12',
-    body:'…NEORIVERE NODE 접속 기록 탐지…\n신원: 비식별. 태그: "셀레르니아" (비공식 코드네임). 분석 대기 중.'
-  }
-];
-
-let contactLog = [];
-try{
-  const saved = JSON.parse(localStorage.getItem('oc_contact_log') || '[]');
-  if(Array.isArray(saved) && saved.length){
-    contactLog = saved;
-  } else {
-    contactLog = defaultContactLog.slice();
-  }
-}catch(e){
-  contactLog = defaultContactLog.slice();
-}
-
 /* ================
    App State
    ================ */
@@ -1710,33 +1543,7 @@ const state = {
   users: JSON.parse(localStorage.getItem('oc_users') || '{}'),
   logged: JSON.parse(localStorage.getItem('oc_logged') || '{}'),
   secretUnlocked: false,
-  contactsLog: JSON.parse(localStorage.getItem('oc_contactsLog') || '[]'),
 };
-
-// 연락 로그가 비어 있으면, 샘플 로그 몇 개 채워두기 (처음 접속용)
-if (!state.contactsLog || state.contactsLog.length === 0) {
-  state.contactsLog = [
-    {
-      id: 'LOG-BOOT-1',
-      ts: Date.now() - 1000 * 60 * 60 * 5,
-      from: "사무소 직원 · K-17",
-      targetType: "staff",
-      targetName: "셀레르니아",
-      direction: "in",
-      content: "오늘 23:00, Lower Docks 접선 준비 완료. — 기존 계획대로 진행합니다."
-    },
-    {
-      id: 'LOG-BOOT-2',
-      ts: Date.now() - 1000 * 60 * 30,
-      from: "익명 의뢰인",
-      targetType: "client",
-      targetName: "셀레르니아",
-      direction: "in",
-      content: "\"보안국이 제 뒤를 밟고 있어요. 기록에 제 이름은 남기지 말아주세요.\""
-    }
-  ];
-  localStorage.setItem('oc_contactsLog', JSON.stringify(state.contactsLog));
-}
 
 let jobStatusFilter = 'all';   // 🔹 의뢰 상태 필터
 
@@ -1760,63 +1567,6 @@ function renderSummary(){
   renderMap();
   renderMarket();
   renderPurchases();
-  renderContactLog();
-}
-
-function renderContactLog(){
-  const wrap = $('#contact-log');
-  if (!wrap) return;
-
-  if (!contactLog.length){
-    wrap.innerHTML =
-      '<div class="contact-log-empty">아직 기록된 대화가 없습니다.</div>';
-    return;
-  }
-
-  wrap.innerHTML = '';
-  contactLog.slice().reverse().forEach(log=>{
-    const el = document.createElement('div');
-    el.className = 'contact-log-entry';
-
-    const kind =
-      log.kind === 'staff'  ? 'STAFF'  :
-      log.kind === 'client' ? 'CLIENT' :
-      log.kind === 'enemy'  ? 'ENEMY'  :
-                              'LOG';
-
-    const safeBody = (log.body || '')
-      .replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;');
-
-    el.innerHTML = `
-      <div class="contact-log-meta">
-        <div>
-          <span class="contact-log-from">${log.from}</span>
-          <span class="contact-log-to"> → ${log.to}</span>
-          <span class="contact-log-kind">[${kind}]</span>
-        </div>
-        <div>${log.time || ''}</div>
-      </div>
-      <div class="contact-log-body">${safeBody}</div>
-    `;
-    wrap.appendChild(el);
-  });
-}
-
-function addContactEntry(from, to, kind, body){
-  const entry = {
-    id: 'L-' + Date.now().toString(36),
-    from,
-    to,
-    kind,
-    body,
-    time: new Date().toLocaleString()
-  };
-  contactLog.push(entry);
-  try{
-    localStorage.setItem('oc_contact_log', JSON.stringify(contactLog));
-  }catch(e){}
-  renderContactLog();
 }
 
 function renderRecent(){
@@ -2058,35 +1808,6 @@ function renderMarket() {
     container.appendChild(el);
   });
 }
-
-// Contact: 셀레르니아 통신 허브 입력
-const contactSendBtn = $('#contact-send');
-if (contactSendBtn) {
-  contactSendBtn.addEventListener('click', () => {
-    const textarea = $('#contact-input');
-    const targetSel = $('#contact-recipient');
-    if (!textarea) return;
-
-    const text = textarea.value.trim();
-    if (!text) {
-      popup('남길 내용을 먼저 입력하세요.');
-      return;
-    }
-
-    const to = targetSel ? targetSel.value : '기록';
-    addContactEntry('셀레르니아', to, 'outgoing', text);
-    textarea.value = '';
-  });
-}
-
-const contactClearBtn = $('#contact-clear');
-if (contactClearBtn) {
-  contactClearBtn.addEventListener('click', () => {
-    const textarea = $('#contact-input');
-    if (textarea) textarea.value = '';
-  });
-}
-
 
 /* purchases: 안전 가드 추가 */
 function renderPurchases(){
@@ -2496,7 +2217,7 @@ const worldLogs = [
   "CORP SPIRE: 내부 스파이 탐지 로그 생성",
   "OLD SUBWAY: 비인가 루트 권한 시도 차단",
   "lobby: 의뢰인 입장중입니다",
-  "N.S.C.: 셀█르██, 이게 너█의 사██인가?"
+  "N.S.B.: 셀█르██, 이게 너█의 사██인가?"
 ];
 
 let worldLogIndex = 0;
@@ -2538,7 +2259,7 @@ window._oc = { jobs, intel, mapZones, items, state, encryptAES, decryptAES };
     tag: "INTERNAL NOTE"
   },
   {
-    title: "SUPPORT // NSC-KID",
+    title: "SUPPORT // NSB-KID",
     body: "리레이: \"…이 채널 구조, 예전에 내가 지웠던 로그랑 똑같아 보여.\"",
     tag: "FIELD MEMO"
   },
@@ -2564,7 +2285,7 @@ window._oc = { jobs, intel, mapZones, items, state, encryptAES, decryptAES };
   },
   {
     title: "INTERNAL LOG",
-    body: "기록: \"보안국 NSC 출신 소년, 올드 채널에서 회수됨. 상태: 불안정 but 유용.\"",
+    body: "기록: \"보안국 출신 소년, 올드 채널에서 회수됨. 상태: 불안정 but 유용.\"",
     tag: "CLASSIFIED"
   },
   {
@@ -2654,8 +2375,8 @@ function popup(msg){
 }
 
 document.getElementById('profPanel').addEventListener('click', openBrokerModal);
-document.getElementById('blackPanel').addEventListener('click', ()=>popup('없는것이 없는 불법 상점'));
-document.getElementById('connPanel').addEventListener('click', ()=>popup('당신의 고민을 해결해드립니다'));
+document.getElementById('blackPanel').addEventListener('click', ()=>popup('암시장 상세 정보 (데모)'));
+document.getElementById('connPanel').addEventListener('click', ()=>popup('연결 포털 기능 (데모)'));
 document.getElementById('secretPanel').addEventListener('click', ()=>{
   if(state.logged[SECRET_OWNER]) popup('비밀 채널 접근 허가됨.');
   else popup('접근 불가 — raven 전용 채널입니다.');
@@ -2685,6 +2406,21 @@ function uiPopup(msg){
 function closeUiPopup(){
   document.querySelector('#uiPopup').style.display = 'none';
 }
+
+/* spark 효과 */
+window.addEventListener('click', (e)=>{
+  const s = document.createElement('div');
+  s.className = 'spark';
+
+  const size = 4;         // .spark width/height
+  const half = size / 1;  // 중앙 보정값
+
+  s.style.left = (e.clientX - half) + 'px';
+  s.style.top  = (e.clientY - half) + 'px';
+
+  document.body.appendChild(s);
+  setTimeout(()=>s.remove(), 400);
+});
 
   </script>
 
@@ -2736,19 +2472,19 @@ backdrop-filter: blur(6px);
 
 <div id="brokerProfileBody" style="margin-top:10px;font-size:13px;color:var(--muted)">
   <!-- 🔧 여기는 네가 마음대로 수정하면 되는 부분이야 -->
-  <div><strong>코드 네임</strong>: <span id="brokerName">celernea</span></div>
-  <div><strong>소속</strong>: <span>NeoRivere · Obsidian Directive 브로커</span></div>
+  <div><strong>콜사인</strong>: <span id="brokerName">raven</span></div>
+  <div><strong>소속</strong>: <span>Free Brokers · NeoRivere 하층 네트워크 브로커</span></div>
   <div style="margin-top:8px"><strong>전문 분야</strong></div>
   <ul style="margin-top:4px;padding-left:18px">
-    <li>전략 설계와 장기 시뮬레이션</li>
-    <li>의도와 패턴을 뽑아내는 정보 블렌딩</li>
-    <li>거래와 심리전을 동시에 설계하는 브로커링</li>
+    <li>신호 추적 및 로그 세탁</li>
+    <li>하층 의뢰자–해결사 매칭</li>
+    <li>감시 사각지대 정보 거래</li>
   </ul>
 
   <div style="margin-top:8px"><strong>특이 사항</strong></div>
   <p style="margin-top:4px">
-    신체 개조가 전혀 없는 '순수 인간'임에도, 정보와 계산만으로 네오리베르 최상위 권력을 유지한다.
-    웃을수록 결정은 더 차갑게 내려져, 주변 인물들에게 항상 묘한 긴장감을 준다.
+    통신망이 끊겨도, 브로커는 항상 다른 길을 찾는다.  
+    이름·능력·사연은 이 블록의 텍스트를 직접 수정해서 네 스타일대로 바꿔도 돼.
   </p>
 </div>
 
