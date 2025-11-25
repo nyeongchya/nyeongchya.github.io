@@ -740,6 +740,85 @@ body.scanlines {
   }
 }
 
+/* ==== NeoRivere Risk Simulation ==== */
+#riskSimPanel {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(0,255,255,0.25);
+  font-size: 12px;
+}
+
+#riskSimSummary {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+#riskSimList {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.risk-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.risk-rank {
+  font-size: 11px;
+  color: var(--muted);
+  min-width: 32px;
+}
+
+.risk-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.risk-meter {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.06);
+}
+
+.risk-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
+  box-shadow: 0 0 8px rgba(0,255,255,0.5);
+  transform-origin: left center;
+}
+
+.risk-score {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.risk-row.highest {
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 16px rgba(255,0,180,0.35);
+}
+
+.risk-row.low {
+  opacity: 0.8;
+}
+
+
 /* Hologram zone preview in left bottom */
 .nd-map-holo{
   margin-top:10px;
@@ -1578,6 +1657,25 @@ body.scanlines {
                   </p>
                 </div>
               </div>
+
+                    <!-- 🔥 도시 위험도 실시간 시뮬레이션 -->
+      <div id="riskSimPanel">
+        <h3 style="margin:0 0 4px 0;font-size:14px;">
+          <span class="glitch" data-text="도시 위험도 시뮬레이션">
+            도시 위험도 시뮬레이션
+          </span>
+        </h3>
+        <p class="small">
+          인텔 로그, 감시망 노이즈, 구역 위험 레벨을 기반으로
+          <strong>현재 시점 네오리베르 위험도</strong>를 계산합니다.
+        </p>
+        <div id="riskSimSummary"></div>
+        <div id="riskSimList"></div>
+      </div>
+
+      <div class="nd-map-layout">
+        <!-- 여기부터는 기존 코드 유지 -->
+
       
               <div class="nd-map-layout">
                 <div class="nd-map-detail">
@@ -2340,7 +2438,114 @@ function renderMap(){
     highlightIntelForZone(z.name);
   }
 
+  /* =========================
+   NeoRivere Risk Simulation
+   ========================= */
 
+// 인텔 신뢰도 → 가중치 테이블
+const TRUST_WEIGHT = {
+  'A+': 12,
+  'A': 10,
+  'A-': 8,
+  'B+': 6,
+  'B': 4,
+  'B-': 3,
+  'C+': 2,
+  'C': 1
+};
+
+// 한 구역의 위험도를 계산 (0~100)
+function computeZoneRisk(z) {
+  let risk = 0;
+
+  // 1) 기본: 레벨 기반
+  risk += z.level * 10; // 레벨 1~9 -> 10~90
+
+  // 2) hazard(문자열) 기반 가중치
+  const hz = (z.hazard || '').toLowerCase();
+  if (hz.includes('extreme'))      risk += 8;
+  else if (hz.includes('very'))    risk += 6;
+  else if (hz.includes('high'))    risk += 4;
+  else if (hz.includes('medium'))  risk += 2;
+  else if (hz.includes('low'))     risk += 0;
+
+  // 3) 인텔 로그에서 해당 구역이 언급되면 추가 가중치
+  const nameKey = z.name.toLowerCase();
+
+  intel.forEach(i => {
+    const text = (i.title + ' ' + i.body + ' ' + i.tag).toLowerCase();
+    if (text.includes(nameKey)) {
+      const w = TRUST_WEIGHT[i.trust] || 3;
+      risk += w;
+    }
+  });
+
+  // 4) worldLogs(상단 상태 로그)에서 구역 언급 시 약간 추가
+  worldLogs.forEach(log => {
+    const t = log.toLowerCase();
+    if (t.includes(nameKey)) {
+      risk += 2;
+    }
+  });
+
+  // 5) 랜덤 노이즈 (도시 상황이 완전히 고정돼 있지 않게)
+  risk += (Math.random() * 10) - 3;  // -3 ~ +7 정도 흔들림
+
+  // 6) 클램프 0~100
+  risk = Math.round(Math.max(0, Math.min(100, risk)));
+
+  return risk;
+}
+
+function simulateCityRisk() {
+  const listEl = document.getElementById('riskSimList');
+  const summaryEl = document.getElementById('riskSimSummary');
+  if (!listEl || !summaryEl) return;
+
+  // 각 구역 위험도 계산
+  const snapshot = mapZones.map(z => ({
+    zone: z,
+    risk: computeZoneRisk(z)
+  }));
+
+  // 높은 순으로 정렬
+  snapshot.sort((a, b) => b.risk - a.risk);
+
+  listEl.innerHTML = '';
+
+  snapshot.forEach((entry, idx) => {
+    const row = document.createElement('div');
+    row.className = 'risk-row';
+    if (idx === 0) row.classList.add('highest');
+    if (entry.risk < 30) row.classList.add('low');
+
+    const name = entry.zone.name;
+    const risk = entry.risk;
+
+    row.innerHTML = `
+      <div class="risk-rank">#${idx + 1}</div>
+      <div>
+        <div class="risk-name">${name}</div>
+        <div class="risk-meter">
+          <div class="risk-bar" style="width:${risk}%;"></div>
+        </div>
+      </div>
+      <div class="risk-score">${risk}%</div>
+    `;
+    listEl.appendChild(row);
+  });
+
+  // 간단 요약
+  const top = snapshot[0];
+  const avg = Math.round(
+    snapshot.reduce((sum, s) => sum + s.risk, 0) / snapshot.length
+  );
+
+  summaryEl.innerHTML = `
+    현재 최고 위험 구역: <strong>${top.zone.name}</strong>
+    (${top.risk}%) · 도시 평균 위험도: <strong>${avg}%</strong>
+  `;
+}
 
   grid.innerHTML = '';
   mapZones.forEach(z=>{
@@ -2871,6 +3076,9 @@ renderSummary();
 rotateWorldLog();
 setInterval(rotateWorldLog, 12000);   // 12초마다 도시 상태 갱신
 
+simulateCityRisk();
+setInterval(simulateCityRisk, 20000);
+
 // 사이드 알림: 약간 딜레이 후 주기적으로 표시
 setTimeout(() => {
   spawnSideAlert();
@@ -2938,12 +3146,12 @@ window._oc = { jobs, intel, mapZones, items, state, encryptAES, decryptAES };
     tag: "MISSION"
   },
   {
-    tittle: "STAFF CHAT",
+    title: "STAFF CHAT",
     body: "로비 직원: \"사장님.. 기물 파손은 좀 참아주세요..\"",
     tag: "OFFICE LIFE"
   },
   {
-    tittle: "GUARD // BODYGUARD",
+    title: "GUARD // BODYGUARD",
     body: "아이기스: \"마스터. 분명 안다친다고 했으면서...\"",
     tag: "STATIONED"
   },
@@ -3023,38 +3231,6 @@ function spawnSideAlert() {
     el.remove();
   }, 4300);
 }
-
-
-function spawnSideAlert() {
-  // 너무 팝업이 많아지지 않도록, 이미 떠 있는 게 있으면 가끔 스킵
-  if (document.querySelectorAll('.side-alert').length > 3) return;
-
-  const msg = sideAlertPool[Math.floor(Math.random() * sideAlertPool.length)];
-  const side = Math.random() < 0.5 ? 'left' : 'right';
-
-  const el = document.createElement('div');
-  el.className = `side-alert side-alert-${side} glitch-text`;
-
-  // 세로 위치를 랜덤 (상단/하단 너무 피해서 10~80vh)
-  const topVH = 10 + Math.random() * 70;
-  el.style.top = `${topVH}vh`;
-
-  el.innerHTML = `
-    <div class="side-alert-title">${msg.title}</div>
-    <div class="side-alert-body">
-      ${msg.body.replace(/\n/g, "<br>")}
-    </div>
-    <div class="side-alert-tag">${msg.tag}</div>
-  `;
-
-  document.body.appendChild(el);
-
-  // 애니메이션 끝난 후 자동 제거
-  setTimeout(() => {
-    el.remove();
-  }, 4300);
-}
-
 
 /* small popup helpers */
 function popup(msg){
