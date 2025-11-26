@@ -1643,96 +1643,19 @@ body.scanlines {
               </div>
       
               <div id="intel-list" class="nd-intel-grid"></div>
-            </section>
-      
+            </sectipon>
 
-            <!-- MAP -->
             <section id="map" class="panel" style="display:none">
               <div class="nd-section-header">
                 <div>
-                  <h2>NeoRivere 구역 맵</h2>
+                  <h2>NeoRivere 구역</h2>
                   <p class="nd-section-caption">
-                    옵시디언 디렉티브 전용 <strong>위험도 브리핑 맵</strong>.
-                    구역을 클릭하면 상세 정보가 오른쪽에 표시됩니다.
+                    네오리베르의 주요 구역
                   </p>
                 </div>
               </div>
-
-                    <!-- 🔥 도시 위험도 실시간 시뮬레이션 -->
-      <div id="riskSimPanel">
-        <h3 style="margin:0 0 4px 0;font-size:14px;">
-          <span class="glitch" data-text="도시 위험도 시뮬레이션">
-            도시 위험도 시뮬레이션
-          </span>
-        </h3>
-        <p class="small">
-          인텔 로그, 감시망 노이즈, 구역 위험 레벨을 기반으로
-          <strong>현재 시점 네오리베르 위험도</strong>를 계산합니다.
-        </p>
-        <div id="riskSimSummary"></div>
-        <div id="riskSimList"></div>
-      </div>
-
-      <div class="nd-map-layout">
-        <!-- 여기부터는 기존 코드 유지 -->
-
-      
-              <div class="nd-map-layout">
-                <div class="nd-map-detail">
-                  <div class="nd-map-detail-title" id="map-detail-name">NeoRivere</div>
-                  <div class="nd-map-detail-level" id="map-detail-level">
-                    위험도 레벨 / 감시 강도
-                  </div>
-                  <div class="nd-map-detail-desc" id="map-detail-desc">
-                    왼쪽의 구역 카드 중 하나를 선택하면, 이 위치의 세부 설명이 표시됩니다.
-                  </div>
-                  <div class="nd-map-detail-key" id="map-detail-key">
-                    핵심 포인트: -
-                  </div>
-                </div>
-
-                <div class="nd-map-holo" id="map-holo">
-                  <div class="nd-map-holo-label">HOLO·ZONE PROJECTION</div>
-                  <div class="nd-map-holo-name" id="map-holo-name">-</div>
-                  <div class="nd-map-holo-meta" id="map-holo-meta">LV.- / status: -</div>
-              
-                  <div class="nd-map-holo-grid">
-                    <div class="nd-map-holo-cell"></div>
-                    <div class="nd-map-holo-cell"></div>
-                    <div class="nd-map-holo-cell"></div>
-                    <div class="nd-map-holo-cell"></div>
-                    <div class="nd-map-holo-cell"></div>
-                    <div class="nd-map-holo-cell"></div>
-                    <div class="nd-map-holo-cell"></div>
-                    <div class="nd-map-holo-cell"></div>
-                  </div>
-                </div>
-
-                <!-- HOLO-ZONE 아래 작전 요약 박스 -->
-<div class="nd-map-ops" id="map-ops">
-  <div class="nd-map-ops-title">작전 요약</div>
-  <div class="nd-map-ops-grid">
-    <div class="ops-item">
-      <div class="label">권장 장비</div>
-      <div class="value" id="ops-gear">
-        구역을 선택하면 권장 장비가 표시됩니다.
-      </div>
-    </div>
-    <div class="ops-item">
-      <div class="label">출몰 세력</div>
-      <div class="value" id="ops-faction">-</div>
-    </div>
-    <div class="ops-item">
-      <div class="label">브로커 메모</div>
-      <div class="value" id="ops-note">-</div>
-    </div>
-  </div>
-</div>
-      
-                <div class="map-grid" id="map-grid"></div>
-              </div>
+              <div class="map-grid" id="map-grid"></div>
             </section>
-      
 
             <!-- CONTACT -->
             <section id="contact" class="panel" style="display:none">
@@ -2407,36 +2330,37 @@ function renderMap(){
   const holoMeta = $('#map-holo-meta');
   const holoCells = $all('.nd-map-holo-cell');
 
-  function setDetail(z){
-    if (!z || !nameEl) return;
-    nameEl.textContent  = z.name;
-    levelEl.textContent = `위험도 레벨 ${z.level} · 상태: ${z.hazard}`;
-    descEl.textContent  = z.desc;
-    if (keyEl) {
-      keyEl.innerHTML = `핵심 포인트: ${z.key || 'N/A'}`;
-    }
+  function renderMap() {
+  const grid = $('#map-grid');
+  if (!grid) return;
 
-    // 🔹 홀로그램 패널 업데이트
-    if (holoName) holoName.textContent = z.name;
-    if (holoMeta) holoMeta.textContent = `LV.${z.level} · status: ${z.hazard}`;
+  grid.innerHTML = '';
 
-    if (holoCells && holoCells.length){
-      const idx = z.level % holoCells.length;   // 레벨에 따라 칸 하나 발광
-      holoCells.forEach((c,i)=>{
-        c.classList.toggle('active', i === idx);
-      });
-    }
+  mapZones.forEach(z => {
+    const el = document.createElement('div');
+    el.className = 'zone';
 
-    // 🔹 선택 시 HOLO 패널 펄스 효과
-    const holoBox = $('#map-holo');
-    if (holoBox) {
-      holoBox.classList.remove('pulse');
-      // reflow로 애니메이션 재시작
-      void holoBox.offsetWidth;
-      holoBox.classList.add('pulse');
-    }
-    highlightIntelForZone(z.name);
-  }
+    el.innerHTML = `
+      <div style="font-weight:700">${z.name}</div>
+      <div class="meta">
+        위험도 레벨: ${z.level} · 상태: ${z.hazard}
+      </div>
+      <div class="key">${z.desc}</div>
+      <div class="tag">${z.key || ''}</div>
+    `;
+
+    // 간단한 툴팁 유지하고 싶으면 유지, 아니면 이 부분 통째로 삭제해도 됨
+    el.onmouseenter = (ev) => showTip(
+      ev.currentTarget,
+      `<strong>${z.name}</strong><br/>${z.desc}<br/>
+       <span style="color:var(--muted)">핵심: ${z.key || 'N/A'}</span>`
+    );
+    el.onmouseleave = hideTip;
+
+    grid.appendChild(el);
+  });
+}
+
 
   /* =========================
    NeoRivere Risk Simulation
