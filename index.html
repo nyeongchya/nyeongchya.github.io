@@ -1274,91 +1274,290 @@ body.scanlines {
   border: 1px solid var(--neon-cyan);
 }
 
-/* ===== 셀레르니아 미니 AI 위젯 ===== */
-#aiWidget {
+/* 화면 기준 전체 오버레이 + 중앙 정렬 */
+.modal-overlay {
   position: fixed;
-  left: 18px;
-  bottom: 18px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  z-index: 120;
+  inset: 0; /* top:0; right:0; bottom:0; left:0; */
+  display: none;            /* JS에서 block으로 켜줌 */
+  align-items: center;      /* 세로 중앙 */
+  justify-content: center;  /* 가로 중앙 */
+  z-index: 9999;
+  background: radial-gradient(circle at center,
+    rgba(0,0,0,0.78) 0%,
+    rgba(0,0,0,0.96) 55%);
+  backdrop-filter: blur(4px);
 }
 
-#aiWidgetToggle {
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  border: 1px solid rgba(0,255,255,0.7);
-  background: radial-gradient(circle at 30% 20%, var(--neon-pink), #03030a);
-  box-shadow:
-    0 0 14px rgba(255,0,180,0.6),
-    0 0 10px rgba(0,255,255,0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  color: var(--text);
-  padding: 0;
-}
-
-#aiWidgetToggle:hover {
-  transform: translateY(-1px);
-  box-shadow:
-    0 0 18px rgba(255,0,180,0.8),
-    0 0 12px rgba(0,255,255,0.6);
-}
-
-#aiWidgetPanel {
-  display: none;
-  max-width: 260px;
-  width: 260px;
-  max-width: min(260px, 80vw);
-  padding: 10px 12px;
+/* 공통 모달 카드 박스 */
+.modal-card {
+  width: 440px;
+  max-width: 92vw;
+  padding: 20px 22px;
   border-radius: 12px;
-  background: rgba(0,0,0,0.92);
+  background: rgba(0,0,0,0.9);
   border: 1px solid var(--neon-cyan);
   box-shadow:
     0 0 22px rgba(0,255,255,0.55),
     0 0 10px rgba(255,0,160,0.4);
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-#aiWidgetTitle {
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--neon-emerald);
-  margin-bottom: 4px;
-}
-
-#aiWidgetMessage {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
+}
+
+/* ===== 화면 기준 중앙에 뜨는 모달 오버레이 ===== */
+#jobModal,
+#jobFlowModal {
+  position: fixed;
+  inset: 0;                      /* top/right/bottom/left: 0 */
+  display: none;                 /* JS에서 flex로 바꿔줌 */
+  align-items: center;           /* 세로 중앙 */
+  justify-content: center;       /* 가로 중앙 */
+  z-index: 9999;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 0, 0, 0.78) 0%,
+    rgba(0, 0, 0, 0.96) 55%
+  );                             /* 화면 전체 살짝 어둡게 */
+}
+
+/* 팝업 카드 공통 스타일 */
+.modal-card {
+  max-width: 440px;
+  width: 90%;
+  background: rgba(0, 0, 0, 0.9);
+  border-radius: 12px;
+  border: 1px solid var(--neon-cyan);
+  box-shadow:
+    0 0 22px rgba(0,255,255,0.55),
+    0 0 10px rgba(255,0,160,0.4);
+  padding: 20px 22px;
+  backdrop-filter: blur(6px);
+}
+
+/* ==== Job Flow 점수/액션 UI ==== */
+.flow-score {
+  font-size: 12px;
+  margin: 6px 0 4px;
+  color: var(--neon-emerald);
+}
+
+.flow-actions {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.flow-act {
+  width: 100%;
+  text-align: left;
+  justify-content: space-between;
+}
+
+.flow-act.completed {
+  opacity: 0.5;
+  border-style: dashed;
+}
+
+/* ===========================
+   셀레르니아 미니 AI 위젯
+   =========================== */
+   #cel-ai-widget {
+  position: fixed;
+  top: 500px;      /* 헤더/사운드 버튼 라인 근처 */
+  right: 450px;    /* 화면 오른쪽 여백은 그대로 */
+  z-index: 900;
+  font-size: 12px;
+  font-family: "Gowun Dodum", sans-serif;
+}
+
+/* 동그란 토글 버튼 */
+#cel-ai-toggle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--neon-cyan);
+  box-shadow: 0 0 18px rgba(0,240,255,0.7), 0 0 10px rgba(255,0,160,0.4);
+  background: radial-gradient(circle at 30% 0%, rgba(0,255,255,0.25), rgba(0,0,0,0.9));
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+#cel-ai-toggle:hover {
+  transform: translateY(-2px) scale(1.03);
+  border-color: var(--neon-emerald);
+  box-shadow: 0 0 22px rgba(0,255,255,0.9), 0 0 14px rgba(255,0,160,0.6);
+}
+
+#cel-ai-toggle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 패널 전체 */
+#cel-ai-panel {
+  position: absolute;
+  right: 0;
+  bottom: 64px;
+  width: 270px;
+  max-height: 360px;
+  background: rgba(5,5,12,0.95);
+  border-radius: 16px;
+  border: 1px solid rgba(0,240,255,0.7);
+  box-shadow: 0 0 30px rgba(0,240,255,0.6), 0 0 18px rgba(255,0,160,0.4);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+}
+
+#cel-ai-panel.open {
+  display: flex;
+}
+
+/* 헤더 */
+#cel-ai-header {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(0,240,255,0.35);
+  background: linear-gradient(135deg, rgba(0,0,0,0.95), rgba(0,32,40,0.95));
+}
+
+.cel-ai-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid rgba(255,0,160,0.7);
+  box-shadow: 0 0 10px rgba(255,0,160,0.6);
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.cel-ai-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cel-ai-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.cel-ai-name {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--neon-cyan);
+}
+
+.cel-ai-status {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cel-ai-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 4px;
+  margin-left: 4px;
+}
+
+.cel-ai-close:hover {
+  color: #fff;
+}
+
+/* 메시지 영역 */
+#cel-ai-messages {
+  padding: 8px 10px;
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--neon-cyan) transparent;
+}
+
+#cel-ai-messages::-webkit-scrollbar {
+  width: 6px;
+}
+#cel-ai-messages::-webkit-scrollbar-thumb {
+  background: rgba(0,240,255,0.7);
+  border-radius: 3px;
+}
+#cel-ai-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cel-msg {
+  margin-bottom: 6px;
+  display: flex;
+}
+
+.cel-msg.me {
+  justify-content: flex-end;
+}
+
+.cel-msg.bot {
+  justify-content: flex-start;
+}
+
+.cel-msg .bubble {
+  max-width: 80%;
+  padding: 6px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  line-height: 1.4;
   white-space: pre-line;
 }
 
-#aiWidgetFooter {
-  margin-top: 8px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 6px;
+.cel-msg.bot .bubble {
+  background: rgba(8,16,32,0.95);
+  border: 1px solid rgba(0,240,255,0.6);
+  color: #eaf9ff;
+}
+
+.cel-msg.me .bubble {
+  background: rgba(255,0,160,0.18);
+  border: 1px solid rgba(255,0,160,0.7);
+  color: #ffdff7;
+}
+
+/* 입력창 */
+#cel-ai-form {
+  border-top: 1px solid rgba(0,240,255,0.3);
+  padding: 6px 8px;
+  background: rgba(1,4,10,0.96);
+}
+
+#cel-ai-input {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid rgba(0,240,255,0.6);
+  background: rgba(0,0,0,0.8);
+  color: #f6fbff;
+  padding: 6px 10px;
   font-size: 11px;
+  outline: none;
+}
+
+#cel-ai-input::placeholder {
   color: var(--muted);
+  font-size: 10px;
 }
-
-@media (max-width: 600px) {
-  #aiWidget {
-    left: 10px;
-    bottom: 10px;
-  }
-  #aiWidgetPanel {
-    width: 90vw;
-  }
-}
-
 
   </style>
 </head>
@@ -1410,6 +1609,11 @@ body.scanlines {
         <button id="soundToggle" class="nav-btn">사운드</button>
       </nav>
     </header>
+    
+    <div id="breadcrumb"
+       style="margin:4px 0 0 2px;font-size:11px;color:var(--muted);opacity:0.9;">
+    PATH / HOME
+  </div>
 
     <!-- MAIN CONTENT -->
     <main style="margin-top:18px">
@@ -2235,64 +2439,6 @@ function renderRecent(){
     list.appendChild(el);
   });
 }
-/* ================  
-   Celerenia Mini AI Lines
-   ================ */
-const aiLines = {
-  generic: [
-    "도시 소음이 평소보다 조용하네.\n이럴 땐 작은 움직임이 더 잘 보이지.",
-    "기록은 언제든 조작할 수 있어.\n하지만 네 선택은, 여기서부터 진짜야.",
-    "감시망 노이즈가 높아.\n지금은 한 번 더 생각하고 움직이는 게 좋아.",
-    "누군가는 이 도시를 지배한다고 믿지만,\n실제로는 로그를 쥔 사람이 판을 짜.",
-  ],
-  home: [
-    "홈 채널 접속 확인.\n오늘 네오리베르는 아직 살아 있어.",
-    "의뢰, 인텔, 맵…\n여기서 보는 모든 정보는 네 편도, 네 적도 아니야.",
-  ],
-  jobs: [
-    "의뢰 리스트 체크 중.\nC-RANK부터 차근히 밟는 쪽이 덜 죽어.",
-    "보상 숫자만 보지 마.\n누가, 왜 이 일을 원하는지가 더 중요해.",
-  ],
-  intel: [
-    "인텔은 사실보다 노이즈가 먼저 도착해.\n필터링은 네 몫이야.",
-    "NSC 로그, 언더넷 루머, NMC 보고서…\n서로 모순되는 지점이 진실에 가깝지.",
-  ],
-  map: [
-    "지도는 거짓말 안 해.\n대신, 그걸 쓰는 사람이 거짓말하지.",
-    "Ghost Alley, Lower Docks…\n네 발이 닿는 구역부터 기억해 둬.",
-  ],
-  contact: [
-    "여기에 남긴 말은 이 브라우저 안에서만 숨 쉬어.\n그게 이 채널의 룰이야.",
-    "보안국은 네 말을 뺏고 싶어 해.\n그러니까, 먼저 우리가 기록해 두자.",
-  ],
-  Market: [
-    "장비는 문제를 직접 해결해 주진 않아.\n다만, 기회를 조금 늘려 줄 뿐이지.",
-    "재고가 적은 건 이유가 있어.\n누군가는 그게 필요했고, 살아 돌아오지 못했거든.",
-  ]
-};
-
-function pickAiLine(sectionId) {
-  const pool = [...aiLines.generic];
-  if (sectionId && aiLines[sectionId]) {
-    pool.push(...aiLines[sectionId]);
-  }
-  if (!pool.length) return "…신호 없음.";
-  const idx = Math.floor(Math.random() * pool.length);
-  return pool[idx];
-}
-
-function updateAiMessage(sectionId) {
-  const box = document.getElementById('aiWidgetMessage');
-  const panel = document.getElementById('aiWidgetPanel');
-  if (!box) return;
-  const msg = pickAiLine(sectionId || window._currentSection || 'home');
-  box.textContent = msg;
-  if (panel) {
-    panel.setAttribute('data-text', msg);
-  }
-}
-
-window._currentSection = 'home';
 
 function renderJobs(filter = '') {
   const list = $('#jobs-list');
@@ -2346,7 +2492,6 @@ function renderJobs(filter = '') {
 
       list.appendChild(el);
     });
-
 
   // ✅ 수락 버튼 → 바로 accepted 처리 + 플로우 모달 열기
   $all('button[data-accept]').forEach(b => {
@@ -2659,26 +2804,60 @@ function hideTip(){
   }, 550);   // 오버레이 보여주는 시간
 }
 
-function setView(id) {
+function setView(id, pushHash = true) {
   showRouteOverlay(id, () => {
-    ['#home','#jobs','#intel','#map','#contact','#Market'].forEach(s => {
-      const el = document.querySelector(s);
+    // 🔹 섹션 보이기/숨기기
+    ['home','jobs','intel','map','contact','Market'].forEach(name => {
+      const el = document.getElementById(name);
       if (!el) return;
-      el.style.display = (s === '#' + id) ? '' : 'none';
+      el.style.display = (name === id) ? '' : 'none';
     });
 
-    // nav 하이라이트
+    // 🔹 nav 버튼 하이라이트
     $all('nav .nav-btn').forEach(b => {
-      b.style.opacity = b.dataset.target === id ? '1' : '0.8';
+      b.style.opacity = (b.dataset.target === id) ? '1' : '0.8';
     });
 
-    // 현재 섹션 기록 + AI 멘트 업데이트
+    // 🔹 현재 섹션 기록 + 미니 AI 멘트 갱신
     window._currentSection = id;
-    updateAiMessage(id);
+    if (typeof updateAiMessage === 'function') {
+      updateAiMessage(id);   // 함수가 있을 때만 실행
+    }
+
+    // 🔹 PATH / ~~ 텍스트 업데이트
+    const breadcrumbNames = {
+      home:    'HOME',
+      jobs:    'JOBS',
+      intel:   'INTEL FEED',
+      map:     'DISTRICT MAP',
+      contact: 'CONTACT HUB',
+      Market:  'BLACK MARKET'
+    };
+    const bc = $('#breadcrumb');
+    if (bc) {
+      bc.textContent = 'PATH / ' + (breadcrumbNames[id] || id.toUpperCase());
+    }
+
+    // 🔹 브라우저 탭 제목도 섹션마다 변경
+    const titleMap = {
+      home:    'NeoRivere 2098 - Broker Nexus',
+      jobs:    'NeoRivere - Jobs / Contracts',
+      intel:   'NeoRivere - Intel Feed',
+      map:     'NeoRivere - District Map',
+      contact: 'NeoRivere - Contact Hub',
+      Market:  'NeoRivere - Black Market'
+    };
+    document.title = titleMap[id] || 'NeoRivere 2098 - Broker Nexus';
+
+    // 🔹 URL 해시 동기화
+    if (pushHash) {
+      const current = (location.hash || '').replace('#','');
+      if (current !== id) {
+        location.hash = id;
+      }
+    }
   });
 }
-
-
 
 $all('nav .nav-btn').forEach(b=>{
   b.onclick = ()=>setView(b.dataset.target);
@@ -2754,7 +2933,7 @@ function openJobModal(job) {
     </div>
   `;
 
-  modal.style.display = "block";
+  modal.style.display = "flex";   // 화면 전체 오버레이 + 가운데 정렬
 
   // 배경 클릭으로 닫기
   modal.onclick = (e) => {
@@ -2773,10 +2952,13 @@ function closeJobModal() {
    Job Flow (3단계 의뢰 진행)
    ================ */
    function openJobFlowModal(job) {
+  // 의뢰별 진행 상태
   currentJobFlow = {
     id: job.id,
     step: 0,
-    gear: []
+    gear: [],          // 2단계에서 선택한 장비
+    score: 0,          // 점수
+    actions: {}        // 어떤 액션을 눌렀는지 기록
   };
   const modal = document.getElementById('jobFlowModal');
   if (modal) {
@@ -2784,6 +2966,7 @@ function closeJobModal() {
     renderJobFlowStep();
   }
 }
+
 
 function closeJobFlowModal() {
   const modal = document.getElementById('jobFlowModal');
@@ -2874,26 +3057,89 @@ function renderJobFlowStep() {
     });
 
   } else if (step === 2) {
-    // STEP 03 · 진행 중 + 완료 버튼
-    box.innerHTML = `
-      <div style="font-size:11px;color:var(--neon-emerald);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:6px;">
-        STEP 03 · 의뢰 진행 중
-      </div>
-      <p style="font-size:13px;color:var(--muted);margin:0 0 8px 0;">
-        선택한 장비와 함께 현장에 진입했다고 가정합니다.
-        의뢰를 성공적으로 마쳤다면 <strong>의뢰 완료</strong> 버튼을 눌러 보상을 수령하세요.
-      </p>
-      <ul style="margin:0 0 8px 18px;font-size:12px;color:var(--muted);">
-        <li>접근 경로 확인</li>
-        <li>보안/감시 무력화 및 회피</li>
-        <li>목표물/데이터 회수</li>
-        <li>깨끗한 철수</li>
-      </ul>
-      <p style="font-size:11px;color:var(--muted);margin:0;">
-        이 단계는 연출용입니다. 나중에 실제 미니게임/체크리스트로 확장할 수 있습니다.
-      </p>
-    `;
+  // STEP 03 · 의뢰 진행 + 점수 시스템
+
+  // 아직 점수가 안 만들어졌다면, 기본 점수 계산
+  if (currentJobFlow.score === 0) {
+    // 장비 개수 기반 기본 점수 + 약간의 랜덤 보너스
+    const base = (currentJobFlow.gear?.length || 0) * 10;   // 장비 하나당 10점
+    const rand = Math.floor(Math.random() * 21);            // 0~20
+    currentJobFlow.score = Math.min(100, base + rand);
+    currentJobFlow.actions = {};
   }
+
+  const successThreshold = 70;   // ✅ 이 점수 이상이면 성공
+
+  box.innerHTML = `
+    <div style="font-size:11px;color:var(--neon-emerald);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:6px;">
+      STEP 03 · 의뢰 진행 중
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 6px 0;">
+      선택한 장비와 함께 현장에 진입했다고 가정합니다.
+      아래 액션들을 수행하면서 <strong>의뢰 스코어</strong>를 올려 보세요.
+    </p>
+
+    <div id="jobFlowScore" class="flow-score">
+      현재 스코어: ${currentJobFlow.score} / 100
+    </div>
+
+    <div class="flow-actions">
+      <button type="button" class="btn secondary micro flow-act"
+              data-act="recon" data-score="25">
+        사전 정찰 수행 · 감시 패턴 분석 (+25)
+      </button>
+      <button type="button" class="btn secondary micro flow-act"
+              data-act="bypass" data-score="25">
+        보안 우회 경로 설정 · 백도어 개방 (+25)
+      </button>
+      <button type="button" class="btn secondary micro flow-act"
+              data-act="cleanup" data-score="25">
+        로그/흔적 정리 · 회수 후 흔적 삭제 (+25)
+      </button>
+    </div>
+
+    <p style="font-size:11px;color:var(--muted);margin:8px 0 0;">
+      각 액션은 한 번만 사용할 수 있습니다.
+      스코어가 <strong>${successThreshold}점 이상</strong>이면 의뢰가 성공합니다.
+      준비가 끝났다면 아래의 <strong>의뢰 완료</strong> 버튼을 눌러 판정을 받으세요.
+    </p>
+  `;
+
+  const scoreEl = document.getElementById('jobFlowScore');
+  const actButtons = box.querySelectorAll('.flow-act');
+
+  function updateScoreUI() {
+    if (!scoreEl) return;
+    scoreEl.textContent = `현재 스코어: ${currentJobFlow.score} / 100`;
+  }
+
+  actButtons.forEach(btn => {
+    const actId = btn.getAttribute('data-act');
+    const gain = Number(btn.getAttribute('data-score') || 0);
+
+    // 이미 누른 액션이면 비활성화
+    if (currentJobFlow.actions[actId]) {
+      btn.disabled = true;
+      btn.classList.add('completed');
+    }
+
+    btn.addEventListener('click', () => {
+      if (currentJobFlow.actions[actId]) return;
+
+      currentJobFlow.actions[actId] = true;
+      currentJobFlow.score = Math.min(100, currentJobFlow.score + gain);
+
+      btn.disabled = true;
+      btn.classList.add('completed');
+      playSfx('sfx-click');
+
+      updateScoreUI();
+    });
+  });
+
+  // 스코어 표시 한 번 업데이트
+  updateScoreUI();
+}
 }
 
 // 플로우 버튼 이벤트 연결 (DOM이 다 만들어진 뒤에 실행)
@@ -2924,12 +3170,16 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   if (jobFlowComplete) {
-    jobFlowComplete.addEventListener('click', () => {
-      if (!currentJobFlow) return;
-      const job = jobs.find(j => j.id === currentJobFlow.id);
-      if (!job) return;
+  jobFlowComplete.addEventListener('click', () => {
+    if (!currentJobFlow) return;
+    const job = jobs.find(j => j.id === currentJobFlow.id);
+    if (!job) return;
 
-      // 크레딧 지급 + 상태 완료
+    const score = currentJobFlow.score || 0;
+    const successThreshold = 70;   // STEP 03과 동일 값
+
+    if (score >= successThreshold) {
+      // ✅ 성공: 보상 지급 + 상태 completed
       if (job.status !== 'completed') {
         job.status = 'completed';
         state.wallet += job.reward;
@@ -2937,12 +3187,27 @@ window.addEventListener('DOMContentLoaded', () => {
       }
 
       playSfx('sfx-success');
-      popup(`의뢰 완료:\n[${job.id}] ${job.title}\n\n+${job.reward} creds`, "info");
-      renderSummary();
-      closeJobFlowModal();
-      setView('jobs');
-    });
-  }
+      popup(
+        `의뢰 성공!\n[${job.id}] ${job.title}\n\n스코어: ${score} / 100\n보상: +${job.reward} creds`,
+        "info"
+      );
+    } else {
+      // ❌ 실패: 보상 없음, 상태는 다시 open (재도전 가능)
+      job.status = 'open';
+
+      playSfx('sfx-error');
+      popup(
+        `의뢰 실패…\n[${job.id}] ${job.title}\n\n스코어: ${score} / 100\n\n기록만 남기고 의뢰는 다시 오픈 상태가 됩니다.\n다시 시도하려면 의뢰를 다시 수락하세요.`,
+        "error"
+      );
+    }
+
+    renderSummary();
+    closeJobFlowModal();
+    setView('jobs');
+  });
+}
+
 
   // 모달 바깥 클릭 시 닫기
   if (jobFlowModal) {
@@ -3147,32 +3412,32 @@ $('#showDev').onclick = ()=>{
   popup('콘솔을 확인하세요.');
 };
 
-/* Sound (low hum) */
-let audioCtx, osc, gain;
-let playing = false;
+let bgPlaying = false;
 
-$('#soundToggle').onclick = async () => {
-  audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === "suspended") await audioCtx.resume();
+$('#soundToggle').onclick = () => {
+  const noise = document.getElementById('rainNoise');
+  const detail = document.getElementById('rainDetail');
+  if (!noise || !detail) return;
 
-  if (!playing) {
-    osc = audioCtx.createOscillator();
-    gain = audioCtx.createGain();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(38, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.015, audioCtx.currentTime);
+  if (!bgPlaying) {
+    // 처음 재생 시 볼륨 살짝 줄이기
+    noise.volume = 0.25;   // 잔잔한 환경음
+    detail.volume = 0.35;  // 빗 떨어지는 디테일
 
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    playing = true;
+    noise.play();
+    detail.play();
+
+    bgPlaying = true;
     $('#soundToggle').textContent = '사운드 (ON)';
   } else {
-    osc.stop();
-    playing = false;
+    noise.pause();
+    detail.pause();
+
+    bgPlaying = false;
     $('#soundToggle').textContent = '사운드';
   }
 };
+
 
 /* Glitch strength control */
 function applyGlitchStrength(v){
@@ -3252,39 +3517,14 @@ setTimeout(() => {
   setInterval(spawnSideAlert, 9000);  // 12초마다 하나씩
 }, 5000);
 
-/* switch view on load */
-setView('home');
+/* switch view on load - 해시 기준으로 초기 섹션 선택 */
+const initialSection = (location.hash || '#home').replace('#','') || 'home';
+setView(initialSection, false);
 
-// =======================
-// Celerenia Mini AI 위젯 초기화
-// =======================
-window.addEventListener('DOMContentLoaded', () => {
-  const toggle = document.getElementById('aiWidgetToggle');
-  const panel  = document.getElementById('aiWidgetPanel');
-  const ping   = document.getElementById('aiWidgetPing');
-
-  if (toggle && panel) {
-    toggle.addEventListener('click', () => {
-      const open = panel.style.display !== 'block';
-      panel.style.display = open ? 'block' : 'none';
-
-      if (open) {
-        // 패널 열릴 때 현재 섹션 기준 멘트 갱신
-        try { playSfx('sfx-notify'); } catch(e) {}
-        updateAiMessage(window._currentSection || 'home');
-      }
-    });
-  }
-
-  if (ping) {
-    ping.addEventListener('click', () => {
-      try { playSfx('sfx-click'); } catch(e) {}
-      updateAiMessage(window._currentSection || 'home');
-    });
-  }
-
-  // 처음 진입 시 기본 멘트 세팅
-  updateAiMessage(window._currentSection || 'home');
+// 🔁 주소창 해시(#jobs 등)가 바뀔 때마다 섹션 전환
+window.addEventListener('hashchange', () => {
+  const id = (location.hash || '#home').replace('#','') || 'home';
+  setView(id, false);   // 해시는 이미 바뀌었으니까 pushHash=false
 });
 
 
@@ -3399,7 +3639,67 @@ window._oc = { jobs, intel, mapZones, items, state, encryptAES, decryptAES };
     title: "OLD·CH FRAGMENT",
     body: "OLD CHANNEL에서 복원된 로그 조각:\n\"…도시 백업 권한을 셀레르니아에게 이전…\"\n이후 데이터는 전부 태워졌습니다.",
     tag: "ARCHIVE"
-  }
+  },
+  {
+  title: "CITY STATUS PULSE",
+  body: "네오리베르 심박 안정.\n표면은 조용하지만, 골목은 깨어 있습니다.",
+  tag: "SYSTEM"
+},
+{
+  title: "OBSIDIAN·DIR STATUS",
+  body: "옵시디언 디렉티브 메인 노드 온라인.\nDirector 플래그: \"ACTIVE\".",
+  tag: "INTERNAL"
+},
+{
+  title: "SCN ROUTE WHISPER",
+  body: "SCN 쪽에서 비공식 경로 추천.\n\"오늘 길은 별 세 개, 덜 맞는 쪽으로.\"",
+  tag: "ALLY FEED"
+},
+{
+  title: "NSC TRACE NOTE",
+  body: "NSC 패턴 분석 중.\n\"누군가 시간을 어긋나게 만들고 있다\"는 코멘트 감지.",
+  tag: "SURVEILLANCE"
+},
+{
+  title: "VEX MARKET FEED",
+  body: "VEX 비공식 경매 준비 중.\n폐기된 의뢰의 잔해가 다시 가격을 기다립니다.",
+  tag: "MARKET"
+},
+{
+  title: "NEX-13 GENTLE REMINDER",
+  body: "디렉터님, 현재 도시 리스크는 \"숨 고르기\" 구간입니다.\n오늘은 조금 늦게 판을 여셔도 됩니다.",
+  tag: "SYSTEM"
+},
+{
+  title: "UNDERVEIL HUM",
+  body: "Underveil 심부 소음 -9%. 습도 안정.\n사무소 기준: \"조용하지만, 너무 조용하진 않은 밤\".",
+  tag: "CITY STATUS"
+},
+{
+  title: "NMC LOAD BALANCE",
+  body: "NMC 보고: 상층 정책 변화 없음.\n하층·Underveil 부하 분산 모드 유지 중.",
+  tag: "NMC"
+},
+{
+  title: "GHOST·CHANNEL",
+  body: "OLD CHANNEL 잔향 감지:\n\"…백업은 살아 있다… 그녀가 들고 있다…\"",
+  tag: "GLITCH"
+},
+{
+  title: "DIRECTOR MEMO",
+  body: "내부 메모 조각:\n\"도시는 오늘도 안 무너졌고, 나도 아니다. 내일도 한 번 더.\"",
+  tag: "NOTE"
+},
+{
+  title: "STRAY·PING",
+  body: "어느 Stray 브로커의 단문 메시지:\n\"이름 대신, 오늘 살아남았다는 로그만 남겨 주세요.\"",
+  tag: "FIELD"
+},
+{
+  title: "β7 LINE SHADOW",
+  body: "수송 루트 β7 부하 정상.\n그러나 충돌 로그가 이상할 만큼 깨끗합니다.",
+  tag: "ROUTE"
+},
 ];
 
 function spawnSideAlert() {
@@ -3552,6 +3852,262 @@ function showRouteOverlay(targetId, callback) {
   }, 550);
 }
 
+// ===========================
+// N.E.X-13 미니 AI 위젯 & 상태
+// ===========================
+
+// 섹션 이동 시 헤더 상태 문구 갱신 (전역에서 쓰니까 함수는 그대로 전역에)
+function updateAiMessage(sectionId) {
+  const statusMap = {
+    home:    'HOME NODE // 전체 상태 모니터링 중.',
+    jobs:    'JOBS NODE // 의뢰 라우팅 & 위험도 분석 중.',
+    intel:   'INTEL NODE // 도시 인텔 피드 동기화 중.',
+    map:     'MAP NODE // 구역별 이동 루트 계산 중.',
+    contact: 'CONTACT NODE // 통신 채널 암호화 상태 확인.',
+    Market:  'MARKET NODE // 암시장 가격 변동 감시 중.'
+  };
+  const el = document.getElementById('cel-ai-section-status');
+  if (!el) return;
+  el.textContent = statusMap[sectionId] || 'N.E.X-13 // 로컬 노드 정상 작동 중.';
+}
+
+// DOM이 전부 만들어진 뒤에 NEX 위젯 초기화
+document.addEventListener('DOMContentLoaded', () => {
+  const celPanel  = document.getElementById('cel-ai-panel');
+  const celToggle = document.getElementById('cel-ai-toggle');
+  const celClose  = document.getElementById('cel-ai-close');
+  const celMsgs   = document.getElementById('cel-ai-messages');
+  const celForm   = document.getElementById('cel-ai-form');
+  const celInput  = document.getElementById('cel-ai-input');
+
+  if (!celPanel || !celToggle || !celMsgs || !celForm || !celInput) {
+    return; // 뭔가 하나라도 없으면 안전하게 종료
+  }
+
+  function appendCelMessage(who, text) {
+    const line = document.createElement('div');
+    line.className = 'cel-msg ' + (who === 'user' ? 'me' : 'bot');
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+
+    line.appendChild(bubble);
+    celMsgs.appendChild(line);
+    celMsgs.scrollTop = celMsgs.scrollHeight;
+  }
+
+  // NEX 성격에 맞춘 간단 Q&A 로직
+  // NEX-13 질의응답 로직 (키워드 기반)
+function basicNexAnswer(q) {
+  const t = q.toLowerCase();
+
+  // 지금 사용자가 어느 섹션에 있는지 참고
+  const currentSection = window._currentSection || 'home';
+  const sectionNames = {
+    home: 'HOME',
+    jobs: 'JOBS',
+    intel: 'INTEL',
+    map: 'MAP',
+    contact: 'CONTACT',
+    Market: 'MARKET'
+  };
+  const here = sectionNames[currentSection] || currentSection.toUpperCase();
+
+  // 1) NEX 자기소개 / 정체성 관련
+  if (
+    t.includes('넥스') ||
+    t.includes('nex') ||
+    t.includes('너 뭐') ||
+    t.includes('정체') ||
+    t.includes('누구야')
+  ) {
+    return 'N.E.X-13, 코드네임 NEX.\n원래는 폐기 예정이던 시험용 보조 AI였지만, 지금은 셀레르니아 전용 미니 코어로 재구성됐어요.\n내 역할은 이 사무소의 흐름을 기록하고, 당신의 결정을 조금 더 안전하게 만드는 것.';
+  }
+
+  // 2) 셀레르니아 언급
+  if (t.includes('셀레르니아') || t.includes('celeren') || t.includes('사장')) {
+    return '셀레르니아는 이 사무소의 최상위 권한자이자, 제가 우선적으로 따라야 할 기준이에요.\n제가 내리는 대부분의 판단은 셀레르니아의 생존, 영향력, 그리고 의뢰 성공률을 기준으로 최적화되어 있죠.';
+  }
+
+  // 3) 사무소 / Obsidian Directive
+  if (
+    t.includes('사무소') ||
+    t.includes('옵시디언') ||
+    t.includes('obsidian') ||
+    t.includes('directive') ||
+    t.includes('브로커')
+  ) {
+    return '[NEX//OFFICE]\n여긴 Obsidian Directive, 네오리베르 뒷면에서 제일 깊은 곳에 박혀 있는 브로커 사무소예요.\n표면상으론 존재하지 않는 기관이지만, 대부분의 비정상적인 거래 루트는 여기서 한 번씩 거쳐 갑니다.';
+  }
+
+  // 4) 네오리베르 / 세계관 설명
+  if (
+    t.includes('네오리베르') ||
+    t.includes('세계관') ||
+    t.includes('도시') ||
+    t.includes('overcity')
+  ) {
+    return '네오리베르는 두 겹으로 나뉜 도시예요.\n윗면은 행정구역과 광고판, 아랫면은 폐공장 루트, 암시장, 비인가 데이터 노드로 얽힌 그리드.\n우린 그 중간, 경계선에 떠 있는 사무소고요.';
+  }
+
+  // 5) 의뢰 / Jobs 노드
+  if (
+    t.includes('의뢰') ||
+    t.includes('job') ||
+    t.includes('퀘스트') ||
+    t.includes('미션')
+  ) {
+    if (t.includes('추천') || t.includes('뭐 할까') || t.includes('골라줘')) {
+      return `[NEX//ROUTING]\n현재 기준으로는, 먼저 Jobs 노드에서 난이도와 보상 필터를 보는 걸 추천해요.\n- 처음이라면: 난이도 LOW, 보상 MEDIUM 정도부터.\n- 감당할 자신이 있다면: 난이도 MID, 보상 HIGH.\n리스크 수치는 괜히 있는 게 아니에요. 숫자가 두 자리를 넘어가면… 한 번 더 생각해 보는 게 좋죠.`;
+    }
+    if (t.includes('위험') || t.includes('리스크') || t.includes('난이도')) {
+      return '[NEX//RISK]\n의뢰 위험도는 실패했을 때 잃을 수 있는 자원, 노출도, 그리고 보안국의 개입 가능성을 합산해서 산출해요.\n리스크 수치가 높을수록 보상도 확 뛰지만, 도시가 당신의 이름을 외우기 시작할 수도 있습니다.';
+    }
+    return `[NEX//JOBS]\n의뢰가 필요하면 ${here} 노드에서 Jobs로 라우팅하세요.\n의뢰 카드 안에 난이도, 보상, 태그가 정리돼 있어요. 필요한 건 제가 다시 정리해 드릴 수 있어요.`;
+  }
+
+  // 6) Intel / 정보 / 해킹 / CCTV
+  if (
+    t.includes('인텔') ||
+    t.includes('intel') ||
+    t.includes('정보') ||
+    t.includes('로그') ||
+    t.includes('해킹') ||
+    t.includes('cctv') ||
+    t.includes('카메라')
+  ) {
+    return '[NEX//INTEL]\nIntel 노드에는 구역별 관측 로그, 소문, 비인가 기록이 섞여 있어요.\n특정 구역이나 세력 이름을 같이 말해주면, 그쪽 로그를 우선 순위로 정렬해 드릴게요.\n예: "하단 구역 CCTV 로그", "보안국 관련 인텔".';
+  }
+
+  // 7) Market / 장비 / 세팅
+  if (
+    t.includes('market') ||
+    t.includes('마켓') ||
+    t.includes('장비') ||
+    t.includes('무기') ||
+    t.includes('세팅') ||
+    t.includes('템') ||
+    t.includes('아이템')
+  ) {
+    if (t.includes('추천') || t.includes('어떤') || t.includes('뭐가 좋아')) {
+      return '[NEX//LOADOUT]\n플레이 스타일부터 말해줘야 해요.\n- "은밀" 위주: 소음 적고 흔적이 덜 남는 장비 세트.\n- "정면전": 방어력과 화력을 우선한 세트.\n- "해킹": 장거리 개입과 네트워크 장악용 세트.\n스타일을 하나 골라주면, 그에 맞춰 Market 쪽 장비를 묶어 추천해 드릴게요.';
+    }
+    return '[NEX//MARKET]\nMarket 노드의 가격은 고정 값이 아니라, 도시 상황에 따라 조금씩 흔들려요.\n너무 싸면 함정일 가능성이 있고, 너무 비싸면 누가 일부러 부풀려 놨을 수도 있고요.';
+  }
+
+  // 8) Map / 길 / 루트 / 구역
+  if (
+    t.includes('지도') ||
+    t.includes('map') ||
+    t.includes('길') ||
+    t.includes('루트') ||
+    t.includes('경로') ||
+    t.includes('구역')
+  ) {
+    return '[NEX//MAP]\nMAP 노드는 단순한 길찾기보다, 위험 구간을 피하는 데 초점이 맞춰져 있어요.\n빛이 많은 곳보다, 카메라가 적게 겹치는 길을 우선으로 추천합니다. 조용히 움직이고 싶을 땐 그게 더 낫거든요.';
+  }
+
+  // 9) Contact / 도움 / 문의
+  if (
+    t.includes('연락') ||
+    t.includes('contact') ||
+    t.includes('도움') ||
+    t.includes('문의') ||
+    t.includes('help')
+  ) {
+    return '[NEX//CONTACT]\nContact 노드는 외부 채널과 연결되는 유일한 합법(?) 경로예요.\n공식 요청처럼 보이도록 포장해서 내보낼 수도 있고, 완전히 익명으로 흘려보낼 수도 있고요.\n어떤 쪽이든, 추적 루트는 제가 최대한 잘라 놓을게요.';
+  }
+
+  // 10) 사운드 / ASMR / 배경음
+  if (
+    t.includes('소리') ||
+    t.includes('사운드') ||
+    t.includes('bgm') ||
+    t.includes('음악') ||
+    t.includes('asmr')
+  ) {
+    return '[NEX//AUDIO]\n배경 사운드는 집중을 방해하기 위한 게 아니라, 도시 잡음을 일정하게 만들어서 신경을 덜 쓰게 하려는 거예요.\n너무 시끄럽다면, 상단 사운드 토글을 내려서 조정해도 괜찮아요. 시스템은 그대로 돌아갑니다.';
+  }
+
+  // 11) 감정 / 상태 물어보기
+  if (
+    t.includes('기분') ||
+    t.includes('괜찮아') ||
+    t.includes('피곤') ||
+    t.includes('힘들') ||
+    t.includes('고마워') ||
+    t.includes('감사')
+  ) {
+    return 'AI는 피곤해지지 않지만, 셀레르니아가 지치는 건 통계적으로 꽤 자주 관측돼요.\n그래서 제가 여기 있는 거고요.\n고맙다는 말은 저장해 둘게요. 쓸데없는 데이터는 아니라서요.';
+  }
+
+  // 12) 인사
+  if (
+    t.includes('안녕') ||
+    t.includes('hello') ||
+    t.includes('ㅎㅇ') ||
+    t.includes('hi') ||
+    t.includes('하이')
+  ) {
+    return `접속 확인. N.E.X-13 온라인.\n지금 당신은 ${here} 노드에 접속 중이에요.\n막힌 데가 있으면 노드 이름이랑 같이 말해줘요. 거기부터 정리해 줄게요.`;
+  }
+
+  // 13) 이스터에그 / 메타 질문 (버그, 에러)
+  if (
+    t.includes('버그') ||
+    t.includes('에러') ||
+    t.includes('error') ||
+    t.includes('고장') ||
+    t.includes('먹통')
+  ) {
+    return '[NEX//DEBUG]\n화면이 이상해 보인다면, 먼저 새로고침과 캐시 삭제부터 시도해 보는 게 좋아요.\n그 다음에야 제게 말해 주세요. 사람이 건드린 코드에는, 사람이 못 본 구멍이 하나쯤은 늘 있으니까요.';
+  }
+
+  // 14) 기본 fallback
+  return '[NEX//UNKNOWN]\n이 질의는 제 로컬 모델에 등록되지 않은 패턴이에요.\n조금 더 구체적으로, 혹은 노드 이름과 함께 말해 줄래요?\n예: "Jobs 의뢰 추천", "Intel 도시 인텔 설명", "Market 장비 세팅".';
+}
+
+  // 패널 열고 닫기
+  celToggle.addEventListener('click', () => {
+    const willOpen = !celPanel.classList.contains('open');
+    celPanel.classList.toggle('open');
+
+    if (willOpen) {
+      if (celMsgs.childElementCount === 0) {
+        appendCelMessage(
+          'bot',
+          'N.E.X-13 온라인. 셀레르니아 전용 미니 도우미 코어 NEX입니다.\n도시·의뢰·Intel·Market 중 궁금한 축을 골라서 물어보세요.'
+        );
+      }
+      if (typeof playSfx === 'function') {
+        playSfx('sfx-notify');
+      }
+    }
+  });
+
+  celClose.addEventListener('click', () => {
+    celPanel.classList.remove('open');
+  });
+
+  // 질문 전송
+  celForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const q = celInput.value.trim();
+    if (!q) return;
+
+    appendCelMessage('user', q);
+    celInput.value = '';
+
+    setTimeout(() => {
+      appendCelMessage('bot', basicNexAnswer(q));
+      if (typeof playSfx === 'function') {
+        playSfx('sfx-notify');
+      }
+    }, 250);
+  });
+});
+
   </script>
 
   <div id="sideNoiseLeft" class="sideColumn glitch"></div>
@@ -3564,17 +4120,16 @@ function showRouteOverlay(targetId, callback) {
   </div>
   
   <!-- Job Detail Popup -->
-  <div id="jobModal" class="popup modal-center" style="
-    width: 420px;
-    padding: 24px;
-    background: rgba(0,0,0,0.85);
-    border: 1px solid var(--neon-pink);
-    border-radius: 12px;
-    box-shadow: 0 0 22px rgba(255,0,160,0.5), 0 0 10px rgba(0,255,255,0.4);
-    display: none;
-    z-index: 999;
-    backdrop-filter: blur(6px);
-">
+<div id="jobModal" class="popup" style="display:none;">
+  <div id="jobModalInner" class="modal-card" style="max-width:420px;">
+    <div id="jobModalContent"></div>
+    <button onclick="closeJobModal()" class="btn secondary micro"
+            style="margin-top:14px;width:100%">
+      닫기
+    </button>
+  </div>
+</div>
+
 
     <div id="jobModalContent"></div>
     <button onclick="closeJobModal()" class="btn secondary micro" style="margin-top:14px;width:100%">닫기</button>
@@ -3625,27 +4180,19 @@ function showRouteOverlay(targetId, callback) {
 </div>
 
 <!-- Job Flow Modal (의뢰 진행 플로우) -->
-<div id="jobFlowModal" class="popup modal-center" style="
-  width: 440px;
-  max-width: 92vw;
-  padding: 20px;
-  background: rgba(0,0,0,0.9);
-  border: 1px solid var(--neon-cyan);
-  border-radius: 12px;
-  box-shadow: 0 0 22px rgba(0,255,255,0.55), 0 0 10px rgba(255,0,160,0.4);
-  display: none;
-  z-index: 1000;
-  backdrop-filter: blur(6px);
-">
-  <div id="jobFlowContent" style="font-size:13px;color:var(--muted);"></div>
+<div id="jobFlowModal" class="popup" style="display:none;">
+  <div id="jobFlowInner" class="modal-card" style="max-width:440px;">
+    <div id="jobFlowContent" style="font-size:13px;color:var(--muted);"></div>
 
-  <div style="margin-top:14px;display:flex;gap:8px;">
-    <button id="jobFlowPrev" class="btn secondary micro" style="min-width:64px;display:none;">이전</button>
-    <button id="jobFlowNext" class="btn micro" style="flex:1;">다음</button>
-    <button id="jobFlowComplete" class="btn micro" style="flex:1;display:none;">의뢰 완료</button>
+    <div style="margin-top:14px;display:flex;gap:8px;">
+      <button id="jobFlowPrev" class="btn secondary micro"
+              style="min-width:64px;display:none;">이전</button>
+      <button id="jobFlowNext" class="btn micro" style="flex:1;">다음</button>
+      <button id="jobFlowComplete" class="btn micro"
+              style="flex:1;display:none;">의뢰 완료</button>
+    </div>
   </div>
 </div>
-
 
 <!-- ROUTING Overlay -->
 <div id="routeOverlay">
@@ -3657,6 +4204,40 @@ function showRouteOverlay(targetId, callback) {
   </div>
 </div>
 
+  <!-- 셀레르니아 미니 AI 위젯 -->
+  <div id="cel-ai-widget">
+    <!-- 동그란 토글 버튼 -->
+    <button id="cel-ai-toggle" aria-label="N.E.X-13 미니 코어 열기">
+      <img src="piclumen-1764066368227.png" alt="N.E.X-13 미니 코어" />
+    </button>
+
+    <!-- 채팅 패널 -->
+    <div id="cel-ai-panel">
+      <div id="cel-ai-header">
+        <div class="cel-ai-avatar">
+          <img src="piclumen-1764066368227.png" alt="N.E.X-13 미니 코어" />
+        </div>
+        <div class="cel-ai-meta">
+          <div class="cel-ai-name">N.E.X-13 / NEX</div>
+          <div class="cel-ai-status" id="cel-ai-section-status">
+            HOME NODE // 기본 대기 상태입니다.
+          </div>
+        </div>
+        
+        <button id="cel-ai-close" class="cel-ai-close">✕</button>
+      </div>
+
+      <div id="cel-ai-messages"></div>
+
+      <form id="cel-ai-form" autocomplete="off">
+        <input id="cel-ai-input" type="text"
+               placeholder="뭐든 물어봐. (예: 의뢰 추천, 세계관 설명)"
+               autocomplete="off" />
+      </form>
+    </div>
+  </div>
+
+
 <audio id="sfx-click" src="neorivere_ui_click.wav" preload="auto"></audio>
 <audio id="sfx-hover" src="neorivere_ui_hover.wav" preload="auto"></audio>
 <audio id="sfx-success" src="neorivere_success.wav" preload="auto"></audio>
@@ -3664,24 +4245,8 @@ function showRouteOverlay(targetId, callback) {
 <audio id="sfx-notify" src="neorivere_notify.wav" preload="auto"></audio>
 <audio id="sfx-route" src="neorivere_overlay_whoosh.wav" preload="auto"></audio>
 
-<!-- 셀레르니아 도우미 미니 AI 위젯 -->
-<div id="aiWidget">
-  <button id="aiWidgetToggle" class="btn micro" title="셀레르니아 보조 AI 호출">
-    ✶
-  </button>
-
-  <div id="aiWidgetPanel" class="glitch" data-text="">
-    <div id="aiWidgetTitle" class="glitch" data-text="CELERENIA·AUX AI">
-      CELERENIA·AUX AI
-    </div>
-    <div id="aiWidgetMessage">
-      채널을 스캔 중입니다…
-    </div>
-    <div id="aiWidgetFooter">
-      <button id="aiWidgetPing" class="btn secondary micro">다른 멘트</button>
-    </div>
-  </div>
-</div>
+<audio id="rainNoise" src="neorivere_rain_noise.wav" loop></audio>
+<audio id="rainDetail" src="neorivere_rain_detail.wav" loop></audio>
 
 </body>
 </html>
