@@ -740,85 +740,6 @@ body.scanlines {
   }
 }
 
-/* ==== NeoRivere Risk Simulation ==== */
-#riskSimPanel {
-  margin-top: 10px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(0,255,255,0.25);
-  font-size: 12px;
-}
-
-#riskSimSummary {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 4px;
-}
-
-#riskSimList {
-  margin-top: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.risk-row {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 8px;
-  align-items: center;
-  padding: 6px 8px;
-  border-radius: 8px;
-  background: rgba(0,0,0,0.55);
-  border: 1px solid rgba(255,255,255,0.06);
-}
-
-.risk-rank {
-  font-size: 11px;
-  color: var(--muted);
-  min-width: 32px;
-}
-
-.risk-name {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.risk-meter {
-  position: relative;
-  height: 6px;
-  border-radius: 999px;
-  overflow: hidden;
-  background: rgba(255,255,255,0.06);
-}
-
-.risk-bar {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
-  box-shadow: 0 0 8px rgba(0,255,255,0.5);
-  transform-origin: left center;
-}
-
-.risk-score {
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.risk-row.highest {
-  border-color: var(--neon-pink);
-  box-shadow: 0 0 16px rgba(255,0,180,0.35);
-}
-
-.risk-row.low {
-  opacity: 0.8;
-}
-
-
 /* Hologram zone preview in left bottom */
 .nd-map-holo{
   margin-top:10px;
@@ -1332,6 +1253,27 @@ body.scanlines {
   z-index: 1000;
 }
 
+/* 화면 기준 한가운데 뜨는 공용 팝업 */
+#uiPopup {
+  position: fixed !important;
+  inset: 0 !important;           /* top/right/bottom/left 모두 0 */
+  display: none;                 /* JS에서 flex로 변경 */
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  background: radial-gradient(circle at center,
+    rgba(0,0,0,0.75) 0%,
+    rgba(0,0,0,0.93) 55%);       /* 로딩/라우팅처럼 배경 어둡게 */
+}
+
+#uiPopupContent {
+  max-width: 380px;
+  width: 90%;
+  background: rgba(0,0,0,0.9);
+  border-radius: 12px;
+  border: 1px solid var(--neon-cyan);
+}
+
   </style>
 </head>
 
@@ -1643,19 +1585,77 @@ body.scanlines {
               </div>
       
               <div id="intel-list" class="nd-intel-grid"></div>
-            </sectipon>
+            </section>
+      
 
+            <!-- MAP -->
             <section id="map" class="panel" style="display:none">
               <div class="nd-section-header">
                 <div>
-                  <h2>NeoRivere 구역</h2>
+                  <h2>NeoRivere 구역 맵</h2>
                   <p class="nd-section-caption">
-                    네오리베르의 주요 구역
+                    옵시디언 디렉티브 전용 <strong>위험도 브리핑 맵</strong>.
+                    구역을 클릭하면 상세 정보가 오른쪽에 표시됩니다.
                   </p>
                 </div>
               </div>
-              <div class="map-grid" id="map-grid"></div>
+      
+              <div class="nd-map-layout">
+                <div class="nd-map-detail">
+                  <div class="nd-map-detail-title" id="map-detail-name">NeoRivere</div>
+                  <div class="nd-map-detail-level" id="map-detail-level">
+                    위험도 레벨 / 감시 강도
+                  </div>
+                  <div class="nd-map-detail-desc" id="map-detail-desc">
+                    왼쪽의 구역 카드 중 하나를 선택하면, 이 위치의 세부 설명이 표시됩니다.
+                  </div>
+                  <div class="nd-map-detail-key" id="map-detail-key">
+                    핵심 포인트: -
+                  </div>
+                </div>
+
+                <div class="nd-map-holo" id="map-holo">
+                  <div class="nd-map-holo-label">HOLO·ZONE PROJECTION</div>
+                  <div class="nd-map-holo-name" id="map-holo-name">-</div>
+                  <div class="nd-map-holo-meta" id="map-holo-meta">LV.- / status: -</div>
+              
+                  <div class="nd-map-holo-grid">
+                    <div class="nd-map-holo-cell"></div>
+                    <div class="nd-map-holo-cell"></div>
+                    <div class="nd-map-holo-cell"></div>
+                    <div class="nd-map-holo-cell"></div>
+                    <div class="nd-map-holo-cell"></div>
+                    <div class="nd-map-holo-cell"></div>
+                    <div class="nd-map-holo-cell"></div>
+                    <div class="nd-map-holo-cell"></div>
+                  </div>
+                </div>
+
+                <!-- HOLO-ZONE 아래 작전 요약 박스 -->
+<div class="nd-map-ops" id="map-ops">
+  <div class="nd-map-ops-title">작전 요약</div>
+  <div class="nd-map-ops-grid">
+    <div class="ops-item">
+      <div class="label">권장 장비</div>
+      <div class="value" id="ops-gear">
+        구역을 선택하면 권장 장비가 표시됩니다.
+      </div>
+    </div>
+    <div class="ops-item">
+      <div class="label">출몰 세력</div>
+      <div class="value" id="ops-faction">-</div>
+    </div>
+    <div class="ops-item">
+      <div class="label">브로커 메모</div>
+      <div class="value" id="ops-note">-</div>
+    </div>
+  </div>
+</div>
+      
+                <div class="map-grid" id="map-grid"></div>
+              </div>
             </section>
+      
 
             <!-- CONTACT -->
             <section id="contact" class="panel" style="display:none">
@@ -2050,6 +2050,7 @@ if (!state.contactsLog || state.contactsLog.length === 0) {
 }
 
 let jobStatusFilter = 'all';   // 🔹 의뢰 상태 필터
+let currentJobFlow = null;   // 지금 진행 중인 의뢰 플로우 상태
 
 /* ================
    Helpers & Rendering
@@ -2149,7 +2150,7 @@ function renderRecent(){
   });
 }
 
-function renderJobs(filter = ''){
+function renderJobs(filter = '') {
   const list = $('#jobs-list');
   list.innerHTML = '';
 
@@ -2160,7 +2161,7 @@ function renderJobs(filter = ''){
         .includes(filter.toLowerCase())
     )
     .filter(j => jobStatusFilter === 'all' ? true : j.status === jobStatusFilter)
-    .forEach(j=>{
+    .forEach(j => {
       const el = document.createElement('div');
       el.className = 'job';
 
@@ -2168,14 +2169,15 @@ function renderJobs(filter = ''){
         ? `<button class="btn micro" data-accept="${j.id}">수락</button>`
         : '';
 
-        const statusLabel = j.status === 'open'
-        ? 'open'
-        : (j.status === 'accepted' ? 'progress' : 'completed');
+      const statusLabel =
+        j.status === 'open'
+          ? 'open'
+          : (j.status === 'accepted' ? 'progress' : 'completed');
 
       const statusColor =
-        j.status === 'open'      ? 'var(--neon-emerald)' :
-        j.status === 'accepted'  ? '#ffc24c' :
-                                   'var(--neon-pink)';
+        j.status === 'open' ? 'var(--neon-emerald)' :
+        j.status === 'accepted' ? '#ffc24c' :
+        'var(--neon-pink)';
 
       el.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:center">
@@ -2201,27 +2203,30 @@ function renderJobs(filter = ''){
       list.appendChild(el);
     });
 
-  // 수락 버튼 → accepted + 암호화 페이로드 생성
-  $all('button[data-accept]').forEach(b => b.onclick = async (e)=>{
-    const id = e.currentTarget.dataset.accept;
-    const pw = prompt('암호를 입력하세요 (수신자와 공유)');
-    if(!pw) return;
-    const enc = await encryptAES('Accept:' + id, pw);
-    $('#payload').value = enc;
+  // ✅ 수락 버튼 → 바로 accepted 처리 + 플로우 모달 열기
+  $all('button[data-accept]').forEach(b => {
+    b.onclick = (e) => {
+      const id = e.currentTarget.dataset.accept;
+      const job = jobs.find(x => x.id === id);
+      if (!job) return;
 
-    const job = jobs.find(x => x.id === id);
-    if (job) job.status = 'accepted';
+      // 처음 수락일 때 상태 변경
+      if (job.status === 'open') {
+        job.status = 'accepted';
+      }
 
-    popup('의뢰가 진행중 상태로 변경되었습니다.\nContact 탭에서 암호화 페이로드를 확인하세요.');
-    renderSummary();
-    setView('contact');
+      playSfx('sfx-success');
+      openJobFlowModal(job);   // 🔹 새로 만들 플로우 모달 열기
+      renderSummary();
+      setView('jobs');
+    };
   });
 
-  // 보기 버튼 → 중앙 팝업
-  $all('button[data-view]').forEach(b => b.onclick = (e)=>{
+  // 보기 버튼 → 기존 디테일 모달
+  $all('button[data-view]').forEach(b => b.onclick = (e) => {
     const id = e.currentTarget.dataset.view;
-    const j = jobs.find(x=>x.id===id);
-    if(!j) return;
+    const j = jobs.find(x => x.id === id);
+    if (!j) return;
     openJobModal(j);
   });
 }
@@ -2330,146 +2335,38 @@ function renderMap(){
   const holoMeta = $('#map-holo-meta');
   const holoCells = $all('.nd-map-holo-cell');
 
-  function renderMap() {
-  const grid = $('#map-grid');
-  if (!grid) return;
-
-  grid.innerHTML = '';
-
-  mapZones.forEach(z => {
-    const el = document.createElement('div');
-    el.className = 'zone';
-
-    el.innerHTML = `
-      <div style="font-weight:700">${z.name}</div>
-      <div class="meta">
-        위험도 레벨: ${z.level} · 상태: ${z.hazard}
-      </div>
-      <div class="key">${z.desc}</div>
-      <div class="tag">${z.key || ''}</div>
-    `;
-
-    // 간단한 툴팁 유지하고 싶으면 유지, 아니면 이 부분 통째로 삭제해도 됨
-    el.onmouseenter = (ev) => showTip(
-      ev.currentTarget,
-      `<strong>${z.name}</strong><br/>${z.desc}<br/>
-       <span style="color:var(--muted)">핵심: ${z.key || 'N/A'}</span>`
-    );
-    el.onmouseleave = hideTip;
-
-    grid.appendChild(el);
-  });
-}
-
-
-  /* =========================
-   NeoRivere Risk Simulation
-   ========================= */
-
-// 인텔 신뢰도 → 가중치 테이블
-const TRUST_WEIGHT = {
-  'A+': 12,
-  'A': 10,
-  'A-': 8,
-  'B+': 6,
-  'B': 4,
-  'B-': 3,
-  'C+': 2,
-  'C': 1
-};
-
-// 한 구역의 위험도를 계산 (0~100)
-function computeZoneRisk(z) {
-  let risk = 0;
-
-  // 1) 기본: 레벨 기반
-  risk += z.level * 10; // 레벨 1~9 -> 10~90
-
-  // 2) hazard(문자열) 기반 가중치
-  const hz = (z.hazard || '').toLowerCase();
-  if (hz.includes('extreme'))      risk += 8;
-  else if (hz.includes('very'))    risk += 6;
-  else if (hz.includes('high'))    risk += 4;
-  else if (hz.includes('medium'))  risk += 2;
-  else if (hz.includes('low'))     risk += 0;
-
-  // 3) 인텔 로그에서 해당 구역이 언급되면 추가 가중치
-  const nameKey = z.name.toLowerCase();
-
-  intel.forEach(i => {
-    const text = (i.title + ' ' + i.body + ' ' + i.tag).toLowerCase();
-    if (text.includes(nameKey)) {
-      const w = TRUST_WEIGHT[i.trust] || 3;
-      risk += w;
+  function setDetail(z){
+    if (!z || !nameEl) return;
+    nameEl.textContent  = z.name;
+    levelEl.textContent = `위험도 레벨 ${z.level} · 상태: ${z.hazard}`;
+    descEl.textContent  = z.desc;
+    if (keyEl) {
+      keyEl.innerHTML = `핵심 포인트: ${z.key || 'N/A'}`;
     }
-  });
 
-  // 4) worldLogs(상단 상태 로그)에서 구역 언급 시 약간 추가
-  worldLogs.forEach(log => {
-    const t = log.toLowerCase();
-    if (t.includes(nameKey)) {
-      risk += 2;
+    // 🔹 홀로그램 패널 업데이트
+    if (holoName) holoName.textContent = z.name;
+    if (holoMeta) holoMeta.textContent = `LV.${z.level} · status: ${z.hazard}`;
+
+    if (holoCells && holoCells.length){
+      const idx = z.level % holoCells.length;   // 레벨에 따라 칸 하나 발광
+      holoCells.forEach((c,i)=>{
+        c.classList.toggle('active', i === idx);
+      });
     }
-  });
 
-  // 5) 랜덤 노이즈 (도시 상황이 완전히 고정돼 있지 않게)
-  risk += (Math.random() * 10) - 3;  // -3 ~ +7 정도 흔들림
+    // 🔹 선택 시 HOLO 패널 펄스 효과
+    const holoBox = $('#map-holo');
+    if (holoBox) {
+      holoBox.classList.remove('pulse');
+      // reflow로 애니메이션 재시작
+      void holoBox.offsetWidth;
+      holoBox.classList.add('pulse');
+    }
+    highlightIntelForZone(z.name);
+  }
 
-  // 6) 클램프 0~100
-  risk = Math.round(Math.max(0, Math.min(100, risk)));
 
-  return risk;
-}
-
-function simulateCityRisk() {
-  const listEl = document.getElementById('riskSimList');
-  const summaryEl = document.getElementById('riskSimSummary');
-  if (!listEl || !summaryEl) return;
-
-  // 각 구역 위험도 계산
-  const snapshot = mapZones.map(z => ({
-    zone: z,
-    risk: computeZoneRisk(z)
-  }));
-
-  // 높은 순으로 정렬
-  snapshot.sort((a, b) => b.risk - a.risk);
-
-  listEl.innerHTML = '';
-
-  snapshot.forEach((entry, idx) => {
-    const row = document.createElement('div');
-    row.className = 'risk-row';
-    if (idx === 0) row.classList.add('highest');
-    if (entry.risk < 30) row.classList.add('low');
-
-    const name = entry.zone.name;
-    const risk = entry.risk;
-
-    row.innerHTML = `
-      <div class="risk-rank">#${idx + 1}</div>
-      <div>
-        <div class="risk-name">${name}</div>
-        <div class="risk-meter">
-          <div class="risk-bar" style="width:${risk}%;"></div>
-        </div>
-      </div>
-      <div class="risk-score">${risk}%</div>
-    `;
-    listEl.appendChild(row);
-  });
-
-  // 간단 요약
-  const top = snapshot[0];
-  const avg = Math.round(
-    snapshot.reduce((sum, s) => sum + s.risk, 0) / snapshot.length
-  );
-
-  summaryEl.innerHTML = `
-    현재 최고 위험 구역: <strong>${top.zone.name}</strong>
-    (${top.risk}%) · 도시 평균 위험도: <strong>${avg}%</strong>
-  `;
-}
 
   grid.innerHTML = '';
   mapZones.forEach(z=>{
@@ -2663,6 +2560,20 @@ jobFilterButtons.forEach(btn => {
   });
 });
 
+$all('nav .nav-btn').forEach(btn => {
+  btn.addEventListener('mouseenter', () => playSfx('sfx-hover'));
+  btn.addEventListener('click', () => playSfx('sfx-click'));
+});
+
+
+$all('button[data-accept]').forEach(b => {
+  b.onclick = async (e) => {
+    // ...원래 로직...
+    playSfx('sfx-success');
+  };
+});
+
+
 // 처음 로드시 "전체" 활성화
 const defaultFilterBtn = document.querySelector('.job-filter[data-status="all"]');
 if (defaultFilterBtn) defaultFilterBtn.classList.add('active');
@@ -2707,6 +2618,191 @@ function openJobModal(job) {
 function closeJobModal() {
   document.getElementById("jobModal").style.display = "none";
 }
+
+/* ================  
+   Job Flow (3단계 의뢰 진행)
+   ================ */
+   function openJobFlowModal(job) {
+  currentJobFlow = {
+    id: job.id,
+    step: 0,
+    gear: []
+  };
+  const modal = document.getElementById('jobFlowModal');
+  if (modal) {
+    modal.style.display = 'block';
+    renderJobFlowStep();
+  }
+}
+
+function closeJobFlowModal() {
+  const modal = document.getElementById('jobFlowModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+  currentJobFlow = null;
+}
+
+function renderJobFlowStep() {
+  if (!currentJobFlow) return;
+  const job = jobs.find(j => j.id === currentJobFlow.id);
+  if (!job) return;
+
+  const box = document.getElementById('jobFlowContent');
+  const prev = document.getElementById('jobFlowPrev');
+  const next = document.getElementById('jobFlowNext');
+  const complete = document.getElementById('jobFlowComplete');
+  if (!box || !prev || !next || !complete) return;
+
+  const step = currentJobFlow.step;
+
+  // 버튼 표시 상태
+  prev.style.display = step === 0 ? 'none' : 'inline-flex';
+  next.style.display = step < 2 ? 'inline-flex' : 'none';
+  complete.style.display = step === 2 ? 'inline-flex' : 'none';
+
+  if (step === 0) {
+    // STEP 01 · 브리핑 확인
+    box.innerHTML = `
+      <div style="font-size:11px;color:var(--neon-emerald);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:6px;">
+        STEP 01 · 브리핑 확인
+      </div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">
+        [${job.id}] ${job.location} · 난이도: ${job.difficulty}
+      </div>
+      <h3 class="glitch" data-text="${job.title}" style="margin:0 0 10px 0;font-size:16px;">
+        ${job.title}
+      </h3>
+      <p style="margin:0 0 10px 0;font-size:13px;color:var(--muted);">
+        의뢰자: ${job.client}
+      </p>
+      <p style="margin:0;font-size:13px;line-height:1.5;">
+        ${job.desc}
+      </p>
+      <p style="margin-top:10px;font-size:11px;color:var(--muted);">
+        다음을 눌러 장비를 선택하고 의뢰를 시작할 수 있습니다.
+      </p>
+    `;
+  } else if (step === 1) {
+    // STEP 02 · 장비 선택 (items 배열 일부 사용)
+    const gearList = items.slice(0, 6).map(it => {
+      const checked = currentJobFlow.gear.includes(it.id) ? 'checked' : '';
+      return `
+        <label style="display:flex;justify-content:space-between;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.05);margin-bottom:4px;font-size:12px;">
+          <div>
+            <div style="font-weight:600;color:var(--text);">${it.name}</div>
+            <div style="color:var(--muted);font-size:11px;">${it.desc}</div>
+          </div>
+          <input type="checkbox" data-gear="${it.id}" ${checked} />
+        </label>
+      `;
+    }).join('');
+
+    box.innerHTML = `
+      <div style="font-size:11px;color:var(--neon-emerald);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:6px;">
+        STEP 02 · 장비 선택
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin:0 0 6px 0;">
+        이 의뢰에서 사용할 장비를 선택하세요. 실제 크레딧은 차감되지 않으며, 기록용 설정입니다.
+      </p>
+      <div style="margin-top:6px;max-height:180px;overflow-y:auto;">
+        ${gearList}
+      </div>
+    `;
+
+    // 체크박스 이벤트 연결
+    box.querySelectorAll('input[type="checkbox"][data-gear]').forEach(chk => {
+      chk.addEventListener('change', (e) => {
+        const id = e.target.getAttribute('data-gear');
+        if (!id) return;
+        if (e.target.checked) {
+          if (!currentJobFlow.gear.includes(id)) currentJobFlow.gear.push(id);
+        } else {
+          currentJobFlow.gear = currentJobFlow.gear.filter(x => x !== id);
+        }
+      });
+    });
+
+  } else if (step === 2) {
+    // STEP 03 · 진행 중 + 완료 버튼
+    box.innerHTML = `
+      <div style="font-size:11px;color:var(--neon-emerald);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:6px;">
+        STEP 03 · 의뢰 진행 중
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin:0 0 8px 0;">
+        선택한 장비와 함께 현장에 진입했다고 가정합니다.
+        의뢰를 성공적으로 마쳤다면 <strong>의뢰 완료</strong> 버튼을 눌러 보상을 수령하세요.
+      </p>
+      <ul style="margin:0 0 8px 18px;font-size:12px;color:var(--muted);">
+        <li>접근 경로 확인</li>
+        <li>보안/감시 무력화 및 회피</li>
+        <li>목표물/데이터 회수</li>
+        <li>깨끗한 철수</li>
+      </ul>
+      <p style="font-size:11px;color:var(--muted);margin:0;">
+        이 단계는 연출용입니다. 나중에 실제 미니게임/체크리스트로 확장할 수 있습니다.
+      </p>
+    `;
+  }
+}
+
+// 플로우 버튼 이벤트 연결 (DOM이 다 만들어진 뒤에 실행)
+window.addEventListener('DOMContentLoaded', () => {
+  const jobFlowPrev = document.getElementById('jobFlowPrev');
+  const jobFlowNext = document.getElementById('jobFlowNext');
+  const jobFlowComplete = document.getElementById('jobFlowComplete');
+  const jobFlowModal = document.getElementById('jobFlowModal');
+
+  if (jobFlowPrev) {
+    jobFlowPrev.addEventListener('click', () => {
+      if (!currentJobFlow) return;
+      if (currentJobFlow.step > 0) {
+        currentJobFlow.step -= 1;
+        renderJobFlowStep();
+      }
+    });
+  }
+
+  if (jobFlowNext) {
+    jobFlowNext.addEventListener('click', () => {
+      if (!currentJobFlow) return;
+      if (currentJobFlow.step < 2) {
+        currentJobFlow.step += 1;
+        renderJobFlowStep();
+      }
+    });
+  }
+
+  if (jobFlowComplete) {
+    jobFlowComplete.addEventListener('click', () => {
+      if (!currentJobFlow) return;
+      const job = jobs.find(j => j.id === currentJobFlow.id);
+      if (!job) return;
+
+      // 크레딧 지급 + 상태 완료
+      if (job.status !== 'completed') {
+        job.status = 'completed';
+        state.wallet += job.reward;
+        localStorage.setItem('oc_wallet', String(state.wallet));
+      }
+
+      playSfx('sfx-success');
+      popup(`의뢰 완료:\n[${job.id}] ${job.title}\n\n+${job.reward} creds`, "info");
+      renderSummary();
+      closeJobFlowModal();
+      setView('jobs');
+    });
+  }
+
+  // 모달 바깥 클릭 시 닫기
+  if (jobFlowModal) {
+    jobFlowModal.addEventListener('click', (e) => {
+      if (e.target === jobFlowModal) {
+        closeJobFlowModal();
+      }
+    });
+  }
+});
 
 /* ================
    Buy item
@@ -3000,9 +3096,6 @@ renderSummary();
 rotateWorldLog();
 setInterval(rotateWorldLog, 12000);   // 12초마다 도시 상태 갱신
 
-simulateCityRisk();
-setInterval(simulateCityRisk, 20000);
-
 // 사이드 알림: 약간 딜레이 후 주기적으로 표시
 setTimeout(() => {
   spawnSideAlert();
@@ -3070,12 +3163,12 @@ window._oc = { jobs, intel, mapZones, items, state, encryptAES, decryptAES };
     tag: "MISSION"
   },
   {
-    title: "STAFF CHAT",
+    tittle: "STAFF CHAT",
     body: "로비 직원: \"사장님.. 기물 파손은 좀 참아주세요..\"",
     tag: "OFFICE LIFE"
   },
   {
-    title: "GUARD // BODYGUARD",
+    tittle: "GUARD // BODYGUARD",
     body: "아이기스: \"마스터. 분명 안다친다고 했으면서...\"",
     tag: "STATIONED"
   },
@@ -3156,6 +3249,37 @@ function spawnSideAlert() {
   }, 4300);
 }
 
+
+function spawnSideAlert() {
+  // 너무 팝업이 많아지지 않도록, 이미 떠 있는 게 있으면 가끔 스킵
+  if (document.querySelectorAll('.side-alert').length > 3) return;
+
+  const msg = sideAlertPool[Math.floor(Math.random() * sideAlertPool.length)];
+  const side = Math.random() < 0.5 ? 'left' : 'right';
+
+  const el = document.createElement('div');
+  el.className = `side-alert side-alert-${side} glitch-text`;
+
+  // 세로 위치를 랜덤 (상단/하단 너무 피해서 10~80vh)
+  const topVH = 10 + Math.random() * 70;
+  el.style.top = `${topVH}vh`;
+
+  el.innerHTML = `
+    <div class="side-alert-title">${msg.title}</div>
+    <div class="side-alert-body">
+      ${msg.body.replace(/\n/g, "<br>")}
+    </div>
+    <div class="side-alert-tag">${msg.tag}</div>
+  `;
+
+  document.body.appendChild(el);
+
+  // 애니메이션 끝난 후 자동 제거
+  setTimeout(() => {
+    el.remove();
+  }, 4300);
+}
+
 /* small popup helpers */
 function popup(msg){
   uiPopup(`
@@ -3201,6 +3325,50 @@ function closeUiPopup(){
   document.querySelector('#uiPopup').style.display = 'none';
 }
 
+function playSfx(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.currentTime = 0;
+  el.volume = 0.6; // 필요하면 섹션별로 다르게 조절 가능
+  el.play();
+}
+
+function popup(msg, kind = "info"){
+  if (kind === "error") playSfx('sfx-error');
+  else playSfx('sfx-notify');
+
+  uiPopup(`
+    <div class="small" style="white-space:pre-line">
+      ${msg}
+    </div>
+    <button class="btn secondary micro"
+            style="margin-top:12px;width:100%"
+            onclick="closeUiPopup()">닫기</button>
+  `);
+}
+
+function showRouteOverlay(targetId, callback) {
+  const overlay = $('#routeOverlay');
+  const txt = $('#routeOverlayText');
+  if (!overlay || !txt) {
+    callback();
+    return;
+  }
+
+  playSfx('sfx-route'); // 여기 추가!
+
+  const label = targetId.toUpperCase();
+  txt.textContent = `ROUTING : ${label}`;
+  txt.setAttribute('data-text', `ROUTING : ${label}`);
+
+  overlay.classList.add('visible');
+
+  setTimeout(() => {
+    callback();
+    overlay.classList.remove('visible');
+  }, 550);
+}
+
   </script>
 
   <div id="sideNoiseLeft" class="sideColumn glitch"></div>
@@ -3230,23 +3398,23 @@ function closeUiPopup(){
   </div>
 
   <!-- Broker Profile Popup -->
-<div id="brokerModal" class="popup" style="
-position: fixed;
-/* 화면 왼쪽 상단 고정 위치 */
-left: 40px;
-top: 90px;
-transform: none;
-width: 420px;
-max-width: 90vw;
-padding: 24px;
-background: rgba(0,0,0,0.9);
-border: 1px solid var(--neon-cyan);
-border-radius: 12px;
-box-shadow: 0 0 22px rgba(0,255,255,0.5), 0 0 10px rgba(255,0,160,0.4);
-display: none;
-z-index: 999;
-backdrop-filter: blur(6px);
-">
+  <div id="brokerModal" class="popup" style="
+  position: fixed;
+  top: 32px;
+  left: 32px;
+  transform: none;
+  width: 420px;
+  max-width: 90vw;
+  padding: 24px;
+  background: rgba(0,0,0,0.9);
+  border: 1px solid var(--neon-cyan);
+  border-radius: 12px;
+  box-shadow: 0 0 22px rgba(0,255,255,0.5), 0 0 10px rgba(255,0,160,0.4);
+  display: none;
+  z-index: 999;
+  backdrop-filter: blur(6px);
+  ">
+  
   
 <h2 class="glitch" data-text="Broker Profile">Broker Profile</h2>
 
@@ -3273,6 +3441,29 @@ backdrop-filter: blur(6px);
 </button>
 </div>
 
+<!-- Job Flow Modal (의뢰 진행 플로우) -->
+<div id="jobFlowModal" class="popup modal-center" style="
+  width: 440px;
+  max-width: 92vw;
+  padding: 20px;
+  background: rgba(0,0,0,0.9);
+  border: 1px solid var(--neon-cyan);
+  border-radius: 12px;
+  box-shadow: 0 0 22px rgba(0,255,255,0.55), 0 0 10px rgba(255,0,160,0.4);
+  display: none;
+  z-index: 1000;
+  backdrop-filter: blur(6px);
+">
+  <div id="jobFlowContent" style="font-size:13px;color:var(--muted);"></div>
+
+  <div style="margin-top:14px;display:flex;gap:8px;">
+    <button id="jobFlowPrev" class="btn secondary micro" style="min-width:64px;display:none;">이전</button>
+    <button id="jobFlowNext" class="btn micro" style="flex:1;">다음</button>
+    <button id="jobFlowComplete" class="btn micro" style="flex:1;display:none;">의뢰 완료</button>
+  </div>
+</div>
+
+
 <!-- ROUTING Overlay -->
 <div id="routeOverlay">
   <div id="routeOverlayInner">
@@ -3282,6 +3473,13 @@ backdrop-filter: blur(6px);
     </div>
   </div>
 </div>
+
+<audio id="sfx-click" src="neorivere_ui_click.wav" preload="auto"></audio>
+<audio id="sfx-hover" src="neorivere_ui_hover.wav" preload="auto"></audio>
+<audio id="sfx-success" src="neorivere_success.wav" preload="auto"></audio>
+<audio id="sfx-error" src="neorivere_error.wav" preload="auto"></audio>
+<audio id="sfx-notify" src="neorivere_notify.wav" preload="auto"></audio>
+<audio id="sfx-route" src="neorivere_overlay_whoosh.wav" preload="auto"></audio>
 
 
 </body>
