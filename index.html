@@ -2235,61 +2235,7 @@ function renderRecent(){
     list.appendChild(el);
   });
 }
-
-function renderJobs(filter = '') {
-  const list = $('#jobs-list');
-  list.innerHTML = '';
-
-  jobs
-    .filter(j =>
-      (j.title + j.tags.join(' ') + j.client + j.status + j.desc)
-        .toLowerCase()
-        .includes(filter.toLowerCase())
-    )
-    .filter(j => jobStatusFilter === 'all' ? true : j.status === jobStatusFilter)
-    .forEach(j => {
-      const el = document.createElement('div');
-      el.className = 'job';
-
-      const openBtn = j.status === 'open'
-        ? `<button class="btn micro" data-accept="${j.id}">수락</button>`
-        : '';
-
-      const statusLabel =
-        j.status === 'open'
-          ? 'open'
-          : (j.status === 'accepted' ? 'progress' : 'completed');
-
-      const statusColor =
-        j.status === 'open' ? 'var(--neon-emerald)' :
-        j.status === 'accepted' ? '#ffc24c' :
-        'var(--neon-pink)';
-
-      el.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div style="font-weight:700">${j.title}</div>
-            <div class="meta">
-              클라이언트: ${j.client}
-              · 보상: ${j.reward} creds
-              · 상태:
-              <span style="color:${statusColor};font-weight:600;">
-                ${statusLabel}
-              </span>
-            </div>
-          </div>
-
-          <div style="display:flex;flex-direction:column;gap:6px">
-            ${openBtn}
-            <button class="btn secondary micro" data-view="${j.id}">보기</button>
-          </div>
-        </div>
-      `;
-
-      list.appendChild(el);
-    });
-
-    /* ================  
+/* ================  
    Celerenia Mini AI Lines
    ================ */
 const aiLines = {
@@ -2347,6 +2293,59 @@ function updateAiMessage(sectionId) {
 }
 
 window._currentSection = 'home';
+
+function renderJobs(filter = '') {
+  const list = $('#jobs-list');
+  list.innerHTML = '';
+
+  jobs
+    .filter(j =>
+      (j.title + j.tags.join(' ') + j.client + j.status + j.desc)
+        .toLowerCase()
+        .includes(filter.toLowerCase())
+    )
+    .filter(j => jobStatusFilter === 'all' ? true : j.status === jobStatusFilter)
+    .forEach(j => {
+      const el = document.createElement('div');
+      el.className = 'job';
+
+      const openBtn = j.status === 'open'
+        ? `<button class="btn micro" data-accept="${j.id}">수락</button>`
+        : '';
+
+      const statusLabel =
+        j.status === 'open'
+          ? 'open'
+          : (j.status === 'accepted' ? 'progress' : 'completed');
+
+      const statusColor =
+        j.status === 'open' ? 'var(--neon-emerald)' :
+        j.status === 'accepted' ? '#ffc24c' :
+        'var(--neon-pink)';
+
+      el.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:700">${j.title}</div>
+            <div class="meta">
+              클라이언트: ${j.client}
+              · 보상: ${j.reward} creds
+              · 상태:
+              <span style="color:${statusColor};font-weight:600;">
+                ${statusLabel}
+              </span>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:6px">
+            ${openBtn}
+            <button class="btn secondary micro" data-view="${j.id}">보기</button>
+          </div>
+        </div>
+      `;
+
+      list.appendChild(el);
+    });
 
 
   // ✅ 수락 버튼 → 바로 accepted 처리 + 플로우 모달 열기
