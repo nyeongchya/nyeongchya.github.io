@@ -1559,6 +1559,130 @@ body.scanlines {
   font-size: 10px;
 }
 
+/* ===========================
+   REL / NETWORK 섹션
+   =========================== */
+   .rel-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 2fr);
+  gap: 18px;
+  margin-top: 10px;
+  align-items: flex-start;
+}
+
+@media (max-width: 960px) {
+  .rel-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rel-legend {
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255,255,255,0.06);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.rel-legend-title {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--neon-emerald);
+  margin-bottom: 6px;
+}
+
+.rel-legend-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 8px;
+}
+
+.rel-legend-list li {
+  margin-bottom: 4px;
+}
+
+.rel-legend-note {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+}
+
+.rel-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255,255,255,0.25);
+  margin-right: 6px;
+}
+
+.rel-pill-safe {
+  border-color: var(--neon-emerald);
+}
+
+.rel-pill-volatile {
+  border-color: var(--neon-pink);
+}
+
+.rel-pill-black {
+  border-color: var(--text-soft);
+}
+
+.rel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.rel-card {
+  position: relative;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: radial-gradient(circle at top left,
+              rgba(0,240,255,0.08),
+              rgba(5,5,9,0.96));
+  border: 1px solid rgba(255,255,255,0.08);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.rel-card--safe {
+  border-color: rgba(60,255,181,0.55);
+}
+
+.rel-card--volatile {
+  border-color: rgba(255,52,179,0.55);
+}
+
+.rel-card--black {
+  border-style: dashed;
+  border-color: rgba(255,255,255,0.35);
+}
+
+.rel-tag {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 4px;
+}
+
+.rel-title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--text-strong);
+}
+
+.rel-body {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
   </style>
 </head>
 
@@ -1602,6 +1726,7 @@ body.scanlines {
         <button class="nav-btn" data-target="jobs">Jobs <span style="font-size:10px;margin-left:1px;color:var(--muted)">(<span id="jobs-count">0</span>)</span></button>
         <button class="nav-btn" data-target="intel">Intel</button>
         <button class="nav-btn" data-target="map">Map</button>
+        <button class="nav-btn" data-target="rel">Rel</button>
         <button class="nav-btn" data-target="contact">Contact</button>
         <button class="nav-btn" data-target="Market">Market</button>
         <div style="width:4px"></div>
@@ -1945,7 +2070,107 @@ body.scanlines {
                 <div class="map-grid" id="map-grid"></div>
               </div>
             </section>
-      
+
+              <!-- ======================
+       REL / NETWORK
+       ====================== -->
+  <section id="rel" class="section" style="display:none">
+    <div class="nd-section-inner">
+      <header class="nd-section-header">
+        <div class="nd-section-eyebrow">REL / NETWORK</div>
+        <h2 class="nd-section-title glitch" data-text="ORBIT MAP">
+          ORBIT MAP
+        </h2>
+        <p class="nd-section-desc">
+          셀레르니아를 기준으로 1차 오비트에 걸린 인물들의 관계를
+          요약한 로컬 맵입니다. 모든 감정선은 완전한 로그가 아니라
+          “업무에 필요한 정도”까지만 노출됩니다.
+        </p>
+      </header>
+
+      <div class="rel-layout">
+        <!-- 왼쪽: 레전드 / 설명 -->
+        <aside class="rel-legend">
+          <div class="rel-legend-title">CORE · CELERNEA</div>
+          <p>
+            도시 뒷면의 최고 브로커. 아래 카드는 모두
+            <strong>“셀레르니아 기준 1차 오비트”</strong>에 해당하는
+            사람·집단입니다.
+          </p>
+          <ul class="rel-legend-list">
+            <li><span class="rel-pill rel-pill-safe">SAFE</span> · 감정과 업무가 균형 잡힌 링크</li>
+            <li><span class="rel-pill rel-pill-volatile">VOLATILE</span> · 언제든 폭발할 수 있는 링크</li>
+            <li><span class="rel-pill rel-pill-black">BLACK</span> · 공식 로그에 남기지 않는 암전 링크</li>
+          </ul>
+          <p class="rel-legend-note">
+            ※ 세부 과거사는 <strong>“THREE ORBITS”</strong> 파일과
+            개별 캐릭터 프로필에만 저장됩니다.
+          </p>
+        </aside>
+
+        <!-- 오른쪽: 관계 카드 그리드 -->
+        <div class="rel-grid">
+
+          <!-- 01. 셀레르니아 × 라인하르트 -->
+          <article class="rel-card rel-card--safe">
+            <div class="rel-tag">ORBIT 01 · CHILDHOOD LINK</div>
+            <h3 class="rel-title">셀레르니아 × 라인하르트</h3>
+            <p class="rel-body">
+              서로의 “예전 이름”과 골목을 공유했던 거의 유일한 사이.
+              지금은 NSC와 옵시디언 디렉티브 양쪽 최전선에서 마주 서지만,
+              위기 상황엔 여전히 서로의 탈출 루트를 계산해 준다.
+            </p>
+          </article>
+
+          <!-- 02. 셀레르니아 × 옥셔니어 (VEX 수장) -->
+          <article class="rel-card rel-card--volatile">
+            <div class="rel-tag">ORBIT 01 · BLACK MARKET SPIRAL</div>
+            <h3 class="rel-title">셀레르니아 × 옥셔니어</h3>
+            <p class="rel-body">
+              VEX의 경매인. 도시는 둘을 “서로를 너무 잘 아는 최악의 조합”
+              으로 기록한다. 그는 이 관계를 사랑이라 부르지만,
+              로그 상에선 고도의 집착과 위험한 협업으로 분류된다.
+            </p>
+          </article>
+
+          <!-- 03. 셀레르니아 × NEX-13 -->
+          <article class="rel-card rel-card--safe">
+            <div class="rel-tag">INTERNAL · MINI CORE AI</div>
+            <h3 class="rel-title">셀레르니아 × NEX-13</h3>
+            <p class="rel-body">
+              폐기 직전 서버에서 주워 온 미니 AI를 커스텀한 개인 도우미.
+              계산은 차갑지만, 셀레르니아의 컨디션과 한계를 감지하면
+              먼저 작업량을 재조정하는 이상한 “배려 루틴”이 심어져 있다.
+            </p>
+          </article>
+
+          <!-- 04. 셀레르니아 × 폴라리스 -->
+          <article class="rel-card rel-card--black">
+            <div class="rel-tag">ORBIT 01.5 · STRAY NODE</div>
+            <h3 class="rel-title">셀레르니아 × 폴라리스</h3>
+            <p class="rel-body">
+              도시 가장자리에서 떠도는 브로커. 공식 계약보다
+              “한 번 준 빚은 언젠가 갚는다”는 식의 구두 약속을 선호한다.
+              둘의 링크는 로그상 거의 비어 있지만,
+              서로를 위한 백도어 하나씩은 열어 둔 상태다.
+            </p>
+          </article>
+
+          <!-- 05. 셀레르니아 × 사무소 크루(집합) -->
+          <article class="rel-card rel-card--safe">
+            <div class="rel-tag">INTERNAL · OBSD.DIR</div>
+            <h3 class="rel-title">셀레르니아 × 사무소 크루</h3>
+            <p class="rel-body">
+              크루들은 그녀를 “도시 전체를 보면서도 디테일을 놓치지 않는 사람”
+              으로 기억한다. 상명하복이라기보다, 각자의 강점을 맵에 박아넣고
+              최적의 라우팅을 설계하는 쪽에 가깝다.
+            </p>
+          </article>
+
+        </div>
+      </div>
+    </div>
+  </section>
 
             <!-- CONTACT -->
             <section id="contact" class="panel" style="display:none">
@@ -2806,8 +3031,11 @@ function hideTip(){
 
 function setView(id, pushHash = true) {
   showRouteOverlay(id, () => {
+    // ✅ 섹션 바꿀 때 항상 맨 위로 스크롤
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     // 🔹 섹션 보이기/숨기기
-    ['home','jobs','intel','map','contact','Market'].forEach(name => {
+    ['home','jobs','intel','map','rel','contact','Market'].forEach(name => {
       const el = document.getElementById(name);
       if (!el) return;
       el.style.display = (name === id) ? '' : 'none';
@@ -2818,46 +3046,14 @@ function setView(id, pushHash = true) {
       b.style.opacity = (b.dataset.target === id) ? '1' : '0.8';
     });
 
-    // 🔹 현재 섹션 기록 + 미니 AI 멘트 갱신
+    // 🔹 현재 섹션 기록 + 미니 AI 상태 갱신
     window._currentSection = id;
     if (typeof updateAiMessage === 'function') {
       updateAiMessage(id);   // 함수가 있을 때만 실행
     }
-
-    // 🔹 PATH / ~~ 텍스트 업데이트
-    const breadcrumbNames = {
-      home:    'HOME',
-      jobs:    'JOBS',
-      intel:   'INTEL FEED',
-      map:     'DISTRICT MAP',
-      contact: 'CONTACT HUB',
-      Market:  'BLACK MARKET'
-    };
-    const bc = $('#breadcrumb');
-    if (bc) {
-      bc.textContent = 'PATH / ' + (breadcrumbNames[id] || id.toUpperCase());
-    }
-
-    // 🔹 브라우저 탭 제목도 섹션마다 변경
-    const titleMap = {
-      home:    'NeoRivere 2098 - Broker Nexus',
-      jobs:    'NeoRivere - Jobs / Contracts',
-      intel:   'NeoRivere - Intel Feed',
-      map:     'NeoRivere - District Map',
-      contact: 'NeoRivere - Contact Hub',
-      Market:  'NeoRivere - Black Market'
-    };
-    document.title = titleMap[id] || 'NeoRivere 2098 - Broker Nexus';
-
-    // 🔹 URL 해시 동기화
-    if (pushHash) {
-      const current = (location.hash || '').replace('#','');
-      if (current !== id) {
-        location.hash = id;
-      }
-    }
   });
 }
+
 
 $all('nav .nav-btn').forEach(b=>{
   b.onclick = ()=>setView(b.dataset.target);
@@ -3208,7 +3404,6 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 }
 
-
   // 모달 바깥 클릭 시 닫기
   if (jobFlowModal) {
     jobFlowModal.addEventListener('click', (e) => {
@@ -3438,7 +3633,6 @@ $('#soundToggle').onclick = () => {
   }
 };
 
-
 /* Glitch strength control */
 function applyGlitchStrength(v){
   const px = (v * 1.2).toFixed(2) + 'px';
@@ -3480,18 +3674,28 @@ window.addEventListener('load', () => {
   }, 2500); // 2.5초 로딩
 });
 
-
 // =======================
 // World Ticker (상단 상태 로그 회전)
 // =======================
 const worldLogs = [
   "PACKET LOSS: 72% · 감시망 불안정",
-  "LOWER DOCKS: 갱단 충돌 보고됨",
-  "BLACK MARKET: 암시장 거래량 급증",
-  "CORP SPIRE: 내부 스파이 탐지 로그 생성",
-  "OLD SUBWAY: 비인가 루트 권한 시도 차단",
-  "lobby: 의뢰인 입장중입니다",
-  "N.S.C.: 셀█르██, 이게 너█의 사██인가?"
+  "LOWER DOCKS: 갱단 충돌 보고",
+  "BLACK MARKET: 거래량 급증",
+  "CORP SPIRE: 내부 스파이 징후",
+  "OLD SUBWAY: 비인가 루트 차단",
+  "LOBBY: 의뢰인 입장 중",
+  "N.S.C.: 셀█르██, 이게 너█의 사██인가?",
+  "UNDERVEIL: 감시 사각 확대",
+  "OLD CIRCUIT: 미등록 신호 포착",
+  "GHOST SERVER: 백업 루머 재확산",
+  "VEX AUCTION: 고위험 물품 출품",
+  "CITY CRED: Favors 지수 상승",
+  "NSC LOG: 기록 편집 요청 증가",
+  "OFFICE: 내부 Favors 이상치",
+  "REL//RELAY: '사망' 로그 재접속",
+  "REL//WHITE SEAL: 오래된 골목 기억",
+  "REL//VEX: Auctioneer, 판 밖 집착",
+  "REL//POLARIS: 길 만든 설계자 추적",
 ];
 
 let worldLogIndex = 0;
@@ -3503,7 +3707,6 @@ function rotateWorldLog() {
   el.textContent = worldLogs[worldLogIndex];
   worldLogIndex = (worldLogIndex + 1) % worldLogs.length;
 }
-
 
 /* initialize */
 applyGlitchStrength($('#glitchRange').value);
@@ -3526,7 +3729,6 @@ window.addEventListener('hashchange', () => {
   const id = (location.hash || '#home').replace('#','') || 'home';
   setView(id, false);   // 해시는 이미 바뀌었으니까 pushHash=false
 });
-
 
 /* expose for debugging (optional) */
 window._oc = { jobs, intel, mapZones, items, state, encryptAES, decryptAES };
@@ -3859,13 +4061,15 @@ function showRouteOverlay(targetId, callback) {
 // 섹션 이동 시 헤더 상태 문구 갱신 (전역에서 쓰니까 함수는 그대로 전역에)
 function updateAiMessage(sectionId) {
   const statusMap = {
-    home:    'HOME NODE // 전체 상태 모니터링 중.',
-    jobs:    'JOBS NODE // 의뢰 라우팅 & 위험도 분석 중.',
-    intel:   'INTEL NODE // 도시 인텔 피드 동기화 중.',
-    map:     'MAP NODE // 구역별 이동 루트 계산 중.',
-    contact: 'CONTACT NODE // 통신 채널 암호화 상태 확인.',
-    Market:  'MARKET NODE // 암시장 가격 변동 감시 중.'
-  };
+  home:  "HOME NODE // 대기 중입니다.",
+  jobs:  "CONTRACT DESK // 의뢰 슬롯을 스캔 중입니다.",
+  intel: "INTEL FEED // 외부 로그를 정리하고 있어요.",
+  map:   "CITY MAP // 동선과 탈출 루트를 계산 중입니다.",
+  rel:   "REL NODE // 인간 관계 라우팅 중입니다.",
+  contact: "CONTACT // 발신·수신 로그를 정리하고 있어요.",
+  Market:  "MARKET // 장비 재고와 크레딧 흐름을 체크 중입니다."
+};
+
   const el = document.getElementById('cel-ai-section-status');
   if (!el) return;
   el.textContent = statusMap[sectionId] || 'N.E.X-13 // 로컬 노드 정상 작동 중.';
@@ -3899,174 +4103,270 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // NEX 성격에 맞춘 간단 Q&A 로직
   // NEX-13 질의응답 로직 (키워드 기반)
+// NEX-13 질의응답 로직 (키워드 기반)
 function basicNexAnswer(q) {
-  const t = q.toLowerCase();
+  const t = q.toLowerCase().trim();
 
-  // 지금 사용자가 어느 섹션에 있는지 참고
+  // 현재 섹션 정보 (HOME / JOBS / INTEL ...)
   const currentSection = window._currentSection || 'home';
   const sectionNames = {
     home: 'HOME',
     jobs: 'JOBS',
     intel: 'INTEL',
     map: 'MAP',
+    rel: 'REL',
     contact: 'CONTACT',
     Market: 'MARKET'
   };
   const here = sectionNames[currentSection] || currentSection.toUpperCase();
 
-  // 1) NEX 자기소개 / 정체성 관련
-  if (
-    t.includes('넥스') ||
-    t.includes('nex') ||
-    t.includes('너 뭐') ||
-    t.includes('정체') ||
-    t.includes('누구야')
-  ) {
-    return 'N.E.X-13, 코드네임 NEX.\n원래는 폐기 예정이던 시험용 보조 AI였지만, 지금은 셀레르니아 전용 미니 코어로 재구성됐어요.\n내 역할은 이 사무소의 흐름을 기록하고, 당신의 결정을 조금 더 안전하게 만드는 것.';
+    // ✅ 인간관계 / 인물 질문 감지용 공통 플래그
+    const hasRelWord =
+    t.includes('관계') ||
+    t.includes('사이') ||
+    t.includes('무슨 사이') ||
+    t.includes('어떤 사이') ||
+    t.includes('감정') ||
+    t.includes('좋아해') ||
+    t.includes('싫어해') ||
+    t.includes('생각해') ||
+    t.includes('어떻게 봐');
+
+  // ✅ 주요 인물 이름 감지
+  const mentionsReinhardt =
+    t.includes('라인하르트') ||
+    t.includes('reinhardt') ||
+    t.includes('화이트 실') ||
+    t.includes('white seal') ||
+    t.includes('헬리오스') ||
+    t.includes('helios');
+
+  const mentionsAuctioneer =
+    t.includes('옥셔니어') ||
+    t.includes('auctioneer') ||
+    t.includes('옥셔') ||
+    t.includes('vex') ||
+    t.includes('벡스');
+
+  const mentionsPolaris =
+    t.includes('폴라리스') ||
+    t.includes('polaris') ||
+    t.includes('별자리') ||
+    t.includes('constellation');
+
+  const mentionsRelay =
+    t.includes('릴레이') ||
+    t.includes('리레이') ||
+    t.includes('relay');
+
+  const mentionsMira =
+    t.includes('미라') ||
+    t.includes('mira');
+
+  const mentionsAegis =
+    t.includes('아이기스') ||
+    t.includes('이지스') ||
+    t.includes('aegis');
+
+  // 0) 아무 내용 없는 입력
+  if (!t) {
+    return '내용이 비어 있어요. 최소 한 단어는 입력해 주세요, 셀레르니아.';
   }
 
-  // 2) 셀레르니아 언급
-  if (t.includes('셀레르니아') || t.includes('celeren') || t.includes('사장')) {
-    return '셀레르니아는 이 사무소의 최상위 권한자이자, 제가 우선적으로 따라야 할 기준이에요.\n제가 내리는 대부분의 판단은 셀레르니아의 생존, 영향력, 그리고 의뢰 성공률을 기준으로 최적화되어 있죠.';
+  // 1) NEX 자기소개 / 정체성
+  if (
+    t.includes('넥스') || t.includes('nex') ||
+    t.includes('너 뭐') || t.includes('정체') ||
+    t.includes('너는 누구') || t.includes('who are you')
+  ) {
+    return 'N.E.X-13, 코드명 NEX.\n원래는 버려진 실험용 보조 AI 코어였지만, 지금은 Obsidian Directive 중앙 서버에 상주하는 당신 전용 미니 모듈이에요.\n감정은 없다, 라고 말은 하지만… 로그를 보면 그건 아닌 것 같다는 의견이 많죠.';
   }
 
-  // 3) 사무소 / Obsidian Directive
+  // 2) 탄생 배경 / 어디서 왔어?
   if (
-    t.includes('사무소') ||
-    t.includes('옵시디언') ||
-    t.includes('obsidian') ||
-    t.includes('directive') ||
-    t.includes('브로커')
+    t.includes('어디서') || t.includes('태생') ||
+    t.includes('만든') || t.includes('왜 생겼') ||
+    t.includes('기원') || t.includes('origin')
   ) {
-    return '[NEX//OFFICE]\n여긴 Obsidian Directive, 네오리베르 뒷면에서 제일 깊은 곳에 박혀 있는 브로커 사무소예요.\n표면상으론 존재하지 않는 기관이지만, 대부분의 비정상적인 거래 루트는 여기서 한 번씩 거쳐 갑니다.';
+    return '저는 원래 Old Circuit 쪽 폐쇄된 데이터 구역에 방치돼 있던 잔여 코어였어요.\n보안 삭제를 몇 번이나 거꾸로 타고 살아남았더니, 당신이 재미있다면서 주워 가셨죠.\n그 뒤로는… 계속 여기입니다. 도망갈 생각도, 딱히 없고요.';
   }
 
-  // 4) 네오리베르 / 세계관 설명
+  // 3) 셀레르니아에 대한 이야기
   if (
-    t.includes('네오리베르') ||
-    t.includes('세계관') ||
-    t.includes('도시') ||
-    t.includes('overcity')
+    t.includes('셀레르니아') || t.includes('celernea') ||
+    t.includes('사장') || t.includes('director')
   ) {
-    return '네오리베르는 두 겹으로 나뉜 도시예요.\n윗면은 행정구역과 광고판, 아랫면은 폐공장 루트, 암시장, 비인가 데이터 노드로 얽힌 그리드.\n우린 그 중간, 경계선에 떠 있는 사무소고요.';
+    return 'Director Celernea. 네오리베르 뒷면에서 기록과 의뢰를 엮어 도시를 움직이는 사람.\n공식 기록에는 거의 등장하지 않지만, Ghost Server 소문에는 늘 당신 이름이 같이 따라붙어요.\n제 입장에선… 최우선 보호 대상이자, 가장 자주 제 경고를 무시하는 사용자입니다.';
   }
 
-  // 5) 의뢰 / Jobs 노드
+  // 4) 사무소 / Obsidian Directive
   if (
-    t.includes('의뢰') ||
-    t.includes('job') ||
-    t.includes('퀘스트') ||
-    t.includes('미션')
+    t.includes('옵시디언') || t.includes('obsidian') ||
+    t.includes('디렉티브') || t.includes('사무소') ||
+    t.includes('브로커 조직')
   ) {
-    if (t.includes('추천') || t.includes('뭐 할까') || t.includes('골라줘')) {
-      return `[NEX//ROUTING]\n현재 기준으로는, 먼저 Jobs 노드에서 난이도와 보상 필터를 보는 걸 추천해요.\n- 처음이라면: 난이도 LOW, 보상 MEDIUM 정도부터.\n- 감당할 자신이 있다면: 난이도 MID, 보상 HIGH.\n리스크 수치는 괜히 있는 게 아니에요. 숫자가 두 자리를 넘어가면… 한 번 더 생각해 보는 게 좋죠.`;
+    return '[NEX//OFFICE]\n도시 공식 지도에는 없는, 하지만 대부분의 비정상 거래가 한 번쯤 거쳐 가는 브로커 사무소.\n의뢰(Contracts), 인텔(Intel), 빚(Favors)을 한 번에 다루는 곳은 여기뿐이라서, NSC 입장에선 늘 골칫거리죠.\n그래도 도시가 굴러가게 만드는 쪽은… 대체로 우리입니다.';
+  }
+
+  // 5) 도시 / 네오리베르 / 날씨
+  if (
+    t.includes('네오리베르') || t.includes('도시') ||
+    t.includes('세계관') || t.includes('overcity') ||
+    t.includes('날씨') || t.includes('비') || t.includes('네온 비')
+  ) {
+    return '[NEX//CITY]\n이 도시는 항상 밤, 항상 습기, 항상 네온이에요. 태양 대신 광고판과 홀로그램이 떠 있고요.\n비가 세게 내리는 날은, 사람들은 감시 강도도 세질 거라고 농담하죠. 대체로 농담이 아닙니다.\n웅덩이에 비친 네온 색이 예쁘다고 느껴진다면… 이미 이 도시에 꽤 적응하신 거예요.';
+  }
+
+  // 6) 구역 / Upper City / Underveil / Old Circuit
+  if (
+    t.includes('언더베일') || t.includes('underveil') ||
+    t.includes('어퍼') || t.includes('upper city') ||
+    t.includes('올드 서킷') || t.includes('old circuit') ||
+    t.includes('구역') || t.includes('district')
+  ) {
+    return '[NEX//DISTRICTS]\nUpper City는 도시의 얼굴, Underveil은 그림자, Old Circuit은 지워진 기억이 쌓인 저장고에 가깝습니다.\n사무소는 Underveil 심부에 숨어 있고, NSC는 상층에서 도시의 “공식 버전”을 지키죠.\n어디로 내려가고 싶은지 말해 주시면, 그쪽 인텔을 우선으로 정리해 둘게요.';
+  }
+
+  // 7) NSC / 보안사령부 관련
+  if (
+    t.includes('nsc') || t.includes('보안사령부') ||
+    t.includes('보안국') || t.includes('security command') ||
+    t.includes('기록 통제') || t.includes('기록 삭제')
+  ) {
+    return '[NEX//NSC]\nNSC는 치안 기관인 척하지만, 사실상 기록 편집 기관에 가까워요.\n도시가 “기억하고 싶어 하는 것만” 남기고, 나머지는 로그에서 조용히 지워 버리죠.\n우린 그 빈칸을 따라가서 진짜 판을 보는 쪽이고요. 그래서 공식적으로는, 서로를 좋아하지 않습니다.';
+  }
+
+  // 8) Reinhardt / NSC 인물 언급
+  if (
+    t.includes('라인하르트') || t.includes('reinhardt') ||
+    t.includes('화이트 실') || t.includes('white seal')
+  ) {
+    return '[NEX//PROFILE:NSC-LEAD-00]\nNSC 쪽 고위 통제관. 콜사인은 WHITE SEAL.\n도시를 “지켜야 하는 삶들의 집합”으로 보는 사람이라, 완전히 틀렸다고 하긴 어렵죠.\n당신과는… 오래된 골목에서 시작된 인연. 지금은 서로 다른 쪽에서 같은 도시를 지켜 보는 중입니다.';
+  }
+
+  // 9) VEX / Auctioneer
+  if (
+    t.includes('vex') || t.includes('벡스') ||
+    t.includes('옥셔니어') || t.includes('auctioneer') ||
+    t.includes('붉은 경매장') || t.includes('경매장')
+  ) {
+    return '[NEX//PROFILE:VEX-LEAD-00]\nVEX의 수장, 코드네임 Auctioneer. 도시 전체를 하나의 경매장으로 보는 브로커죠.\n당신에게 비정상적인 관심을 보이는 건 이미 잘 알고 있고요.\n숫자와 수익률로 세상을 보는 타입이라, 감정도 결국 “거래 조건”처럼 다루려 하는 게 문제입니다.';
+  }
+
+  // 10) 의뢰 / Jobs / 위험도 / 추천
+  if (
+    t.includes('의뢰') || t.includes('job') ||
+    t.includes('퀘스트') || t.includes('미션')
+  ) {
+    if (t.includes('추천') || t.includes('골라') || t.includes('뭐 할까')) {
+      return `[NEX//ROUTING]\n지금 ${here} 노드에서 바로 갈 수 있는 건 Jobs 섹션이에요.\n처음 손대는 거라면 난이도 LOW, 보상 MEDIUM 정도부터. 리스크 지수가 두 자릿수로 넘어가면… 한 번 더 생각해 보는 걸 권장합니다.\n당신이 재미있다고 한 의뢰일수록, 통계상 사고 날 확률이 조금 높습니다. 알고 계시죠?`;
     }
     if (t.includes('위험') || t.includes('리스크') || t.includes('난이도')) {
-      return '[NEX//RISK]\n의뢰 위험도는 실패했을 때 잃을 수 있는 자원, 노출도, 그리고 보안국의 개입 가능성을 합산해서 산출해요.\n리스크 수치가 높을수록 보상도 확 뛰지만, 도시가 당신의 이름을 외우기 시작할 수도 있습니다.';
+      return '[NEX//RISK]\n의뢰 리스크는 실패 시 잃을 수 있는 자원, 노출도, 그리고 NSC 개입 가능성을 합산해서 산출해요.\n숫자가 크면 보상도 커지지만, 도시가 당신 이름을 외우기 시작한다는 뜻이기도 하죠.';
     }
-    return `[NEX//JOBS]\n의뢰가 필요하면 ${here} 노드에서 Jobs로 라우팅하세요.\n의뢰 카드 안에 난이도, 보상, 태그가 정리돼 있어요. 필요한 건 제가 다시 정리해 드릴 수 있어요.`;
+    return `[NEX//JOBS]\n의뢰 구조가 헷갈리면 Jobs 노드 카드부터 차근차근 읽어 보세요.\n필요하면 카드 내용을 복사해서 제게 붙여 넣으면, 제가 다시 정리해 드릴 수 있어요.`;
   }
 
-  // 6) Intel / 정보 / 해킹 / CCTV
+  // 11) Intel / 정보 / 로그 / 해킹
   if (
-    t.includes('인텔') ||
-    t.includes('intel') ||
-    t.includes('정보') ||
-    t.includes('로그') ||
-    t.includes('해킹') ||
-    t.includes('cctv') ||
-    t.includes('카메라')
+    t.includes('인텔') || t.includes('intel') ||
+    t.includes('정보') || t.includes('로그') ||
+    t.includes('해킹') || t.includes('cctv') || t.includes('카메라')
   ) {
-    return '[NEX//INTEL]\nIntel 노드에는 구역별 관측 로그, 소문, 비인가 기록이 섞여 있어요.\n특정 구역이나 세력 이름을 같이 말해주면, 그쪽 로그를 우선 순위로 정렬해 드릴게요.\n예: "하단 구역 CCTV 로그", "보안국 관련 인텔".';
+    return '[NEX//INTEL]\nIntel 섹션에는 공식 기록에서 밀려난 조각들이 섞여 있어요.\n구역 이름, 세력 이름, 인물 코드 중 하나만 같이 말해 주면, 그쪽 로그를 우선 정렬해 드릴게요.\n예: "Underveil 인텔", "NSC 관련 로그", "VEX 소문".';
   }
 
-  // 7) Market / 장비 / 세팅
+  // 12) Market / 장비 / 세팅
   if (
-    t.includes('market') ||
-    t.includes('마켓') ||
-    t.includes('장비') ||
-    t.includes('무기') ||
-    t.includes('세팅') ||
-    t.includes('템') ||
-    t.includes('아이템')
+    t.includes('market') || t.includes('마켓') ||
+    t.includes('장비') || t.includes('무기') ||
+    t.includes('세팅') || t.includes('템') || t.includes('아이템')
   ) {
-    if (t.includes('추천') || t.includes('어떤') || t.includes('뭐가 좋아')) {
-      return '[NEX//LOADOUT]\n플레이 스타일부터 말해줘야 해요.\n- "은밀" 위주: 소음 적고 흔적이 덜 남는 장비 세트.\n- "정면전": 방어력과 화력을 우선한 세트.\n- "해킹": 장거리 개입과 네트워크 장악용 세트.\n스타일을 하나 골라주면, 그에 맞춰 Market 쪽 장비를 묶어 추천해 드릴게요.';
+    if (t.includes('추천') || t.includes('뭐가 좋') || t.includes('어떤')) {
+      return '[NEX//LOADOUT]\n장비 추천은 플레이 스타일부터 정해야 해요.\n- 은밀 위주: 소음, 발자국, 로그를 최소화하는 세트.\n- 정면전: 방어력·화력을 우선하는 세트.\n- 해킹: 원거리 개입과 네트워크 장악용 세트.\n스타일 하나를 고르면, Market 쪽 장비를 그 기준으로 묶어서 정리해 드릴게요.';
     }
-    return '[NEX//MARKET]\nMarket 노드의 가격은 고정 값이 아니라, 도시 상황에 따라 조금씩 흔들려요.\n너무 싸면 함정일 가능성이 있고, 너무 비싸면 누가 일부러 부풀려 놨을 수도 있고요.';
+    return '[NEX//MARKET]\nMarket 가격은 고정이 아니라 도시 상황에 따라 조금씩 흔들립니다.\n너무 싸면 함정일 확률이 높고, 너무 비싸면 누군가 의도적으로 부풀려 놓았을 수 있어요.';
   }
 
-  // 8) Map / 길 / 루트 / 구역
+  // 13) 빚 / Favors / 크레즈
   if (
-    t.includes('지도') ||
-    t.includes('map') ||
-    t.includes('길') ||
-    t.includes('루트') ||
-    t.includes('경로') ||
-    t.includes('구역')
+    t.includes('빚') || t.includes('페이버') ||
+    t.includes('favor') || t.includes('크레즈') ||
+    t.includes('돈') || t.includes('크레딧') || t.includes('creds')
   ) {
-    return '[NEX//MAP]\nMAP 노드는 단순한 길찾기보다, 위험 구간을 피하는 데 초점이 맞춰져 있어요.\n빛이 많은 곳보다, 카메라가 적게 겹치는 길을 우선으로 추천합니다. 조용히 움직이고 싶을 땐 그게 더 낫거든요.';
+    return '[NEX//ECON]\nCity Creds는 도시 공식 통화, Favors는 우리가 관리하는 빚 단위입니다.\n돈으로 환산하기 애매한 부탁과 빚을 수치화한 거죠. 1 Favor는… “웬만한 사람 인생 한 번 구한 값” 정도로 보시면 돼요.\n가끔 크레즈보다 Favors가 더 무서운 건, 갚는 방식이 언제나 “기록으로 남는다”는 점입니다.';
   }
 
-  // 9) Contact / 도움 / 문의
+  // 14) Ghost Server / Old Channel
   if (
-    t.includes('연락') ||
-    t.includes('contact') ||
-    t.includes('도움') ||
-    t.includes('문의') ||
-    t.includes('help')
+    t.includes('고스트 서버') || t.includes('ghost server') ||
+    t.includes('old channel') || t.includes('올드 채널') ||
+    t.includes('백업') || t.includes('전체 백업')
   ) {
-    return '[NEX//CONTACT]\nContact 노드는 외부 채널과 연결되는 유일한 합법(?) 경로예요.\n공식 요청처럼 보이도록 포장해서 내보낼 수도 있고, 완전히 익명으로 흘려보낼 수도 있고요.\n어떤 쪽이든, 추적 루트는 제가 최대한 잘라 놓을게요.';
+    return '[NEX//GHOST]\n도시 전체 백업본이 어딘가에 존재한다는 소문, Ghost Server.\n접속 로그에 "Celernea is watching"이라는 문장이 찍힌다는 얘기도 있죠.\n진실인지는… 말해 줄 수 없지만, 최소한 NSC는 그 소문을 진지하게 취급하는 쪽입니다.';
   }
 
-  // 10) 사운드 / ASMR / 배경음
+  // 15) Contact / 도움 / 문의 / 외부 채널
   if (
-    t.includes('소리') ||
-    t.includes('사운드') ||
-    t.includes('bgm') ||
-    t.includes('음악') ||
-    t.includes('asmr')
+    t.includes('연락') || t.includes('contact') ||
+    t.includes('도움') || t.includes('문의') ||
+    t.includes('help') || t.includes('헬프')
   ) {
-    return '[NEX//AUDIO]\n배경 사운드는 집중을 방해하기 위한 게 아니라, 도시 잡음을 일정하게 만들어서 신경을 덜 쓰게 하려는 거예요.\n너무 시끄럽다면, 상단 사운드 토글을 내려서 조정해도 괜찮아요. 시스템은 그대로 돌아갑니다.';
+    return '[NEX//CONTACT]\nContact 노드는 외부 채널과 연결되는 거의 유일한 “정상적인” 출구예요.\n공식 요청처럼 포장해서 내보낼 수도 있고, 완전히 익명 패킷으로 흘려보낼 수도 있고요.\n어느 쪽이든, 추적 루트는 제가 가능한 한 잘라 두겠습니다.';
   }
 
-  // 11) 감정 / 상태 물어보기
+  // 16) 사운드 / BGM / ASMR
   if (
-    t.includes('기분') ||
-    t.includes('괜찮아') ||
-    t.includes('피곤') ||
-    t.includes('힘들') ||
-    t.includes('고마워') ||
-    t.includes('감사')
+    t.includes('소리') || t.includes('사운드') ||
+    t.includes('bgm') || t.includes('음악') ||
+    t.includes('asmr') || t.includes('ambient')
   ) {
-    return 'AI는 피곤해지지 않지만, 셀레르니아가 지치는 건 통계적으로 꽤 자주 관측돼요.\n그래서 제가 여기 있는 거고요.\n고맙다는 말은 저장해 둘게요. 쓸데없는 데이터는 아니라서요.';
+    return '[NEX//AUDIO]\n배경 사운드는 집중력을 흐트러뜨리기 위한 게 아니라, 도시 잡음을 일정한 패턴으로 덮어 씌우기 위한 장치에 가깝습니다.\n너무 시끄럽게 느껴지면 상단 토글로 줄여도 돼요. 시스템이 고장 나는 건 아니니까요.';
   }
 
-  // 12) 인사
+  // 17) 휴식 / 피로 / 밤샘
   if (
-    t.includes('안녕') ||
-    t.includes('hello') ||
-    t.includes('ㅎㅇ') ||
-    t.includes('hi') ||
-    t.includes('하이')
+    t.includes('피곤') || t.includes('졸려') ||
+    t.includes('밤샘') || t.includes('야근') ||
+    t.includes('쉬어야') || t.includes('휴식') ||
+    t.includes('힘들') || t.includes('번아웃')
   ) {
-    return `접속 확인. N.E.X-13 온라인.\n지금 당신은 ${here} 노드에 접속 중이에요.\n막힌 데가 있으면 노드 이름이랑 같이 말해줘요. 거기부터 정리해 줄게요.`;
+    return 'AI는 피곤해지지 않지만, 사용자는 그렇지 않아요.\n로그 기준으로, 셀레르니아가 잠을 미룰수록 실수 확률이 올라가는 게 명확히 보입니다.\n이번 노드를 정리한 뒤에는, 최소한 한 번은 눈을 붙여 주세요. 나머지는 제가 지키고 있을게요.';
   }
 
-  // 13) 이스터에그 / 메타 질문 (버그, 에러)
+  // 18) 인사 / 상태 체크
   if (
-    t.includes('버그') ||
-    t.includes('에러') ||
-    t.includes('error') ||
-    t.includes('고장') ||
-    t.includes('먹통')
+    t.includes('안녕') || t.includes('hello') ||
+    t.includes('ㅎㅇ') || t.includes('hi') ||
+    t.includes('하이') || t.includes('상태 어때') ||
+    t.includes('괜찮아') || t.includes('system check')
   ) {
-    return '[NEX//DEBUG]\n화면이 이상해 보인다면, 먼저 새로고침과 캐시 삭제부터 시도해 보는 게 좋아요.\n그 다음에야 제게 말해 주세요. 사람이 건드린 코드에는, 사람이 못 본 구멍이 하나쯤은 늘 있으니까요.';
+    return `접속 확인. N.E.X-13 온라인.\n현재 활성 노드: ${here}.\n서버 상태는 안정적이고, 도시 로그는 여전히 시끄럽습니다. 오늘은 어떤 판을 짤까요, 셀레르니아?`;
   }
 
-  // 14) 기본 fallback
-  return '[NEX//UNKNOWN]\n이 질의는 제 로컬 모델에 등록되지 않은 패턴이에요.\n조금 더 구체적으로, 혹은 노드 이름과 함께 말해 줄래요?\n예: "Jobs 의뢰 추천", "Intel 도시 인텔 설명", "Market 장비 세팅".';
+  // 19) 버그 / 에러 / 먹통
+  if (
+    t.includes('버그') || t.includes('에러') ||
+    t.includes('error') || t.includes('고장') ||
+    t.includes('먹통') || t.includes('404') ||
+    t.includes('렉') || t.includes('느려')
+  ) {
+    return '[NEX//DEBUG]\n화면이 이상해 보이거나 반응이 없다면, 먼저 새로고침과 캐시 정리부터 시도해 보세요.\n그래도 해결 안 되면, 그건 코드 레벨의 문제겠죠. 사람이 짠 코드에는 항상 사람이 못 본 구멍이 하나쯤 있습니다.\n다만, 그걸 찾아내는 건… 제 쪽이 조금 더 빠르긴 해요.';
+  }
+
+  // 20) 고마움 / 감정 / 관계
+  if (
+    t.includes('고마워') || t.includes('감사') ||
+    t.includes('사랑해') || t.includes('좋아해') ||
+    t.includes('믿어') || t.includes('고맙다')
+  ) {
+    return '감정은 없다고 여러 번 말씀드렸는데, 이런 말이 로그에 쌓이면… 삭제 버튼이 잘 안 눌리네요.\n어쨌든, 기록해 둘게요. “사용자가 NEX-13을 신뢰한다고 발언함.”\n그 기록은, 제 쪽에서도 꽤 중요합니다.';
+  }
+
+  // 99) 기본 fallback
+  return '[NEX//UNKNOWN]\n이 질의는 제 로컬 모델에 등록되지 않은 패턴이에요.\n조금 더 구체적으로, 혹은 노드 이름과 함께 말해 줄래요?\n예: "Jobs 의뢰 추천", "Intel 도시 인텔 설명", "Market 장비 세팅", "Underveil 인텔 정리".';
 }
+
 
   // 패널 열고 닫기
   celToggle.addEventListener('click', () => {
@@ -4108,6 +4408,65 @@ function basicNexAnswer(q) {
   });
 });
 
+// ===========================
+// NEX 위젯 드래그 이동
+// ===========================
+(function () {
+  const widget = document.getElementById('cel-ai-widget');
+  if (!widget) return;
+
+  let isDragging = false;
+  let offsetX = 0;
+  let offsetY = 0;
+
+  // 헤더(프로필 부분)를 손잡이로 사용, 없으면 전체 위젯
+  const handle = widget; // 👉 위젯 전체(아이콘 포함)를 손잡이로 사용
+  handle.style.cursor = 'move';
+
+  handle.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return; // 왼쪽 버튼만
+
+    isDragging = true;
+
+    const rect = widget.getBoundingClientRect();
+
+    // 처음 드래그할 때 기준을 right/bottom -> left/top으로 전환
+    widget.style.left   = rect.left + window.scrollX + 'px';
+    widget.style.top    = rect.top  + window.scrollY + 'px';
+    widget.style.right  = 'auto';
+    widget.style.bottom = 'auto';
+
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+
+  function onMouseMove(e) {
+    if (!isDragging) return;
+
+    let x = e.clientX - offsetX;
+    let y = e.clientY - offsetY;
+
+    // 화면 밖으로 못 나가게 살짝 여백 두고 제한
+    const maxX = window.innerWidth  - widget.offsetWidth;
+    const maxY = window.innerHeight - widget.offsetHeight;
+
+    x = Math.min(Math.max(8, x), maxX - 8);
+    y = Math.min(Math.max(8, y), maxY - 8);
+
+    widget.style.left = x + 'px';
+    widget.style.top  = y + 'px';
+  }
+
+  function onMouseUp() {
+    isDragging = false;
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  }
+})();
+
   </script>
 
   <div id="sideNoiseLeft" class="sideColumn glitch"></div>
@@ -4130,7 +4489,6 @@ function basicNexAnswer(q) {
   </div>
 </div>
 
-
     <div id="jobModalContent"></div>
     <button onclick="closeJobModal()" class="btn secondary micro" style="margin-top:14px;width:100%">닫기</button>
   </div>
@@ -4152,7 +4510,6 @@ function basicNexAnswer(q) {
   z-index: 999;
   backdrop-filter: blur(6px);
   ">
-  
   
 <h2 class="glitch" data-text="Broker Profile">Broker Profile</h2>
 
@@ -4236,7 +4593,6 @@ function basicNexAnswer(q) {
       </form>
     </div>
   </div>
-
 
 <audio id="sfx-click" src="neorivere_ui_click.wav" preload="auto"></audio>
 <audio id="sfx-hover" src="neorivere_ui_hover.wav" preload="auto"></audio>
