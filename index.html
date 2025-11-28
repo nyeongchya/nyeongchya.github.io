@@ -1,1187 +1,1102 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🖤A Shadow Broker's Office🖤</title>
-
-<style>
-body {
-    margin: 0;
-    font-family: 'Gowun Dodum', sans-serif;
-    background: linear-gradient(135deg, #200a68, #000000, #4b62ca);
-    background-size: 300% 300%;
-    animation: bgShift 12s ease infinite;
-    color: white;
-    overflow-x: hidden;
-}
-
-@keyframes bgShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-section {
-    min-height: 70vh;
-    padding: 100px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.neon {
-    font-size: 2.8em;
-    color: #ff00f7;
-    text-shadow: 0 0 14px #ff00f7, 0 0 35px #ff00f6;
-}
-
-.panel {
-    width: 80%;
-    max-width: 850px;
-    background: rgba(255,255,255,0.06);
-    border: 1.5px solid #00ffe1;
-    padding: 30px;
-    border-radius: 10px;
-    backdrop-filter: blur(6px);
-    box-shadow: 0 0 20px #00ffe144;
-    margin-top: 30px;
-}
-
-#keycard-menu {
-    position: fixed;
-    top: 50%;
-    left: 25px;
-    transform: translateY(-50%);
-    z-index: 1000;
-}
-
-.key-btn {
-    display: block;
-    padding: 10px 18px;
-    border: 2px solid #00faff;
-    background: rgba(0,0,0,0.4);
-    margin: 10px 0;
-    cursor: pointer;
-    color: #00faff;
-    transition: 0.2s;
-}
-
-.key-btn:hover { background: rgba(0,255,255,0.25); }
-.key-btn.active {
-    border-color: #ff00f7;
-    color: #ff00f7;
-    text-shadow: 0 0 8px #ff00f7;
-    animation: pulse 1.2s infinite;
-}
-
-@keyframes pulse {
-    0% { box-shadow: 0 0 8px #ff00f7; }
-    50% { box-shadow: 0 0 18px #ff00f7; }
-    100% { box-shadow: 0 0 8px #ff00f7; }
-}
-
-/* ---------------------- STAFF ---------------------- */
-.staff-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 25px;
-}
-
-.staff-card {
-    border: 1.5px solid #00ffe1;
-    padding: 20px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 8px;
-    box-shadow: 0 0 12px #00ffe155;
-    cursor: pointer;
-}
-
-/* ---------------------- FILES ---------------------- */
-.file-item {
-    position: relative;
-    overflow: hidden;
-    padding: 12px 15px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid #ff00f7;
-    margin: 8px 0;
-    border-radius: 5px;
-    font-family: 'Gowun Dodum', sans-serif;
-    color: #ffbfff;
-    transition: all 0.25s ease;
-    cursor: pointer;
-}
-
-.file-item:hover {
-    background: rgba(255,0,255,0.15);
-    box-shadow: 0 0 12px #ff00ff;
-    transform: translateX(4px);
-}
-
-.file-item::after {
-    content: '';
-    position: absolute;
-    top: -20%;
-    left: -10%;
-    width: 120%;
-    height: 40%;
-    background: linear-gradient(90deg, rgba(255,0,255,0.3), rgba(0,255,255,0.3), rgba(255,0,255,0.3));
-    transform: skewX(-20deg);
-    animation: glitchDrop 2s infinite;
-}
-
-@keyframes glitchDrop {
-    0% { top: -20%; opacity: 0; }
-    10% { opacity: 1; }
-    50% { top: 100%; opacity: 0; }
-    100% { top: 100%; opacity: 0; }
-}
-
-.hidden-file {
-  display:none;
-  color:#ff00ff; 
-  border:1px dashed #ff00ff;
-  animation: glitch 1s infinite;
-}
-
-/* ---------------------- MAP ---------------------- */
-.map-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 40px);
-    gap: 6px;
-    margin-top: 25px;
-}
-
-.map-cell {
-    width: 40px;
-    height: 40px;
-    border: 1px solid #00ffe1;
-    background: rgba(255,255,255,0.04);
-    cursor: pointer;
-}
-.map-cell:hover { background: rgba(0,255,255,0.2); }
-
-#map-info { margin-top: 20px; color: #ffb4ff; }
-
-/* ---------------------- REQUEST ---------------------- */
-textarea, input {
-    width: 100%;
-    padding: 12px;
-    margin: 8px 0;
-    background: rgba(255,255,255,0.08);
-    border: 1.5px solid #ff00f7;
-    color: #fff;
-    border-radius: 6px;
-    font-size: 1em;
-}
-
-button {
-    margin-top: 10px;
-    padding: 12px 25px;
-    font-size: 1em;
-    border: 2px solid #00ffe1;
-    background: transparent;
-    color: #00ffe1;
-    cursor: pointer;
-}
-
-button:hover { background: rgba(0,255,255,0.2); }
-button:active {
-    box-shadow: 0 0 15px #00ffe1 inset;
-    transform: scale(0.98);
-    transition: 0.1s;
-}
-
-/* ---------------------- POPUP ---------------------- */
-#staff-popup, #file-popup {
-    display:none;
-    position:fixed;
-    top:0; left:0;
-    width:100%; height:100%;
-    background: rgba(0,0,0,0.85);
-    justify-content:center;
-    align-items:center;
-    z-index:9999;
-}
-
-#staff-data, #file-data {
-    background: rgba(30,10,40,0.95);
-    border: 1px solid #ff00f7;
-    padding: 25px;
-    width: 50%;
-    text-align:center;
-    border-radius:8px;
-    color:#fff;
-    animation: glitch 1s infinite;
-}
-
-@keyframes glitch {
-    0% { text-shadow: 2px 2px #ff00f7; }
-    50% { text-shadow: -2px -2px #00ffe1; }
-    100% { text-shadow: 2px -2px #ff00f7; }
-}
-
-/* ---------------------- EFFECTS ---------------------- */
-span[style*="#55ff77"] { animation: pulse 1.6s infinite; }
-@keyframes pulse {
-  0% { text-shadow: 0 0 2px #55ff77; }
-  50% { text-shadow: 0 0 9px #55ff77; }
-  100% { text-shadow: 0 0 2px #55ff77; }
-}
-
-span[style*="#ffaa00"] { animation: blink 1s infinite; }
-@keyframes blink { 50% { opacity:0.4; } 100% { opacity:1; } }
-
-body::after {
-  content:"";
-  position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  pointer-events:none;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(255,255,255,0.03),
-    rgba(255,255,255,0.03) 1px,
-    transparent 1px,
-    transparent 2px
-  );
-  opacity:0.07;
-  animation: flicker 0.2s infinite;
-}
-
-@keyframes flicker { 0% { opacity:0.05; } 50% { opacity:0.15; } 100% { opacity:0.07; } }
-
-#neonFog {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    opacity: 0.32;
-}
-
-body{
-    cursor: pointer;
-    .glitch-chunk {
-    position: fixed;
-    width: 14px;
-    height: 14px;
-    background: linear-gradient(45deg, #ff00ff, #00fff2);
-    opacity: 0.75;
-    mix-blend-mode: screen;
-    pointer-events: none;
-    filter: blur(2px);
-    animation: chunkGlitch 0.25s linear forwards;
-}
-
-@keyframes chunkGlitch {
-    0% { 
-        transform: translate(0, 0) scale(1);
-        opacity: 0.9;
-        filter: blur(0px);
-    }
-    30% {
-        transform: translate(-4px, 3px) scale(1.3);
-        opacity: 0.7;
-        filter: blur(1px);
-    }
-    60% {
-        transform: translate(3px, -4px) scale(1.7);
-        opacity: 0.4;
-        filter: blur(2px);
-    }
-    100% { 
-        transform: translate(0, 0) scale(2.2);
-        opacity: 0;
-        filter: blur(3px);
-    }
-}}
-.glitch-chunk {
-    position: fixed;
-    width: 14px;
-    height: 14px;
-    background: linear-gradient(45deg, #ff00ff, #00fff2);
-    opacity: 0.75;
-    mix-blend-mode: screen;
-    pointer-events: none;
-    filter: blur(2px);
-    animation: chunkGlitch 0.25s linear forwards;
-}
-
-@keyframes chunkGlitch {
-    0% { 
-        transform: translate(0, 0) scale(1);
-        opacity: 0.9;
-        filter: blur(0px);
-    }
-    30% {
-        transform: translate(-4px, 3px) scale(1.3);
-        opacity: 0.7;
-        filter: blur(1px);
-    }
-    60% {
-        transform: translate(3px, -4px) scale(1.7);
-        opacity: 0.4;
-        filter: blur(2px);
-    }
-    100% { 
-        transform: translate(0, 0) scale(2.2);
-        opacity: 0;
-        filter: blur(3px);
-    }
-}
-
-/* 진짜 커서 숨기기 */
-html, body {
-    cursor: none;
-}
-
-/* 글리치 덩어리 커서 */
-#glitchCursor {
-    position: fixed;
-    width: 24px;
-    height: 24px;
-    background: radial-gradient(circle, #00fff0 0%, #ff00ff 60%);
-    border-radius: 50%;
-    pointer-events: none;
-    mix-blend-mode: screen;
-    filter: blur(3px);
-    transform: translate(-50%, -50%);
-    animation: glitchPulse 0.15s infinite;
-}
-
-@keyframes glitchPulse {
-    0%   { transform: translate(-50%, -50%) scale(1); filter: blur(2px); }
-    50%  { transform: translate(-49%, -51%) scale(1.3); filter: blur(4px); }
-    100% { transform: translate(-51%, -48%) scale(1); filter: blur(3px); }
-}
-
-body {
-  font-family: "Gowun Dodum", sans-serif;
-}
-
-
-</style>
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap');
-</style>
-
-</head>
-
-<body>
-
-    <div id="scroll-bg"></div>
-
-    <div id="glitchCursor"></div>
-
-    <audio id="hover-sound" src="hover.mp3" preload="auto"></audio>
-    <audio id="glitch-sound" src="glitch.mp3" preload="auto"></audio>
-    
-<!-- =========================== -->
-<!-- KEYCARD FIXED MENU -->
-<!-- =========================== -->
-<div id="keycard-menu">
-    <div class="key-btn" onclick="nav('hero')">HOME</div>
-    <div class="key-btn" onclick="nav('staff')">STAFF</div>
-    <div class="key-btn" onclick="nav('request')">REQUEST</div>
-    <div class="key-btn" onclick="nav('files')">FILES</div>
-    <div class="key-btn" onclick="nav('map')">MAP</div>
-</div>
-
-<!-- =========================== -->
-<!-- HERO -->
-<!-- =========================== -->
-<section id="hero">
-    <h1 class="neon">A shadow broker's office</h1>
-    <p>도시의 가장 어두운 틈에서 움직이는 그림자 브로커 사무소.</p>
-    <p>우리는 감시망 아래서 포착되지 않는 일을 처리한다.</p>
-</section>
-
-<!-- =========================== -->
-<!-- STAFF -->
-<!-- =========================== -->
-<section id="staff">
-    <h1 class="neon">STAFF — CODENAMES</h1>
-    <div class="panel staff-grid">
-        <div class="staff-card" onclick="openStaff('gw1')">
-            <h3>GHOSTWIRE-01</h3>
-            <p>정보 거래와 의뢰 판독 담당</p>
-        </div>
-        <div class="staff-card" onclick="openStaff('gw2')">
-            <h3>PORTRIFT-42</h3>
-            <p>데이터 운반과 감시망 우회</p>
-        </div>
-        <div class="staff-card" onclick="openStaff('gw3')">
-            <h3>SPECTRENODE-A</h3>
-            <p>위험 분석 비인가 Analyst</p>
-        </div>
-    </div>
-</section>
-
-<!-- STAFF POPUP -->
-<div id="staff-popup" onclick="closeStaff()">
-    <div id="staff-data"></div>
-</div>
-
-<!-- =========================== -->
-<!-- REQUEST -->
-<!-- =========================== -->
-<section id="request">
-    <h1 class="neon">의뢰 접수 시스템</h1>
-    <div class="panel">
-        <input type="text" id="request-input" placeholder="의뢰자 코드네임">
-        <textarea id="request-content" rows="6" placeholder="의뢰 내용을 입력하세요"></textarea>
-        <button onclick="sendRequest()">전송</button>
-        <div id="terminal-output" s tyle="margin-top:15px;"></div>
-    </div>
-</section>
-
-
-<!-- =========================== -->
-<!-- FILES -->
-<!-- =========================== -->
-<section id="files">
-    <h1 class="neon">Encrypted Files</h1>
-    <div class="panel" id="files-list">
-
-        <section id="files">
-            <div class="panel" id="files-list">
-        
-                <!-- 기존 파일들... -->
-        
-                <!-- ⭐ 여기 넣기 -->
-                <div class="file-item secret-file" onclick="openSecret('Z-SHADOW')">
-                    <strong>[FILE–Z-SHADOW]</strong><br>
-                    <span>비공개 의뢰 — 섀도우 프로토콜</span><br>
-                    <span>의뢰자: <b>UNKNOWN SIGNAL</b></span><br>
-                    <span>상태: <span style="color:#ff55ff">CLASSIFIED</span></span>
-                </div>
-        
-            </div>
-        </section>
-        
-
-        <div class="file-item" onclick="openFile('K584')">
-            <strong>[FILE–K584]</strong><br>
-            <span>제목: 존재하되 존재하지 않는 자</span><br>
-            <span>의뢰자: <b>신원 불명</b></span><br>
-            <span>상태: <span style="color:#ff2222">FAILED</span></span>
-        </div>
-
-        <div class="file-item" onclick="openFile('C901')">
-            <strong>[FILE–C901]</strong><br>
-            <span>제목: 익명 신분세탁</span><br>
-            <span>의뢰자: <b>LAMINAR-9</b></span><br>
-            <span>상태: <span style="color:#55ff77">SUCCESS</span></span>
-        </div>
-
-        <div class="file-item" onclick="openFile('N777')">
-            <strong>[FILE–N777]</strong><br>
-            <span>제목: 네온 신호 탈취 사건</span><br>
-            <span>의뢰자: <b>PULSEWALKER-Δ13</b></span><br>
-            <span>상태: <span style="color:#ffaa00">PENDING</span></span>
-        </div>
-
-        <div class="file-item" onclick="openFile('H021')">
-            <strong>[FILE–H021]</strong><br>
-            <span>제목: 사라지는 신원 루프</span><br>
-            <span>의뢰자: <b>NULLFRAME-0X</b></span><br>
-            <span>상태: <span style="color:#ff2222">FAILED</span></span>
-        </div>
-
-        <div class="file-item" onclick="openFile('R530')">
-            <strong>[FILE–R530]</strong><br>
-            <span>제목: 검은 연기의 경로</span><br>
-            <span>의뢰자: <b>???</b></span><br>
-            <span>상태: <span style="color:#55ff77;">SUCCESS</span></span>
-        </div>
-
-        <div class="file-item" onclick="openFile('X002')">
-            <strong>[FILE–X002]</strong><br>
-            <span>제목: 사고 원점 추적</span><br>
-            <span>의뢰자: <b>???</b></span><br>
-            <span>상태: <span style="color:#ffaa00;">PENDING</span></span>
-        </div>
-
-        <div class="file-item" onclick="openFile('V913')">
-            <strong>[FILE–V913]</strong><br>
-            <span>제목: 합성 기억 제조 공정 추적</span><br>
-            <span>의뢰자: <b>???</b></span><br>
-            <span>상태: <span style="color:#ff0033;">FAILED</span></span>
-        </div>
-
-        <div class="file-item" onclick="openFile('D404')">
-            <strong>[FILE–D404]</strong><br>
-            <span>제목: 존재할 수 없는 존재</span><br>
-            <span>의뢰자: <b>???</b></span><br>
-            <span>상태: <span style="color:#ff0033;">FAILED</span></span>
-
-        <div class="file-item hidden-file" id="hidden-file" onclick="openFile('Z0??')">
-            <strong>[FILE–Z0??]</strong><br>
-            <span>제목: 기록되지 않은 의뢰</span><br>
-            <span>의뢰자: <b>UNKNOWN</b></span><br>
-            <span>상태: <span style="color:#ff00ff">?????</span></span>
-        </div>
-        
-
-    </div>
-</section>
-
-<!-- FILE POPUP -->
-<div id="file-popup" onclick="closeFile()">
-    <div id="file-data"></div>
-</div>
-
-<!-- =========================== -->
-<!-- MAP -->
-<!-- =========================== -->
-<section id="map">
-    <h1 class="neon">Back Alley Sector Map</h1>
-    <div class="panel">
-        <div class="map-grid" id="map-grid"></div>
-        <div id="map-info">선택된 구역 없음</div>
-    </div>
-</section>
-
-<section class="parallax">
-  <div class="overlay-text">
-    <h1>WELCOME TO THE GRID</h1>
-    <p>Cyber UI Interface System</p>
-  </div>
-</section>
-
-
-<script>
-// ===========================
-// NAVIGATION
-// ===========================
-function nav(id){
-    document.getElementById(id).scrollIntoView({ behavior: "smooth" });
-    document.querySelectorAll(".key-btn").forEach(btn => btn.classList.remove("active"));
-    event.target.classList.add("active");
-}
-
-// ===========================
-// STAFF POPUP
-// ===========================
-const staffProfiles = {
-    gw1: {name:"GHOSTWIRE-01", role:"Memory Hacker", description:"데이터를 훔치고, 기억 흔적을 조작하는 전문가."},
-    gw2: {name:"GHOSTWIRE-02", role:"Trace Cleaner", description:"모든 로그와 흔적을 지우는 침묵의 그림자."},
-    gw3: {name:"GHOSTWIRE-03", role:"Data Phantom", description:"서버 속에서 사라지고 나타나며 정보를 수집."}   
-};
-
-function openStaff(id){
-    const staff = staffProfiles[id];
-    const popup = document.getElementById("staff-popup");
-    const content = document.getElementById("staff-data");
-    content.innerHTML = `<h2>${staff.name}</h2><p><strong>Role:</strong> ${staff.role}</p><p>${staff.description}</p><p style="font-size:0.8em;color:#55ff77">Click anywhere to close</p>`;
-    popup.style.display="flex";
-}
-function closeStaff(){ document.getElementById("staff-popup").style.display="none"; }
-
-// ===========================
-// FILE POPUP
-// ===========================
-/* ===========================
-   ENCRYPTED FILES — NEW DATA
-   =========================== */
-   const filesData = {
-    "K584": {
-        title: "존재하되 존재하지 않는 자",
-        content: "대상 존재를 유지하되 외부 기록—행동 로그, CCTV, 시민 데이터베이스에서 완전 삭제하는 임무.",
-        status: "FAILED"
-    },
-    "C901": {
-        title: "익명 신분세탁",
-        content: "디지털 ID 폐기 후 새로운 시민권 생성. 뉴로-시그너처 재지정 완료.",
-        status: "SUCCESS"
-    },
-    "Z0??": {
-        title: "기록되지 않은 의뢰",
-        content: "권한 없음. 내용이 고강도 양자 암호화 상태.",
-        status: "???"
-    },
-    "N777": {
-        title: "네온 신호 탈취 사건",
-        content: "도시 전력망 일부가 '맥박 신호'로 변조됨. 의뢰인은 이 신호가 비밀 집단의 연락망이라 주장하며, 신호 원점을 역추적하길 요청함.",
-        status: "PENDING"
-    },
-    "H021": {
-        title: "사라지는 신원 루프",
-        content: "한 시민의 디지털 신분이 7일 주기로 초기화됨. 시스템 심층 루프 의심. 루프 생성자의 정체를 추적하라는 의뢰.",
-        status: "FAILED"
-    },
-    "R530": {
-        title: "검은 연기의 경로",
-        content: "폐공장에서 발생하는 '학습된 연기 패턴'이 무기 밀매 루트를 은폐 중. 드론 감시망을 우회할 새로운 경로 설계 요청.",
-        status: "SUCCESS"
-    },
-    "X002": {
-        title: "사고 원점 추적",
-        content: "도심 중심부에서 발생한 집단 신경 오류. 불법 신경 링크 실험으로 추정되며, 네트워크 소스 추적 의뢰.",
-        status: "PENDING"
-    },
-    "V913": {
-        title: "합성 기억 제조 공정 추적",
-        content: "여러 시민에게 동일한 조작 기억이 주입됨. 기억 제조소의 생산점을 추적해달라는 요청.",
-        status: "FAILED"
-    },
-    "D404": {
-        title: "존재할 수 없는 존재",
-        content: "데이터 그리드 내 존재하지 않아야 할 유령 노드가 감지됨. 추적하면 사라지고, 사라지면 재출현하는 스펙트럼 서버.",
-        status: "FAILED"
-    }
-};
-
-function openFile(id){
-    const popup = document.getElementById("file-popup");
-    const content = document.getElementById("file-data");
-    const file = filesData[id];
-
-    content.innerHTML = `
-        <p style="color:#00ffe1; font-family:'Gowun Dodum', sans-serif;">
-            [DECRYPTING FILE–${id}…]
-        </p>
-        <p style="color:#ffaa00; font-family:'Gowun Dodum', sans-serif;">■■■□□ 43%</p>
-    `;
-    popup.style.display = "flex";
-
-    setTimeout(() => {
-        content.innerHTML = `
-            <h2>${id} — ${file.title}</h2>
-            <p>${file.content}</p>
-            <p>Status: <span style="color:#ff00ff">${file.status}</span></p>
-            <p style="font-size:0.8em;color:#ffaa00">Click anywhere to close</p>
-        `;
-    }, 800);
-}
-function closeFile(){ document.getElementById("file-popup").style.display="none"; }
-
-// ===========================
-// MAP GRID & PUZZLE
-// ===========================
-const mapGrid = document.getElementById("map-grid");
-const mapInfo = document.getElementById("map-info");
-let selectionSequence = [];
-
-for(let i=0;i<36;i++){
-    const cell = document.createElement("div");
-    cell.className="map-cell";
-    cell.onclick=()=>selectMap(i);
-    mapGrid.appendChild(cell);
-}
-
-function selectMap(i){
-    const infoList = ["A1 - 네온 파츠 블랙마켓","A2 - 사각지대 감시장소","A3 - 폐기 메모리 드랍존","A4 - 불법 신경 링크 지점","A5 - 암호화 통신 허브","A6 - 그림자 브로커 연락소",
-                      "B1 - 데이터 해킹 포인트","B2 - 익명 거래 구역","B3 - 불법 개조 워크숍","B4 - 기억 조작 클리닉","B5 - 암시장 진입로","B6 - 위장 카페",
-                      "C1 - 신원 세탁소","C2 - 비인가 드론 정비소","C3 - 폐기 신경 임플란트 상점","C4 - 암호화 화폐 환전소","C5 - 비밀 정보 중개소","C6 - 그림자 네트워크 노드",
-                      "D1 - 불법 감시 장비 상점","D2 - 기억 칩 리퍼브 샵","D3 - 신경 인터페이스 바이어스 포인트","D4 - 데이터 브로커 연락처","D5 - 암호화 메시지 릴레이","D6 - 비인가 사이버웨어 딜러",
-                      "E1 - 폐기 전자 부품 시장","E2 - 신원 위장 서비스","E3 - 불법 소프트웨어 유통점","E4 - 기억 삭제 서비스","E5 - 암호화 통신 장비 상점","E6 - 그림자 브로커 지점",
-                      "F1 - 비밀 거래 장소","F2 - 불법 네트워크 접속점","F3 - 신경 링크 업그레이드 샵","F4 - 데이터 복구 서비스","F5 - 암호화 화폐 채굴장","F6 - 폐기 사이버웨어 시장"];
-    mapInfo.innerText = infoList[i] || "미확인 구역";
-
-    selectionSequence.push(i);
-    if(selectionSequence.length>4) selectionSequence.shift();
-    const secretCode = [11,4,22,30];
-    if(secretCode.every((v,idx)=>v===selectionSequence[idx])){
-        document.getElementById("hidden-file").style.display="block";
-        mapInfo.innerText = "숨겨진 의뢰 파일 해금!";
-    }
-}
-
-// ===========================
-// REQUEST TERMINAL
-// ===========================
-function sendRequest(){
-    const input = document.getElementById("request-input").value.trim();
-    const output = document.getElementById("terminal-output");
-    if(!input){ output.innerText="입력값이 비어 있습니다."; return; }
-    output.innerHTML = `<p style="color:#55ff77">[TERMINAL] 암호화된 요청이 전송되었습니다.</p>`;
-    document.getElementById("request-input").value="";
-}
-
-// filesData 그대로 유지하면서 아래 코드 추가
-function generateFileID() {
-    return "U" + Math.floor(100 + Math.random() * 900); // U234 형식
-}
-
-function sendRequest() {
-    const name = document.getElementById('request-input').value.trim();
-    const content = document.getElementById('request-content').value.trim();
-    const output = document.getElementById('terminal-output');
-
-    if (!name || !content) {
-        output.innerHTML = "<span style='color:#ff5555'>[ERROR] 모든 필드를 입력하세요.</span>";
-        return;
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Portfolio Gallery – 1st Exhibition</title>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-0: #050509;
+      --bg-1: #0b0b11;
+      --panel: rgba(18,18,22,0.9);
+      --accent: #ffb84c;
+      --accent-soft: rgba(255,184,76,0.12);
+      --text-main: #f3f3f5;
+      --text-sub: #a9a9b8;
+      --border-soft: rgba(255,255,255,0.08);
+      --shadow-soft: 0 18px 40px rgba(0,0,0,0.6);
+      --radius-xl: 22px;
+      --radius-lg: 16px;
+      --radius-pill: 999px;
+      --gap-section: 90px;
+      --transition-fast: 0.18s ease-out;
     }
 
-    // 파일 ID 자동 생성
-    const newID = generateFileID();
-
-    // filesData에 새 데이터 추가
-    filesData[newID] = {
-        title: `사용자 의뢰 — ${name}`,
-        content: content,
-        status: "RECEIVED"
-    };
-
-    // FILES 섹션에 새로운 file-item 생성
-    const filesList = document.getElementById("files-list");
-    const newFile = document.createElement("div");
-    newFile.className = "file-item";
-    newFile.innerHTML = `
-        <strong>[FILE–${newID}]</strong><br>
-        <span>의뢰자: <b>${name}</b></span><br>
-        <span>상태: <span style="color:#ffaa00">RECEIVED</span></span>
-    `;
-    newFile.onclick = () => openFile(newID);
-    filesList.prepend(newFile); // 최신 의뢰가 위로 올라오게
-
-    // 터미널 효과 출력
-    output.innerHTML = `<span style="color:#55ff77">[SUCCESS] 의뢰가 접수되었습니다 — FILE–${newID}</span>`;
-
-    // 입력창 초기화
-    document.getElementById('request-input').value = "";
-    document.getElementById('request-content').value = "";
-}
-
-
-</script>
-
-<canvas id="neonFog"></canvas>
-
-<!-- =========================== -->
-<!-- SECRET REQUEST INTERFACE MODULE -->
-<!-- (독립 모듈 형태로 삽입 가능) -->
-<!-- =========================== -->
-
-<style>
-    /* =========================== */
-    /* STATUS-BASED FILE EFFECTS   */
-    /* =========================== */
-    .file-success {
-      border-color: #55ff77;
-      animation: successScan 2.2s linear infinite;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-    @keyframes successScan {
-      0% { box-shadow: 0 0 10px #55ff77; }
-      50% { box-shadow: 0 0 20px #55ffaa; }
-      100% { box-shadow: 0 0 10px #55ff77; }
+
+    body {
+      font-family: "Gowun Dodum", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(255,184,76,0.15), transparent 55%),
+        radial-gradient(circle at 90% 100%, rgba(158,137,255,0.16), transparent 55%),
+        linear-gradient(135deg, var(--bg-0), var(--bg-1));
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
     }
-    
-    .file-pending {
-      border-color: #ffaa00;
-      animation: pendingBlink 1.2s steps(2, jump-none) infinite;
+
+    /* ============= Layout ============= */
+
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 18px 18px 80px;
     }
-    @keyframes pendingBlink {
-      0% { opacity: 1; }
-      50% { opacity: 0.35; }
-      100% { opacity: 1; }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      background: linear-gradient(to bottom,
+        rgba(5,5,10,0.96),
+        rgba(5,5,10,0.86),
+        transparent
+      );
+      margin: -18px -18px 18px;
+      padding: 10px 20px 8px;
+      border-bottom: 1px solid var(--border-soft);
     }
-    
-    .file-failed {
-      border-color: #ff0033;
-      animation: failedGlitch 0.35s infinite;
+
+    .nav-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
     }
-    @keyframes failedGlitch {
-      0% { transform: translateX(0); }
-      20% { transform: translateX(-2px); }
-      40% { transform: translateX(2px); }
-      60% { transform: translateX(-1px); }
-      80% { transform: translateX(1px); }
-      100% { transform: translateX(0); }
+
+    .logo-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
     }
-    
-    /* =========================== */
-    /* SECRET / CLASSIFIED FILE   */
-    /* =========================== */
-    .secret-file {
-      background: rgba(255,0,255,0.18);
-      border: 2px solid #ff00ff;
-      box-shadow: 0 0 18px #ff00ffaa;
+
+    .logo-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.16);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 30% 10%, rgba(255,255,255,0.3), transparent 60%),
+                  radial-gradient(circle at 70% 90%, rgba(255,184,76,0.6), transparent 60%),
+                  #111119;
+      box-shadow: 0 0 18px rgba(255,184,76,0.4);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .logo-text-main {
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-main);
+    }
+
+    .logo-text-sub {
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+
+    nav a {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid transparent;
+      color: var(--text-sub);
+      text-decoration: none;
+      transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    nav a:hover {
+      background: rgba(0,0,0,0.6);
+      border-color: rgba(255,255,255,0.2);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap-section);
+    }
+
+    section {
+      position: relative;
+    }
+
+    .section-inner {
+      border-radius: var(--radius-xl);
+      background: linear-gradient(135deg, rgba(9,9,14,0.96), rgba(12,12,18,0.96));
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-soft);
+      padding: 26px 22px 26px;
+    }
+
+    @media (min-width: 768px) {
+      .section-inner {
+        padding: 32px 30px 30px;
+      }
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0.8;
+    }
+
+    .section-title {
+      font-size: 20px;
+      margin-top: 4px;
+    }
+
+    .section-sub {
+      margin-left: 2px;
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+
+    /* ============= Hero / Lobby ============= */
+
+    .hero {
+      margin-top: 6px;
+    }
+
+    .hero-main {
+      display: grid;
+      grid-template-columns: 1.1fr minmax(0, 0.9fr);
+      gap: 24px;
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .hero-main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .hero-title {
+      font-size: clamp(26px, 5vw, 32px);
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    .hero-title span.accent {
+      color: var(--accent);
+    }
+
+    .hero-text {
+      font-size: 14px;
+      color: var(--text-sub);
+      margin-bottom: 18px;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tag {
+      padding: 5px 11px;
+      font-size: 11px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255,255,255,0.14);
+      background: radial-gradient(circle at 0 0, rgba(255,255,255,0.13), transparent 60%);
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    .hero-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 16px;
+      border-radius: var(--radius-pill);
+      border: 1px solid transparent;
+      font-size: 12px;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ffb84c, #ff7a3c);
+      color: #1c1206;
+      box-shadow: 0 10px 30px rgba(255,143,76,0.5);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(255,143,76,0.65);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border-color: rgba(255,255,255,0.2);
+      color: var(--text-main);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(0,0,0,0.7);
+      border-color: rgba(255,255,255,0.4);
+      transform: translateY(-1px);
+    }
+
+    .hero-side {
+      border-radius: var(--radius-lg);
+      background: radial-gradient(circle at 15% 0%, rgba(255,255,255,0.18), transparent 60%),
+                  radial-gradient(circle at 100% 100%, rgba(255,184,76,0.5), transparent 60%),
+                  #11111a;
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 16px 16px 16px;
       position: relative;
       overflow: hidden;
     }
-    
-    .secret-file::before {
-      content: "CLASSIFIED";
-      position: absolute;
-      top: 8px;
-      right: -10px;
-      font-size: 0.75em;
-      padding: 3px 10px;
-      background: #ff00ff99;
-      border: 1px solid #ff66ff;
-      transform: rotate(10deg);
-      color: white;
-      font-family: 'Gowun Dodum';
-      text-shadow: 0 0 4px #ff00ff;
-    }
-    
-    .secret-file::after {
+
+    .hero-side::before {
       content: "";
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: repeating-linear-gradient(
-        0deg,
-        rgba(255,0,255,0.06),
-        rgba(255,0,255,0.06) 1px,
-        transparent 1px,
-        transparent 3px
-      );
-      animation: scanlines 0.25s linear infinite;
-    }
-    @keyframes scanlines {
-      0% { opacity: .1; }
-      50% { opacity: .25; }
-      100% { opacity: .1; }
-    }
-    
-    /* =========================== */
-    /* SECRET POPUP EFFECT         */
-    /* =========================== */
-    .secret-popup {
-      animation: secretReveal 0.7s ease forwards;
-    }
-    @keyframes secretReveal {
-      0% { filter: blur(7px) brightness(0.3); opacity: 0; }
-      40% { filter: blur(4px) brightness(0.6); opacity: .5; }
-      100% { filter: blur(0) brightness(1); opacity: 1; }
-    }
-    
-    /* Glitchy title */
-    .secret-title {
-      font-size: 1.6em;
-      color: #ff66ff;
-      animation: glitchTitle 0.9s infinite;
-    }
-    @keyframes glitchTitle {
-      0% { text-shadow: -2px 0 #ff00ff, 2px 0 #00ffff; }
-      50% { text-shadow: -1px -1px #ff00ff, 1px 1px #00ffff; }
-      100% { text-shadow: 2px 1px #ff00ff, -2px -1px #00ffff; }
+      inset: 0;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.12), transparent 60%),
+        repeating-linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.04) 1px, transparent 1px, transparent 4px);
+      mix-blend-mode: soft-light;
+      opacity: 0.7;
+      pointer-events: none;
     }
 
-    /* 모든 요소 기본 커서 제거 */
-* {
-    cursor: none !important;
-}
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      padding: 5px 10px;
+      border-radius: var(--radius-pill);
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.26);
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
 
-/* 글리치 커서 */
-#glitchCursor {
-    position: fixed;
-    width: 24px;
-    height: 24px;
-    background: radial-gradient(circle, #00fff0 0%, #ff00ff 60%);
-    border-radius: 50%;
-    pointer-events: none;
-    mix-blend-mode: screen;
-    filter: blur(3px);
-    transform: translate(-50%, -50%);
-    animation: glitchPulse 0.15s infinite;
-}
+    .hero-badge-pill {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #7bff98;
+      box-shadow: 0 0 12px rgba(123,255,152,0.8);
+    }
 
-@keyframes glitchPulse {
-    0%   { transform: translate(-50%, -50%) scale(1); filter: blur(2px); }
-    50%  { transform: translate(-49%, -51%) scale(1.3); filter: blur(4px); }
-    100% { transform: translate(-51%, -48%) scale(1); filter: blur(3px); }
-}
+    .hero-side-title {
+      font-size: 14px;
+      margin-bottom: 6px;
+      position: relative;
+      z-index: 1;
+    }
 
-body {
-    margin: 0;
-    font-family: 'Gowun Dodum', sans-serif;
-    background-image: url("/mnt/data/A_digital_illustration_in_a_cyberpunk_art_style_de.png");
-    background-size: cover;           /* 화면 전체에 꽉 차게 */
-    background-position: center;      /* 중앙 정렬 */
-    background-repeat: no-repeat;     /* 반복 안함 */
-    background-attachment: fixed;     /* 스크롤해도 고정된 배경 */
-    background-color: #081026;        /* 로딩 전에 어두운 색 */
-    color: white;
-  }
+    .hero-side-sub {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+    .hero-meta-list {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 6px;
+      font-size: 12px;
+    }
 
-body {
-  background: #000;
-  color: #fff;
-  font-family: "Gowun Dodum", sans-serif;
-  height: 200vh; /* 스크롤 가능하게 */
-}
+    .hero-meta-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
 
-/* 비 효과 Canvas */
-#rain {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 10;
-}
+    .hero-meta-label {
+      color: var(--text-sub);
+    }
 
-/* 첫 화면 */
-.hero {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(#020202, #0d0d0d);
-  z-index: 1;
-  text-align: center;
-}
+    .hero-meta-value {
+      text-align: right;
+    }
 
-.hero h1 {
-  font-size: 4rem;
-  letter-spacing: 4px;
-  text-shadow: 0 0 15px #0ff;
-}
+    /* ============= Gallery / Halls ============= */
 
-/* 도시 섹션 */
-.city {
-  height: 100vh;
-  background: url('cyberpunk-city.jpg') center/cover no-repeat fixed;
-  filter: brightness(0.8) saturate(1.5);
-}
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 16px;
+    }
 
-#scroll-bg {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: -1;
-
-    /* 기본 색 */
-    background: linear-gradient(135deg, #220044, #000000);
-    mix-blend-mode: screen;
-    opacity: 0.55;
-    transition: background 0.15s linear;
-}
-
-.parallax {
-  background-image: url('/mnt/data/IMG_0671.jpeg'); /* 이미지 경로 */
-  height: 600px;
-  background-attachment: fixed;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.overlay-text {
-  text-align: center;
-  color: cyan;
-  font-family: 'Gowun Dodum', sans-serif;
-  animation: neonFlicker 2.5s infinite;
-  text-shadow:
-    0 0 5px cyan,
-    0 0 10px cyan,
-    0 0 20px cyan,
-    0 0 40px #00ffff,
-    0 0 80px #00ffff;
-}
-
-.overlay-text h1 {
-  font-size: 3.5rem;
-  margin: 0;
-  letter-spacing: 3px;
-}
-
-.overlay-text p {
-  font-size: 1.3rem;
-  margin-top: 10px;
-}
-
-/* 네온 깜빡임 효과 */
-@keyframes neonFlicker {
-  0%, 18%, 22%, 25%, 53%, 57%, 100% {
-    opacity: 1;
-    text-shadow:
-      0 0 5px cyan,
-      0 0 10px cyan,
-      0 0 20px cyan,
-      0 0 40px #00ffff,
-      0 0 80px #00ffff;
-  }
-  20%, 24%, 55% {
-    opacity: 0.4;
-    text-shadow: none;
-  }
-}
-
-.rain {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.raindrop {
-  position: absolute;
-  width: 1px;
-  height: 80px;
-  background: rgba(0, 255, 255, 0.5); /* 사이버펑크 네온 청록 */
-  filter: blur(1px);
-  animation: fall linear infinite;
-}
-
-@keyframes fall {
-  to {
-    transform: translateY(100vh);
-  }
-}
-
-::selection {
-  background: white;
-  color: black;
-}
-
-/* Firefox 전용 */
-::-moz-selection {
-  background: white;
-  color: black;
-}
-
-.gowun-dodum-regular {
-  font-family: "Gowun Dodum", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-}
-
-
-    </style>
-    
-    
-    <!-- =========================== -->
-    <!-- SECRET FILE POPUP TEMPLATE -->
-    <!-- =========================== -->
-    <div id="secret-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.88); justify-content:center; align-items:center; z-index:99999;">
-      <div id="secret-content" class="secret-popup" style="background:rgba(40,0,50,0.9); padding:25px; border:2px solid #ff00ff; width:50%; border-radius:10px; text-align:center; color:white; font-family:Gowun Dodum;"></div>
-    </div>
-    
-    <script>
-    /* =========================== */
-    /* SECRET FILE DATA TEMPLATE  */
-    /* =========================== */
-    const secretFiles = {
-      "Z-SHADOW": {
-        title: "비공개 의뢰 — 섀도우 프로토콜",
-        content: "도시 전역에 동시다발적으로 발생한 '검은 패킷'에 대한 기밀 추적 의뢰. 기록되지 않은 백도어 신호가 감지됨.",
-        status: "CLASSIFIED"
+    @media (max-width: 960px) {
+      .gallery-grid {
+        grid-template-columns: repeat(2, minmax(0,1fr));
       }
-    };
-    
-    /* =========================== */
-    /* SECRET FILE POPUP FUNCTION */
-    /* =========================== */
-    function openSecret(id){
-      const data = secretFiles[id];
-      const popup = document.getElementById("secret-popup");
-      const content = document.getElementById("secret-content");
-    
-      content.innerHTML = `
-        <h2 class="secret-title">${data.title}</h2>
-        <p style="margin-top:15px;">${data.content}</p>
-        <p style="margin-top:20px; color:#ff55ff;">STATUS: ${data.status}</p>
-        <p style="margin-top:15px; font-size:0.75em; color:#ffaaee;">(Click anywhere to close)</p>
-      `;
-    
-      popup.style.display = "flex";
     }
-    
-    function closeSecret(){
-      document.getElementById("secret-popup").style.display = "none";
+
+    @media (max-width: 640px) {
+      .gallery-grid {
+        grid-template-columns: minmax(0,1fr);
+      }
     }
-    
-    document.getElementById("secret-popup").addEventListener("click", closeSecret);
 
-     const glitchCursor = document.getElementById("glitchCursor");
+    .project-card {
+      position: relative;
+      border-radius: 18px;
+      background: radial-gradient(circle at 0 0, rgba(255,255,255,0.1), transparent 60%),
+                  rgba(12,12,18,0.98);
+      border: 1px solid rgba(255,255,255,0.16);
+      padding: 14px 13px 13px;
+      overflow: hidden;
+      cursor: default;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+    }
 
-document.addEventListener("mousemove", (e) => {
-    glitchCursor.style.left = e.pageX + "px";
-    glitchCursor.style.top = e.pageY + "px";
-});    
+    .project-card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: conic-gradient(from 180deg, transparent 0deg, rgba(255,255,255,0.16) 30deg, transparent 60deg);
+      opacity: 0;
+      transition: opacity var(--transition-fast), transform var(--transition-fast);
+      transform: rotate(0deg);
+      pointer-events: none;
+    }
 
-document.addEventListener("mousemove", (e) => {
-    glitchCursor.style.left = e.clientX + "px";
-    glitchCursor.style.top = e.clientY + "px";
-});
+    .project-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+      border-color: rgba(255,255,255,0.32);
+      background: radial-gradient(circle at 0 0, rgba(255,255,255,0.15), transparent 60%),
+                  rgba(16,16,24,0.99);
+    }
 
-document.addEventListener("mousemove", (e) => {
-    glitchCursor.style.left = e.buttonX + "px";
-    glitchCursor.style.top = e.buttonY + "px";
-});
+    .project-card:hover::before {
+      opacity: 1;
+      transform: rotate(12deg);
+    }
 
+    .project-tag-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
 
-function nav(id, el){
-    document.getElementById(id).scrollIntoView({ behavior: "smooth" });
-    document.querySelectorAll(".key-btn").forEach(btn => btn.classList.remove("active"));
-    el.classList.add("active");
-}
+    .project-hall-label {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-sub);
+    }
 
-// ===========================
-// SCROLL-BASED BACKGROUND COLOR SHIFT
-// ===========================
-window.addEventListener("scroll", () => {
-    const scrollRatio = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+    .project-year {
+      font-size: 11px;
+      color: var(--text-sub);
+    }
 
-    // 0 ~ 1 사이 값
-    const r1 = Math.floor(20 + scrollRatio * 120);   // 보라 → 사이언
-    const g1 = Math.floor(0 + scrollRatio * 150);
-    const b1 = Math.floor(80 + scrollRatio * 100);
+    .project-title {
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
 
-    const r2 = Math.floor(0 + scrollRatio * 80);     // 검정 → 네온블루
-    const g2 = Math.floor(0 + scrollRatio * 80);
-    const b2 = Math.floor(0 + scrollRatio * 180);
+    .project-caption {
+      font-size: 12px;
+      color: var(--text-sub);
+      min-height: 34px;
+      margin-bottom: 8px;
+    }
 
-    document.getElementById("scroll-bg").style.background =
-        `linear-gradient(135deg, rgb(${r1},${g1},${b1}), rgb(${r2},${g2},${b2}))`;
-});
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
 
+    .chip {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255,255,255,0.22);
+      color: var(--text-main);
+      background: rgba(0,0,0,0.5);
+      white-space: nowrap;
+    }
 
-    </script>
-    
-    <div class="file-item secret-file" onclick="openSecret('Z-SHADOW')">
-        <strong>[FILE–Z-SHADOW]</strong><br>
-        <span>비공개 의뢰 — 섀도우 프로토콜</span><br>
-        <span>의뢰자: <b>UNKNOWN SIGNAL</b></span><br>
-        <span>상태: <span style="color:#ff55ff">CLASSIFIED</span></span>
+    .project-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .project-note {
+      font-size: 11px;
+      color: var(--accent);
+      opacity: 0.9;
+    }
+
+    .project-meta {
+      font-size: 10px;
+      color: var(--text-sub);
+      text-align: right;
+    }
+
+    /* ============= WIP / Special Room ============= */
+
+    .wip-list {
+      display: grid;
+      gap: 10px;
+      font-size: 12px;
+    }
+
+    .wip-item {
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: rgba(0,0,0,0.5);
+      border: 1px dashed rgba(255,255,255,0.25);
+      display: grid;
+      gap: 3px;
+    }
+
+    .wip-title {
+      font-size: 13px;
+    }
+
+    .wip-status {
+      font-size: 11px;
+      color: var(--accent);
+    }
+
+    .wip-next {
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    /* ============= Info Desk ============= */
+
+    .info-layout {
+      display: grid;
+      grid-template-columns: minmax(0,1.1fr) minmax(0,0.9fr);
+      gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .info-layout {
+        grid-template-columns: minmax(0,1fr);
+      }
+    }
+
+    .info-text {
+      font-size: 13px;
+      color: var(--text-sub);
+      line-height: 1.7;
+      display: grid;
+      gap: 10px;
+    }
+
+    .info-keywords {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .keyword-pill {
+      padding: 5px 10px;
+      border-radius: var(--radius-pill);
+      background: rgba(0,0,0,0.7);
+      border: 1px solid rgba(255,255,255,0.18);
+      font-size: 11px;
+    }
+
+    .info-box {
+      border-radius: 16px;
+      padding: 12px 12px 10px;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.2);
+      font-size: 12px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .info-label {
+      font-size: 11px;
+      color: var(--text-sub);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .info-contact-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .info-contact-label {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .info-contact-value {
+      font-size: 12px;
+    }
+
+    .muted {
+      color: var(--text-sub);
+      font-size: 11px;
+    }
+
+    /* ============= Utility ============= */
+
+    .section-note {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    .accent-soft-box {
+      margin-top: 10px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,184,76,0.28);
+      background: var(--accent-soft);
+      font-size: 11px;
+      color: var(--accent);
+    }
+
+    .to-top {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 30;
+    }
+
+    .to-top button {
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(0,0,0,0.8);
+      color: var(--text-main);
+      font-size: 11px;
+      padding: 7px 11px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: background var(--transition-fast), transform var(--transition-fast), border-color var(--transition-fast), opacity var(--transition-fast);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .to-top button.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .to-top button:hover {
+      background: rgba(0,0,0,0.95);
+      border-color: rgba(255,255,255,0.4);
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav-inner">
+      <div class="logo-mark">
+        <div class="logo-badge">EX</div>
+        <div>
+          <div class="logo-text-main">PORTFOLIO GALLERY</div>
+          <div class="logo-text-sub">1st Exhibition · Ongoing</div>
+        </div>
+      </div>
+      <nav>
+        <a href="#lobby">Lobby</a>
+        <a href="#hall-a">Hall A</a>
+        <a href="#hall-b">Hall B</a>
+        <a href="#hall-c">Hall C</a>
+        <a href="#special-room">Special</a>
+        <a href="#info-desk">Info Desk</a>
+      </nav>
+    </div>
+  </header>
+
+    <div class="page">
+      <!-- ========== LOBBY / HERO ========== -->
+      <section id="lobby" class="hero">
+        <div class="section-inner">
+          <div class="section-header">
+            <div>
+              <div class="section-label">01 · Lobby</div>
+              <h1 class="section-title">1st <span class="accent">Portfolio Exhibition</span></h1>
+              <p class="section-sub">완성본뿐 아니라, 성장 과정까지 함께 전시하는 포트폴리오 갤러리입니다.</p>
+            </div>
+          </div>
+
+          <div class="hero-main">
+            <div>
+              <div class="hero-title">
+                작업들을 한곳에 모아<br />
+                <span class="accent">“전시”처럼 보는 페이지</span>
+              </div>
+              <p class="hero-text">
+                이곳에는 웹 연습, 창작 작업, 학교 프로젝트 등 지금까지 해온 작업들이
+                하나의 전시처럼 정리되어 있습니다. 완벽하진 않지만, 그때그때의 고민과
+                성장 기록을 솔직하게 남깁니다.
+              </p>
+
+              <div class="hero-tags">
+                <span class="tag">#Web&nbsp;Study</span>
+                <span class="tag">#Portfolio</span>
+                <span class="tag">#Experiment</span>
+                <span class="tag">#School&nbsp;Projects</span>
+              </div>
+
+              <div class="hero-buttons">
+                <a href="#hall-a" class="btn btn-primary">
+                  작품 보러 가기
+                </a>
+                <a href="#info-desk" class="btn btn-ghost">
+                  나에 대해
+                </a>
+              </div>
+            </div>
+
+            <aside class="hero-side">
+              <div class="hero-badge">
+                <span class="hero-badge-pill"></span>
+                <span>전시 상태 · Ongoing</span>
+              </div>
+              <div class="hero-side-title">Exhibition Overview</div>
+              <div class="hero-side-sub">작업물의 수보다는, 작업을 통해 어떤 생각을 했는지에 초점을 둔 포트폴리오입니다.</div>
+
+              <div class="hero-meta-list">
+                <div class="hero-meta-row">
+                  <span class="hero-meta-label">Halls</span>
+                  <span class="hero-meta-value">Web · Creative · School · WIP</span>
+                </div>
+                <div class="hero-meta-row">
+                  <span class="hero-meta-label">Focus</span>
+                  <span class="hero-meta-value">과정, 기록, 배운 점</span>
+                </div>
+                <div class="hero-meta-row">
+                  <span class="hero-meta-label">Status</span>
+                  <span class="hero-meta-value">업데이트 예정</span>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== HALL A – WEB & CODE ========== -->
+      <section id="hall-a">
+        <div class="section-inner">
+          <div class="section-header">
+            <div>
+              <div class="section-label">02 · Hall A</div>
+              <h2 class="section-title">Web &amp; Code</h2>
+              <p class="section-sub">브라우저 위에서 직접 만든 작은 실험들과 연습 결과물들입니다.</p>
+            </div>
+          </div>
+
+          <div class="gallery-grid">
+            <!-- 카드 내용은 나중에 직접 수정해서 사용해도 됨 -->
+            <article class="project-card">
+              <div class="project-tag-row">
+                <span class="project-hall-label">WEB EXPERIMENT</span>
+                <span class="project-year">2025</span>
+              </div>
+              <h3 class="project-title">Simple Landing Page</h3>
+              <p class="project-caption">
+                HTML과 CSS만으로 만든 기본 랜딩 페이지입니다.
+                구조를 잡는 연습과, 텍스트를 배치하는 감각을 익히기 위해 제작했습니다.
+              </p>
+              <div class="chip-row">
+                <span class="chip">HTML</span>
+                <span class="chip">CSS</span>
+                <span class="chip">Layout Practice</span>
+              </div>
+              <div class="project-footer">
+                <span class="project-note">배운 점: 구조를 먼저 생각하면 스타일링이 쉬워진다.</span>
+                <span class="project-meta">Role · Design &amp; Markup</span>
+              </div>
+            </article>
+
+            <article class="project-card">
+              <div class="project-tag-row">
+                <span class="project-hall-label">WEB STUDY</span>
+                <span class="project-year">2025</span>
+              </div>
+              <h3 class="project-title">HTML Tag Playground</h3>
+              <p class="project-caption">
+                다양한 HTML 태그를 직접 써 보면서 기능을 테스트한 연습 페이지 모음입니다.
+                사용하는 것부터 익숙해지자는 목표로 시작했습니다.
+              </p>
+              <div class="chip-row">
+                <span class="chip">Semantic Tags</span>
+                <span class="chip">Practice</span>
+                <span class="chip">Study Note</span>
+              </div>
+              <div class="project-footer">
+                <span class="project-note">배운 점: 의미 있는 태그 선택이 중요하다는 것.</span>
+                <span class="project-meta">Role · Study</span>
+              </div>
+            </article>
+
+            <article class="project-card">
+              <div class="project-tag-row">
+                <span class="project-hall-label">CODE</span>
+                <span class="project-year">2025</span>
+              </div>
+              <h3 class="project-title">Small Python Tools</h3>
+              <p class="project-caption">
+                간단한 계산기, 랜덤 메시지 출력 같은 파이썬 연습 프로젝트입니다.
+                자잘하지만, 프로그래밍에 익숙해지는 데 도움이 된 작업들입니다.
+              </p>
+              <div class="chip-row">
+                <span class="chip">Python</span>
+                <span class="chip">CLI</span>
+                <span class="chip">Practice</span>
+              </div>
+              <div class="project-footer">
+                <span class="project-note">배운 점: 작게라도 직접 만들어보는 경험의 힘.</span>
+                <span class="project-meta">Role · Coding</span>
+              </div>
+            </article>
+          </div>
+
+          <p class="section-note">
+            ※ 이 홀의 작업들은 계속 추가/수정될 예정입니다. 실제 작업물을 만든 뒤 제목과 설명을 직접 바꾸어도 좋습니다.
+          </p>
+        </div>
+      </section>
+
+      <!-- ========== HALL B – CREATIVE & WRITING ========== -->
+      <section id="hall-b">
+        <div class="section-inner">
+          <div class="section-header">
+            <div>
+              <div class="section-label">03 · Hall B</div>
+              <h2 class="section-title">Creative &amp; Writing</h2>
+              <p class="section-sub">이야기, 설정, 글쓰기 등 생각을 정리하고 표현한 작업들입니다.</p>
+            </div>
+          </div>
+
+          <div class="gallery-grid">
+            <article class="project-card">
+              <div class="project-tag-row">
+                <span class="project-hall-label">STORY</span>
+                <span class="project-year">2024</span>
+              </div>
+              <h3 class="project-title">Character Notes</h3>
+              <p class="project-caption">
+                스스로 만든 캐릭터의 설정, 성격, 관계를 정리한 기록입니다.
+                글로 써 보면서 캐릭터의 생각과 감정을 더 깊게 상상해 보았습니다.
+              </p>
+              <div class="chip-row">
+                <span class="chip">Character</span>
+                <span class="chip">Worldbuilding</span>
+                <span class="chip">Writing</span>
+              </div>
+              <div class="project-footer">
+                <span class="project-note">배운 점: 캐릭터는 결국 나를 비추는 거울이라는 생각.</span>
+                <span class="project-meta">Medium · Text</span>
+              </div>
+            </article>
+
+            <article class="project-card">
+              <div class="project-tag-row">
+                <span class="project-hall-label">NOTE</span>
+                <span class="project-year">2024</span>
+              </div>
+              <h3 class="project-title">Daily Idea Log</h3>
+              <p class="project-caption">
+                떠오르는 장면, 배경, 대사 등을 짧게 메모해 둔 아이디어 노트입니다.
+                언젠가 제대로 만든 작품의 씨앗이 될 수 있는 조각들을 모았습니다.
+              </p>
+              <div class="chip-row">
+                <span class="chip">Idea</span>
+                <span class="chip">Fragment</span>
+                <span class="chip">Notebook</span>
+              </div>
+              <div class="project-footer">
+                <span class="project-note">배운 점: 완벽한 생각보다 빠르게 적어두는 메모가 중요하다.</span>
+                <span class="project-meta">Medium · Memo</span>
+              </div>
+            </article>
+
+            <article class="project-card">
+              <div class="project-tag-row">
+                <span class="project-hall-label">ESSAY</span>
+                <span class="project-year">2024</span>
+              </div>
+              <h3 class="project-title">Short Reflections</h3>
+              <p class="project-caption">
+                하루를 돌아보며 느낀 점을 간단히 적은 짧은 글들입니다.
+                감정과 생각을 언어로 정리하는 연습을 했습니다.
+              </p>
+              <div class="chip-row">
+                <span class="chip">Reflection</span>
+                <span class="chip">Essay</span>
+              </div>
+              <div class="project-footer">
+                <span class="project-note">배운 점: 글은 나를 한 발짝 떨어져서 보게 해 준다.</span>
+                <span class="project-meta">Medium · Essay</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== HALL C – SCHOOL & PROJECTS ========== -->
+      <section id="hall-c">
+        <div class="section-inner">
+          <div class="section-header">
+            <div>
+              <div class="section-label">04 · Hall C</div>
+              <h2 class="section-title">School &amp; Projects</h2>
+              <p class="section-sub">과제를 넘어, 스스로 ‘작업’이라고 부를 수 있었던 결과물들을 모았습니다.</p>
+            </div>
+          </div>
+
+          <div class="gallery-grid">
+            <article class="project-card">
+              <div class="project-tag-row">
+                <span class="project-hall-label">SCHOOL PROJECT</span>
+                <span class="project-year">2025</span>
+              </div>
+              <h3 class="project-title">Space Planning Proposal</h3>
+              <p class="project-caption">
+                제한된 예산과 면적 안에서 공간을 구성하는 과제였습니다.
+                가구 배치뿐 아니라, 실제로 사용할 사람을 상상하며 기획했습니다.
+              </p>
+              <div class="chip-row">
+                <span class="chip">Planning</span>
+                <span class="chip">Budget</span>
+                <span class="chip">Layout</span>
+              </div>
+              <div class="project-footer">
+                <span class="project-note">배운 점: 현실적인 제한 속에서 최선을 찾는 연습.</span>
+                <span class="project-meta">Role · Planning &amp; Design</span>
+              </div>
+            </article>
+
+            <article class="project-card">
+              <div class="project-tag-row">
+                <span class="project-hall-label">STUDY NOTE</span>
+                <span class="project-year">2024</span>
+              </div>
+              <h3 class="project-title">Formatted Study PDF</h3>
+              <p class="project-caption">
+                공부한 내용을 보기 좋게 정리한 PDF 노트입니다.
+                직접 다시 읽기 편한 구조와 디자인을 고민하면서 만들었습니다.
+              </p>
+              <div class="chip-row">
+                <span class="chip">Note Design</span>
+                <span class="chip">Summary</span>
+              </div>
+              <div class="project-footer">
+                <span class="project-note">배운 점: 정리는 복습이자, 다른 사람에게 설명하는 연습.</span>
+                <span class="project-meta">Medium · PDF</span>
+              </div>
+            </article>
+
+            <article class="project-card">
+              <div class="project-tag-row">
+                <span class="project-hall-label">TASK</span>
+                <span class="project-year">2024</span>
+              </div>
+              <h3 class="project-title">Presentation Slides</h3>
+              <p class="project-caption">
+                한 주제를 조사해서 발표하는 수업에서 사용한 슬라이드입니다.
+                텍스트 양을 줄이고 핵심 메시지만 남기려는 시도를 했습니다.
+              </p>
+              <div class="chip-row">
+                <span class="chip">Presentation</span>
+                <span class="chip">Slide Design</span>
+              </div>
+              <div class="project-footer">
+                <span class="project-note">배운 점: 슬라이드는 ‘말’을 도와주는 시각 자료라는 것.</span>
+                <span class="project-meta">Medium · PPT</span>
+              </div>
+            </article>
+          </div>
+
+          <div class="accent-soft-box">
+            이 홀에는 앞으로 더 많은 학교 활동과 프로젝트를 추가할 수 있습니다.
+            새로운 작업을 할 때마다, 카드 하나를 더 만든다는 느낌으로 업데이트해 보세요.
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== SPECIAL ROOM – WIP ========== -->
+      <section id="special-room">
+        <div class="section-inner">
+          <div class="section-header">
+            <div>
+              <div class="section-label">05 · Special Room</div>
+              <h2 class="section-title">In Progress · Experiments</h2>
+              <p class="section-sub">아직 완성되지는 않았지만, 시도해 보고 있는 작업들을 모아 둔 공간입니다.</p>
+            </div>
+          </div>
+
+          <div class="wip-list">
+            <div class="wip-item">
+              <div class="wip-title">반응형 웹 페이지 만들기</div>
+              <div class="wip-status">Status · WIP</div>
+              <div class="wip-next">Next Step · 모바일 화면에서 깨지는 부분을 정리하고, 폰트 크기를 조정할 예정입니다.</div>
+            </div>
+
+            <div class="wip-item">
+              <div class="wip-title">개인 포트폴리오 디자인 개편</div>
+              <div class="wip-status">Status · Idea Stage</div>
+              <div class="wip-next">Next Step · 색상 팔레트와 레이아웃을 더 심플하게 정리한 버전을 구상 중입니다.</div>
+            </div>
+
+            <div class="wip-item">
+              <div class="wip-title">작은 웹 인터랙션 모음</div>
+              <div class="wip-status">Status · Prototype</div>
+              <div class="wip-next">Next Step · 버튼 호버, 카드 애니메이션 등 자주 쓸 수 있는 패턴을 정리할 예정입니다.</div>
+            </div>
+          </div>
+
+          <p class="section-note">
+            ※ 이 공간에는 “완성되지 않은 것”도 마음 편하게 올립니다. 나중에 돌아봤을 때,
+            현재의 시도가 어떤 의미였는지 기록으로 남기기 위함입니다.
+          </p>
+        </div>
+      </section>
+
+      <!-- ========== INFO DESK – ABOUT & CONTACT ========== -->
+      <section id="info-desk">
+        <div class="section-inner">
+          <div class="section-header">
+            <div>
+              <div class="section-label">06 · Info Desk</div>
+              <h2 class="section-title">About &amp; Contact</h2>
+              <p class="section-sub">이 전시를 만든 사람과, 앞으로의 방향에 대한 간단한 소개입니다.</p>
+            </div>
+          </div>
+
+          <div class="info-layout">
+            <div class="info-text">
+              <p>
+                이 포트폴리오는 “완성된 작품 모음”이라기보다,
+                공부와 시도, 실패와 수정을 거치며 쌓여 가는 기록에 가깝습니다.
+              </p>
+              <p>
+                웹을 배우고, 글을 쓰고, 다양한 형식의 과제를 수행하면서 느낀 점들을
+                최대한 솔직하게 남기려고 합니다. 언젠가 지금의 작업들이 조금은 어색해 보이더라도,
+                그 어색함 자체가 성장의 증거라고 생각합니다.
+              </p>
+              <div class="info-keywords">
+                <span class="keyword-pill">꾸준한 연습</span>
+                <span class="keyword-pill">기록</span>
+                <span class="keyword-pill">실험</span>
+                <span class="keyword-pill">웹 프론트엔드</span>
+                <span class="keyword-pill">자기 이해</span>
+              </div>
+              <p class="muted">
+                ※ 이 페이지는 계속 업데이트될 예정입니다. 새로운 작업을 만들 때마다,
+                “카드 하나 더 추가하기” 정도의 느낌으로 가볍게 확장해 나갈 계획입니다.
+              </p>
+            </div>
+
+            <div class="info-box">
+              <div>
+                <div class="info-label">Contact</div>
+                <div class="info-contact-item">
+                  <span class="info-contact-label">Email</span>
+                  <span class="info-contact-value">example@mail.com</span>
+                </div>
+                <div class="info-contact-item">
+                  <span class="info-contact-label">GitHub</span>
+                  <span class="info-contact-value">github.com/username</span>
+                </div>
+              </div>
+              <div>
+                <div class="info-label" style="margin-top:8px;">Note</div>
+                <p style="font-size:12px; margin-top:3px;">
+                  실제로 사용할 때는 이메일, 깃허브 등 연락처 정보를
+                  본인에게 맞게 수정해서 사용하면 됩니다.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
-<div class="key-btn" onclick="nav('hero', this)">HOME</div>
+    <!-- ========== TO TOP BUTTON ========== -->
+    <div class="to-top">
+      <button id="toTopBtn" type="button">
+        ↑ Top
+      </button>
+    </div>
 
-<div class="rain"></div>
+    <script>
+      // 맨 위로 가기 버튼 표시/숨김
+      const toTopBtn = document.getElementById('toTopBtn');
 
-<script>
-  const rainContainer = document.querySelector('.rain');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 260) {
+          toTopBtn.classList.add('visible');
+        } else {
+          toTopBtn.classList.remove('visible');
+        }
+      });
 
-  for (let i = 0; i < 120; i++) {  // 빗줄기 개수 조절
-    const drop = document.createElement('div');
-    drop.classList.add('raindrop');
-    
-    drop.style.left = Math.random() * 100 + "vw";
-    drop.style.animationDuration = (Math.random() * 0.5 + 0.5) + "s";
-    drop.style.animationDelay = Math.random() * 5 + "s";
-    drop.style.opacity = Math.random();
-
-    rainContainer.appendChild(drop);
-  }
-
-</script>
-
+      toTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    </script>
 </body>
 </html>
