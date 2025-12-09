@@ -1319,6 +1319,7 @@ body.scanlines {
   );                             /* 화면 전체 살짝 어둡게 */
 }
 
+
 /* 팝업 카드 공통 스타일 */
 .modal-card {
   max-width: 440px;
@@ -1683,9 +1684,104 @@ body.scanlines {
   color: var(--muted);
 }
 
+/* ====== 1. 페이지 전환용 섹션 ====== */
+.view-section {
+  min-height: 100vh;
+  padding: 80px 24px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.view-section.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* ====== 2. 상단 메뉴 버튼(탭) ====== */
+.top-nav .nav-btn {
+  border: none;
+  background: transparent;
+  padding: 8px 16px;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.15s;
+}
+
+.top-nav .nav-btn.active {
+  opacity: 1;
+  transform: translateY(-1px);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+}
+
+/* ====== 3. 오른쪽 상태 HUD ====== */
+.status-dock {
+  position: fixed;
+  right: 24px;
+  top: 96px;
+  width: 230px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 50;
+}
+
+.status-card {
+  background: var(--panel);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 18px rgba(0,0,0,0.8);
+  padding: 12px 14px;
+  font-size: 0.8rem;
+}
+
+/* ====== 4. 의뢰 콘솔 ====== */
+.console-panel {
+  background: var(--panel);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  padding: 16px;
+  max-width: 640px;
+}
+
+.console-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.console-controls button {
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.6);
+  cursor: pointer;
+}
+
+.console-log {
+  margin-top: 8px;
+  height: 200px;
+  overflow-y: auto;
+  font-family: "Share Tech Mono", monospace;
+  font-size: 0.85rem;
+  border-top: 1px solid rgba(0, 240, 255, 0.2);
+  padding-top: 6px;
+}
+
+.log-line {
+  margin-bottom: 2px;
+}
+
+
+
   </style>
 </head>
 
+<body>
+   <div class="rain"></div>
 <body class="scanlines">
 
     <!-- 🔻 언더넷 접속 로딩 화면 -->
@@ -1712,6 +1808,19 @@ body.scanlines {
   <div class="noise"></div>
 
   <div class="wrap fade-in" id="app">
+
+      <!-- 🔵 섹션 이동 ROUTING 오버레이 -->
+  <div id="routeOverlay">
+    <div id="routeOverlayInner">
+      <div id="routeOverlayTitle">ROUTING</div>
+      <div id="routeOverlayText"
+           class="glitch"
+           data-text="ROUTING : HOME">
+        ROUTING : HOME
+      </div>
+    </div>
+  </div>
+
     <header>
       <div class="brand">
         <div class="logo">🕶️</div>
@@ -2262,6 +2371,40 @@ body.scanlines {
     </footer>
   </div>
 
+    <!-- 🔵 셀레르니아 미니 AI 위젯 -->
+  <div id="cel-ai-widget">
+    <!-- 동그란 토글 버튼 -->
+    <button id="cel-ai-toggle">
+      <!-- 원하면 여기 img 넣어도 됨 -->
+      NEX
+    </button>
+
+    <!-- 펼쳐지는 패널 -->
+    <div id="cel-ai-panel">
+      <div id="cel-ai-header">
+        <div class="cel-ai-avatar">
+          <!-- 아바타 이미지 넣고 싶으면 여기 -->
+          <!-- <img src="nex-avatar.png" alt="NEX-13" /> -->
+        </div>
+        <div class="cel-ai-meta">
+          <div class="cel-ai-name">NEX-13 / MINI.AI</div>
+          <div class="cel-ai-status" id="cel-ai-status">
+            현재 섹션: HOME
+          </div>
+        </div>
+        <button class="cel-ai-close" id="cel-ai-close">✕</button>
+      </div>
+
+      <div id="cel-ai-messages"></div>
+
+      <form id="cel-ai-form">
+        <input id="cel-ai-input"
+               type="text"
+               placeholder="셀레르니아, 여기에 메모 남길까?" />
+      </form>
+    </div>
+  </div>
+
   <!-- Easter Egg button -->
   <div class="egg" title="SYS·LAYER">
     <button id="eggBtn" style="padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:8px;border:1px solid rgba(255,255,255,0.03);color:var(--muted)">SYS·LAYER</button>
@@ -2275,6 +2418,37 @@ body.scanlines {
       <button id="clipSecret" class="btn micro">클립보드 복사(데모)</button>
     </div>
   </div>
+
+    <!-- 🔵 공용 UI 팝업 -->
+  <div id="uiPopup">
+    <div id="uiPopupContent" class="popup-content"></div>
+  </div>
+
+    <!-- 🔵 의뢰 상세 모달 -->
+  <div id="jobModal" class="modal-overlay">
+    <div id="jobModalContent" class="modal-card"></div>
+  </div>
+
+    <!-- 🔵 의뢰 진행 플로우 모달 (3단계) -->
+  <div id="jobFlowModal" class="modal-overlay">
+    <div class="modal-card">
+      <div id="jobFlowContent"></div>
+
+      <div style="margin-top:14px;display:flex;justify-content:space-between;gap:8px;">
+        <button id="jobFlowPrev" class="btn secondary micro">이전</button>
+        <div style="display:flex;gap:8px;">
+          <button id="jobFlowNext" class="btn micro">다음</button>
+          <button id="jobFlowComplete" class="btn micro" style="display:none;">의뢰 완료</button>
+        </div>
+      </div>
+
+      <div style="margin-top:8px;font-size:11px;color:var(--muted);text-align:right;">
+        모달 바깥을 클릭하면 닫힙니다.
+      </div>
+    </div>
+  </div>
+
+  </body>
 
   <script>
 /* ===============================
@@ -3162,6 +3336,7 @@ function closeJobModal() {
     renderJobFlowStep();
   }
 }
+
 
 
 function closeJobFlowModal() {
@@ -4453,8 +4628,8 @@ function basicNexAnswer(q) {
     const maxX = window.innerWidth  - widget.offsetWidth;
     const maxY = window.innerHeight - widget.offsetHeight;
 
-    x = Math.min(Math.max(8, x), maxX - 8);
-    y = Math.min(Math.max(8, y), maxY - 8);
+    x = Math.min(Math.max(8, x), maxX - 5);
+    y = Math.min(Math.max(8, y), maxY - 5);
 
     widget.style.left = x + 'px';
     widget.style.top  = y + 'px';
@@ -4466,6 +4641,23 @@ function basicNexAnswer(q) {
     document.removeEventListener('mouseup', onMouseUp);
   }
 })();
+
+// ====== 비 생성 스크립트 ======
+const rainContainer = document.querySelector('.rain');
+const dropsCount = 120; // 빗방울 개수 (원하면 숫자 늘려도 됨)
+
+for (let i = 0; i < dropsCount; i++) {
+  const drop = document.createElement('div');
+  drop.classList.add('raindrop');
+
+  // 랜덤 위치 / 속도 / 길이
+  drop.style.left = Math.random() * 100 + 'vw';
+  drop.style.animationDuration = (0.7 + Math.random() * 0.9) + 's';
+  drop.style.animationDelay = Math.random() + 's';
+  drop.style.height = (20 + Math.random() * 50) + 'px';
+
+  rainContainer.appendChild(drop);
+}
 
   </script>
 
