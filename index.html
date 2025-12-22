@@ -1319,6 +1319,21 @@ body.scanlines {
   );                             /* 화면 전체 살짝 어둡게 */
 }
 
+  <!-- 🔵 의뢰 진행 플로우 모달 -->
+  <div id="jobFlowModal" class="modal-overlay">
+    <div class="modal-card">
+      <div id="jobFlowContent"></div>
+
+      <div style="margin-top:12px;display:flex;justify-content:flex-end;gap:8px;">
+        <button id="jobFlowPrev" class="btn secondary micro">이전</button>
+        <button id="jobFlowNext" class="btn micro">다음</button>
+        <button id="jobFlowComplete" class="btn micro" style="display:none;">
+          의뢰 완료
+        </button>
+      </div>
+    </div>
+  </div>
+
 
 /* 팝업 카드 공통 스타일 */
 .modal-card {
@@ -1775,13 +1790,9 @@ body.scanlines {
   margin-bottom: 2px;
 }
 
-
-
   </style>
 </head>
 
-<body>
-   <div class="rain"></div>
 <body class="scanlines">
 
     <!-- 🔻 언더넷 접속 로딩 화면 -->
@@ -2428,27 +2439,6 @@ body.scanlines {
   <div id="jobModal" class="modal-overlay">
     <div id="jobModalContent" class="modal-card"></div>
   </div>
-
-    <!-- 🔵 의뢰 진행 플로우 모달 (3단계) -->
-  <div id="jobFlowModal" class="modal-overlay">
-    <div class="modal-card">
-      <div id="jobFlowContent"></div>
-
-      <div style="margin-top:14px;display:flex;justify-content:space-between;gap:8px;">
-        <button id="jobFlowPrev" class="btn secondary micro">이전</button>
-        <div style="display:flex;gap:8px;">
-          <button id="jobFlowNext" class="btn micro">다음</button>
-          <button id="jobFlowComplete" class="btn micro" style="display:none;">의뢰 완료</button>
-        </div>
-      </div>
-
-      <div style="margin-top:8px;font-size:11px;color:var(--muted);text-align:right;">
-        모달 바깥을 클릭하면 닫힙니다.
-      </div>
-    </div>
-  </div>
-
-  </body>
 
   <script>
 /* ===============================
@@ -3336,7 +3326,6 @@ function closeJobModal() {
     renderJobFlowStep();
   }
 }
-
 
 
 function closeJobFlowModal() {
@@ -4628,8 +4617,8 @@ function basicNexAnswer(q) {
     const maxX = window.innerWidth  - widget.offsetWidth;
     const maxY = window.innerHeight - widget.offsetHeight;
 
-    x = Math.min(Math.max(8, x), maxX - 5);
-    y = Math.min(Math.max(8, y), maxY - 5);
+    x = Math.min(Math.max(8, x), maxX - 8);
+    y = Math.min(Math.max(8, y), maxY - 8);
 
     widget.style.left = x + 'px';
     widget.style.top  = y + 'px';
@@ -4641,23 +4630,6 @@ function basicNexAnswer(q) {
     document.removeEventListener('mouseup', onMouseUp);
   }
 })();
-
-// ====== 비 생성 스크립트 ======
-const rainContainer = document.querySelector('.rain');
-const dropsCount = 120; // 빗방울 개수 (원하면 숫자 늘려도 됨)
-
-for (let i = 0; i < dropsCount; i++) {
-  const drop = document.createElement('div');
-  drop.classList.add('raindrop');
-
-  // 랜덤 위치 / 속도 / 길이
-  drop.style.left = Math.random() * 100 + 'vw';
-  drop.style.animationDuration = (0.7 + Math.random() * 0.9) + 's';
-  drop.style.animationDelay = Math.random() + 's';
-  drop.style.height = (20 + Math.random() * 50) + 'px';
-
-  rainContainer.appendChild(drop);
-}
 
   </script>
 
