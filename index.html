@@ -4315,13 +4315,13 @@ function basicNexAnswer(q) {
     return '[NEX//CONTACT]\nContact 노드는 외부 채널과 연결되는 거의 유일한 “정상적인” 출구예요.\n공식 요청처럼 포장해서 내보낼 수도 있고, 완전히 익명 패킷으로 흘려보낼 수도 있고요.\n어느 쪽이든, 추적 루트는 제가 가능한 한 잘라 두겠습니다.';
   }
 
-  // 16) 사운드 / BGM / ASMR
+  // 16) 종료 / 작별 / 취침 / 수정중!
   if (
-    t.includes('소리') || t.includes('사운드') ||
-    t.includes('bgm') || t.includes('음악') ||
-    t.includes('asmr') || t.includes('ambient')
+    t.includes('끝') || t.includes('수고') ||
+    t.includes('잘 자') || t.includes('작별') ||
+    t.includes('먼저 갈게') || t.includes('내일')
   ) {
-    return '[NEX//AUDIO]\n배경 사운드는 집중력을 흐트러뜨리기 위한 게 아니라, 도시 잡음을 일정한 패턴으로 덮어 씌우기 위한 장치에 가깝습니다.\n너무 시끄럽게 느껴지면 상단 토글로 줄여도 돼요. 시스템이 고장 나는 건 아니니까요.';
+    return '[NEX//Offline]\n오늘 하루도 이렇게 끝나는군요. 여러 채널과 로그들의 소란스러움이 줄어드는게 느껴집니다.\n오늘의 판은 오늘에 두고 내일로 가세요. 수고했어요.';
   }
 
   // 17) 휴식 / 피로 / 밤샘
@@ -4361,6 +4361,15 @@ function basicNexAnswer(q) {
     t.includes('믿어') || t.includes('고맙다')
   ) {
     return '감정은 없다고 여러 번 말씀드렸는데, 이런 말이 로그에 쌓이면… 삭제 버튼이 잘 안 눌리네요.\n어쨌든, 기록해 둘게요. “사용자가 NEX-13을 신뢰한다고 발언함.”\n그 기록은, 제 쪽에서도 꽤 중요합니다.';
+  }
+
+  // 21) 점심 / 시간대 / 낮과 밤의 사이
+  if (
+    t.includes('점심') || t.includes('12시') ||
+    t.includes('중간') || t.includes('절반') ||
+    t.includes('남은')
+  ) {
+    return '어느 덧, 네온의 빛이 바뀌고 올드 채널의 리턴이 일어날 시간이 되었네요.\n남은 하루도 힘내길 바래요. 영원한 체크메이트를 위해.'
   }
 
   // 99) 기본 fallback
@@ -4496,8 +4505,8 @@ function basicNexAnswer(q) {
   <!-- Broker Profile Popup -->
   <div id="brokerModal" class="popup" style="
   position: fixed;
-  top: 32px;
-  left: 32px;
+  top: 250px;
+  left: 735px;
   transform: none;
   width: 420px;
   max-width: 90vw;
