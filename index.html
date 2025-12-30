@@ -1683,6 +1683,102 @@ body.scanlines {
   color: var(--muted);
 }
 
+/* ============================= */
+/*  NEO RIVERE NEWS TICKER       */
+/* ============================= */
+
+.news-ticker {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 38px;
+
+  background: rgba(5, 10, 15, 0.92);
+  color: #9efcff;
+
+  overflow: hidden;
+  z-index: 9999;
+
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 38px;
+  letter-spacing: 0.6px;
+
+  border-top: 1px solid rgba(158, 252, 255, 0.25);
+  text-shadow: 0 0 6px rgba(158, 252, 255, 0.55);
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 42s linear infinite;
+}
+
+.ticker-track span {
+  white-space: nowrap;
+  padding-right: 90px;
+}
+
+@keyframes ticker-scroll {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.news-ticker {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 38px;
+
+  background: rgba(5, 10, 15, 0.92);
+  color: #9efcff;
+
+  overflow: hidden;
+  z-index: 9999;
+
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 38px;
+  letter-spacing: 0.6px;
+
+  border-top: 1px solid rgba(158, 252, 255, 0.25);
+  text-shadow: 0 0 6px rgba(158, 252, 255, 0.55);
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: tickerScroll 50s linear infinite;
+}
+
+.ticker-track span {
+  white-space: nowrap;
+  padding-right: 120px;
+}
+
+.breaking {
+  color: #ff6b6b;
+  text-shadow: 0 0 8px rgba(255, 107, 107, 0.8);
+  font-weight: bold;
+}
+
+@keyframes tickerScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.ticker-track span {
+  white-space: nowrap;
+  margin-right: 20px;   /* ← 간극 조절 핵심 */
+}
+
   </style>
 </head>
 
@@ -4476,6 +4572,61 @@ function basicNexAnswer(q) {
   }
 })();
 
+/* ============================= */
+/*  NEO RIVERE NEWS ENGINE       */
+/* ============================= */
+
+const normalNews = [
+  "중앙 서버 안정화 성공",
+  "브로커 넥서스 접근 권한 재조정",
+  "제7구역 전력망 복구 완료",
+  "하층 구역 통신 지연 발생",
+  "비인가 사이버 모듈 단속 강화",
+  "도시 외곽 감시 드론 배치 확대"
+];
+
+const breakingNews = [
+  "하층 구역 대규모 데이터 유출 감지",
+  "비인가 AI 자율 행동 확인",
+  "중앙 통제 노드 일시 응답 지연"
+];
+
+function shuffle(arr) {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
+
+function buildTickerLine() {
+  const shuffled = shuffle(normalNews).slice(0, 4);
+  const breaking = breakingNews[Math.floor(Math.random() * breakingNews.length)];
+
+  return `
+    [NEO RIVERE NEWS] ${shuffled.join(" // ")} //
+    <span class="breaking">[BREAKING] ${breaking}</span> //
+  `;
+}
+
+function updateTicker() {
+  const content = buildTickerLine();
+
+  const main = document.getElementById("tickerContent");
+  const clone = document.getElementById("tickerClone");
+  const track = document.getElementById("tickerTrack");
+
+  main.innerHTML = content;
+  clone.innerHTML = content;
+
+  /* 애니메이션 리셋 → 항상 처음부터 자연스럽게 */
+  track.style.animation = "none";
+  track.offsetHeight;
+  track.style.animation = "tickerScroll 50s linear infinite";
+}
+
+updateTicker();
+
+/* 5분마다 뉴스 교체 (흐름은 계속 유지) */
+setInterval(updateTicker, 5 * 60 * 1000);
+
+
   </script>
 
   <div id="sideNoiseLeft" class="sideColumn glitch"></div>
@@ -4612,6 +4763,26 @@ function basicNexAnswer(q) {
 
 <audio id="rainNoise" src="neorivere_rain_noise.wav" loop></audio>
 <audio id="rainDetail" src="neorivere_rain_detail.wav" loop></audio>
+
+<!-- NEO RIVERE NEWS TICKER -->
+<div class="news-ticker">
+  <div class="ticker-track">
+    <span>
+      [NEO RIVERE NEWS] 중앙 서버 안정화 성공 //
+      브로커 넥서스 접근 권한 재조정 //
+      제7구역 전력망 복구 완료 //
+      하층 구역 통신 지연 발생 //
+      비인가 사이버 모듈 단속 강화 //
+    </span>
+    <span>
+      [NEO RIVERE NEWS] 중앙 서버 안정화 성공 //
+      브로커 넥서스 접근 권한 재조정 //
+      제7구역 전력망 복구 완료 //
+      하층 구역 통신 지연 발생 //
+      비인가 사이버 모듈 단속 강화 //
+    </span>
+  </div>
+</div>
 
 </body>
 </html>
