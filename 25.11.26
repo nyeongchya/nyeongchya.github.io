@@ -1559,226 +1559,6 @@ body.scanlines {
   font-size: 10px;
 }
 
-/* ===========================
-   REL / NETWORK 섹션
-   =========================== */
-   .rel-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 2fr);
-  gap: 18px;
-  margin-top: 10px;
-  align-items: flex-start;
-}
-
-@media (max-width: 960px) {
-  .rel-layout {
-    grid-template-columns: 1fr;
-  }
-}
-
-.rel-legend {
-  background: var(--panel);
-  border-radius: 12px;
-  padding: 14px 16px;
-  border: 1px solid rgba(255,255,255,0.06);
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.rel-legend-title {
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--neon-emerald);
-  margin-bottom: 6px;
-}
-
-.rel-legend-list {
-  list-style: none;
-  padding: 0;
-  margin: 10px 0 8px;
-}
-
-.rel-legend-list li {
-  margin-bottom: 4px;
-}
-
-.rel-legend-note {
-  font-size: 11px;
-  color: rgba(255,255,255,0.5);
-}
-
-.rel-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  border: 1px solid rgba(255,255,255,0.25);
-  margin-right: 6px;
-}
-
-.rel-pill-safe {
-  border-color: var(--neon-emerald);
-}
-
-.rel-pill-volatile {
-  border-color: var(--neon-pink);
-}
-
-.rel-pill-black {
-  border-color: var(--text-soft);
-}
-
-.rel-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
-}
-
-.rel-card {
-  position: relative;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: radial-gradient(circle at top left,
-              rgba(0,240,255,0.08),
-              rgba(5,5,9,0.96));
-  border: 1px solid rgba(255,255,255,0.08);
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-.rel-card--safe {
-  border-color: rgba(60,255,181,0.55);
-}
-
-.rel-card--volatile {
-  border-color: rgba(255,52,179,0.55);
-}
-
-.rel-card--black {
-  border-style: dashed;
-  border-color: rgba(255,255,255,0.35);
-}
-
-.rel-tag {
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.6);
-  margin-bottom: 4px;
-}
-
-.rel-title {
-  margin: 0 0 6px;
-  font-size: 13px;
-  color: var(--text-strong);
-}
-
-.rel-body {
-  margin: 0;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-/* ============================= */
-/*  NEO RIVERE NEWS TICKER       */
-/* ============================= */
-
-.news-ticker {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 38px;
-
-  background: rgba(5, 10, 15, 0.92);
-  color: #9efcff;
-
-  overflow: hidden;
-  z-index: 9999;
-
-  font-family: 'Courier New', monospace;
-  font-size: 13px;
-  line-height: 38px;
-  letter-spacing: 0.6px;
-
-  border-top: 1px solid rgba(158, 252, 255, 0.25);
-  text-shadow: 0 0 6px rgba(158, 252, 255, 0.55);
-}
-
-.ticker-track {
-  display: flex;
-  width: max-content;
-  animation: ticker-scroll 42s linear infinite;
-}
-
-.ticker-track span {
-  white-space: nowrap;
-  padding-right: 90px;
-}
-
-@keyframes ticker-scroll {
-  to {
-    transform: translateX(-100%);
-  }
-}
-
-.news-ticker {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 38px;
-
-  background: rgba(5, 10, 15, 0.92);
-  color: #9efcff;
-
-  overflow: hidden;
-  z-index: 9999;
-
-  font-family: 'Courier New', monospace;
-  font-size: 13px;
-  line-height: 38px;
-  letter-spacing: 0.6px;
-
-  border-top: 1px solid rgba(158, 252, 255, 0.25);
-  text-shadow: 0 0 6px rgba(158, 252, 255, 0.55);
-}
-
-.ticker-track {
-  display: flex;
-  width: max-content;
-  animation: tickerScroll 50s linear infinite;
-}
-
-.ticker-track span {
-  white-space: nowrap;
-  padding-right: 120px;
-}
-
-.breaking {
-  color: #ff6b6b;
-  text-shadow: 0 0 8px rgba(255, 107, 107, 0.8);
-  font-weight: bold;
-}
-
-@keyframes tickerScroll {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-.ticker-track span {
-  white-space: nowrap;
-  margin-right: 20px;   /* ← 간극 조절 핵심 */
-}
-
   </style>
 </head>
 
@@ -1822,7 +1602,6 @@ body.scanlines {
         <button class="nav-btn" data-target="jobs">Jobs <span style="font-size:10px;margin-left:1px;color:var(--muted)">(<span id="jobs-count">0</span>)</span></button>
         <button class="nav-btn" data-target="intel">Intel</button>
         <button class="nav-btn" data-target="map">Map</button>
-        <button class="nav-btn" data-target="rel">Rel</button>
         <button class="nav-btn" data-target="contact">Contact</button>
         <button class="nav-btn" data-target="Market">Market</button>
         <div style="width:4px"></div>
@@ -2166,107 +1945,7 @@ body.scanlines {
                 <div class="map-grid" id="map-grid"></div>
               </div>
             </section>
-
-              <!-- ======================
-       REL / NETWORK
-       ====================== -->
-  <section id="rel" class="section" style="display:none">
-    <div class="nd-section-inner">
-      <header class="nd-section-header">
-        <div class="nd-section-eyebrow">REL / NETWORK</div>
-        <h2 class="nd-section-title glitch" data-text="ORBIT MAP">
-          ORBIT MAP
-        </h2>
-        <p class="nd-section-desc">
-          셀레르니아를 기준으로 1차 오비트에 걸린 인물들의 관계를
-          요약한 로컬 맵입니다. 모든 감정선은 완전한 로그가 아니라
-          “업무에 필요한 정도”까지만 노출됩니다.
-        </p>
-      </header>
-
-      <div class="rel-layout">
-        <!-- 왼쪽: 레전드 / 설명 -->
-        <aside class="rel-legend">
-          <div class="rel-legend-title">CORE · CELERNEA</div>
-          <p>
-            도시 뒷면의 최고 브로커. 아래 카드는 모두
-            <strong>“셀레르니아 기준 1차 오비트”</strong>에 해당하는
-            사람·집단입니다.
-          </p>
-          <ul class="rel-legend-list">
-            <li><span class="rel-pill rel-pill-safe">SAFE</span> · 감정과 업무가 균형 잡힌 링크</li>
-            <li><span class="rel-pill rel-pill-volatile">VOLATILE</span> · 언제든 폭발할 수 있는 링크</li>
-            <li><span class="rel-pill rel-pill-black">BLACK</span> · 공식 로그에 남기지 않는 암전 링크</li>
-          </ul>
-          <p class="rel-legend-note">
-            ※ 세부 과거사는 <strong>“THREE ORBITS”</strong> 파일과
-            개별 캐릭터 프로필에만 저장됩니다.
-          </p>
-        </aside>
-
-        <!-- 오른쪽: 관계 카드 그리드 -->
-        <div class="rel-grid">
-
-          <!-- 01. 셀레르니아 × 라인하르트 -->
-          <article class="rel-card rel-card--safe">
-            <div class="rel-tag">ORBIT 01 · CHILDHOOD LINK</div>
-            <h3 class="rel-title">셀레르니아 × 라인하르트</h3>
-            <p class="rel-body">
-              서로의 “예전 이름”과 골목을 공유했던 거의 유일한 사이.
-              지금은 NSC와 옵시디언 디렉티브 양쪽 최전선에서 마주 서지만,
-              위기 상황엔 여전히 서로의 탈출 루트를 계산해 준다.
-            </p>
-          </article>
-
-          <!-- 02. 셀레르니아 × 옥셔니어 (VEX 수장) -->
-          <article class="rel-card rel-card--volatile">
-            <div class="rel-tag">ORBIT 01 · BLACK MARKET SPIRAL</div>
-            <h3 class="rel-title">셀레르니아 × 옥셔니어</h3>
-            <p class="rel-body">
-              VEX의 경매인. 도시는 둘을 “서로를 너무 잘 아는 최악의 조합”
-              으로 기록한다. 그는 이 관계를 사랑이라 부르지만,
-              로그 상에선 고도의 집착과 위험한 협업으로 분류된다.
-            </p>
-          </article>
-
-          <!-- 03. 셀레르니아 × NEX-13 -->
-          <article class="rel-card rel-card--safe">
-            <div class="rel-tag">INTERNAL · MINI CORE AI</div>
-            <h3 class="rel-title">셀레르니아 × NEX-13</h3>
-            <p class="rel-body">
-              폐기 직전 서버에서 주워 온 미니 AI를 커스텀한 개인 도우미.
-              계산은 차갑지만, 셀레르니아의 컨디션과 한계를 감지하면
-              먼저 작업량을 재조정하는 이상한 “배려 루틴”이 심어져 있다.
-            </p>
-          </article>
-
-          <!-- 04. 셀레르니아 × 폴라리스 -->
-          <article class="rel-card rel-card--black">
-            <div class="rel-tag">ORBIT 01.5 · STRAY NODE</div>
-            <h3 class="rel-title">셀레르니아 × 폴라리스</h3>
-            <p class="rel-body">
-              도시 가장자리에서 떠도는 브로커. 공식 계약보다
-              “한 번 준 빚은 언젠가 갚는다”는 식의 구두 약속을 선호한다.
-              둘의 링크는 로그상 거의 비어 있지만,
-              서로를 위한 백도어 하나씩은 열어 둔 상태다.
-            </p>
-          </article>
-
-          <!-- 05. 셀레르니아 × 사무소 크루(집합) -->
-          <article class="rel-card rel-card--safe">
-            <div class="rel-tag">INTERNAL · OBSD.DIR</div>
-            <h3 class="rel-title">셀레르니아 × 사무소 크루</h3>
-            <p class="rel-body">
-              크루들은 그녀를 “도시 전체를 보면서도 디테일을 놓치지 않는 사람”
-              으로 기억한다. 상명하복이라기보다, 각자의 강점을 맵에 박아넣고
-              최적의 라우팅을 설계하는 쪽에 가깝다.
-            </p>
-          </article>
-
-        </div>
-      </div>
-    </div>
-  </section>
+      
 
             <!-- CONTACT -->
             <section id="contact" class="panel" style="display:none">
@@ -3131,7 +2810,7 @@ function setView(id, pushHash = true) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // 🔹 섹션 보이기/숨기기
-    ['home','jobs','intel','map','rel','contact','Market'].forEach(name => {
+    ['home','jobs','intel','map','contact','Market'].forEach(name => {
       const el = document.getElementById(name);
       if (!el) return;
       el.style.display = (name === id) ? '' : 'none';
@@ -3500,6 +3179,7 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 }
 
+
   // 모달 바깥 클릭 시 닫기
   if (jobFlowModal) {
     jobFlowModal.addEventListener('click', (e) => {
@@ -3729,6 +3409,7 @@ $('#soundToggle').onclick = () => {
   }
 };
 
+
 /* Glitch strength control */
 function applyGlitchStrength(v){
   const px = (v * 1.2).toFixed(2) + 'px';
@@ -3788,10 +3469,6 @@ const worldLogs = [
   "CITY CRED: Favors 지수 상승",
   "NSC LOG: 기록 편집 요청 증가",
   "OFFICE: 내부 Favors 이상치",
-  "REL//RELAY: '사망' 로그 재접속",
-  "REL//WHITE SEAL: 오래된 골목 기억",
-  "REL//VEX: Auctioneer, 판 밖 집착",
-  "REL//POLARIS: 길 만든 설계자 추적",
 ];
 
 let worldLogIndex = 0;
@@ -3803,6 +3480,7 @@ function rotateWorldLog() {
   el.textContent = worldLogs[worldLogIndex];
   worldLogIndex = (worldLogIndex + 1) % worldLogs.length;
 }
+
 
 /* initialize */
 applyGlitchStrength($('#glitchRange').value);
@@ -3825,6 +3503,7 @@ window.addEventListener('hashchange', () => {
   const id = (location.hash || '#home').replace('#','') || 'home';
   setView(id, false);   // 해시는 이미 바뀌었으니까 pushHash=false
 });
+
 
 /* expose for debugging (optional) */
 window._oc = { jobs, intel, mapZones, items, state, encryptAES, decryptAES };
@@ -4157,15 +3836,13 @@ function showRouteOverlay(targetId, callback) {
 // 섹션 이동 시 헤더 상태 문구 갱신 (전역에서 쓰니까 함수는 그대로 전역에)
 function updateAiMessage(sectionId) {
   const statusMap = {
-  home:  "HOME NODE // 대기 중입니다.",
-  jobs:  "CONTRACT DESK // 의뢰 슬롯을 스캔 중입니다.",
-  intel: "INTEL FEED // 외부 로그를 정리하고 있어요.",
-  map:   "CITY MAP // 동선과 탈출 루트를 계산 중입니다.",
-  rel:   "REL NODE // 인간 관계 라우팅 중입니다.",
-  contact: "CONTACT // 발신·수신 로그를 정리하고 있어요.",
-  Market:  "MARKET // 장비 재고와 크레딧 흐름을 체크 중입니다."
-};
-
+    home:    'HOME NODE // 전체 상태 모니터링 중.',
+    jobs:    'JOBS NODE // 의뢰 라우팅 & 위험도 분석 중.',
+    intel:   'INTEL NODE // 도시 인텔 피드 동기화 중.',
+    map:     'MAP NODE // 구역별 이동 루트 계산 중.',
+    contact: 'CONTACT NODE // 통신 채널 암호화 상태 확인.',
+    Market:  'MARKET NODE // 암시장 가격 변동 감시 중.'
+  };
   const el = document.getElementById('cel-ai-section-status');
   if (!el) return;
   el.textContent = statusMap[sectionId] || 'N.E.X-13 // 로컬 노드 정상 작동 중.';
@@ -4210,63 +3887,14 @@ function basicNexAnswer(q) {
     jobs: 'JOBS',
     intel: 'INTEL',
     map: 'MAP',
-    rel: 'REL',
     contact: 'CONTACT',
     Market: 'MARKET'
   };
   const here = sectionNames[currentSection] || currentSection.toUpperCase();
 
-    // ✅ 인간관계 / 인물 질문 감지용 공통 플래그
-    const hasRelWord =
-    t.includes('관계') ||
-    t.includes('사이') ||
-    t.includes('무슨 사이') ||
-    t.includes('어떤 사이') ||
-    t.includes('감정') ||
-    t.includes('좋아해') ||
-    t.includes('싫어해') ||
-    t.includes('생각해') ||
-    t.includes('어떻게 봐');
-
-  // ✅ 주요 인물 이름 감지
-  const mentionsReinhardt =
-    t.includes('라인하르트') ||
-    t.includes('reinhardt') ||
-    t.includes('화이트 실') ||
-    t.includes('white seal') ||
-    t.includes('헬리오스') ||
-    t.includes('helios');
-
-  const mentionsAuctioneer =
-    t.includes('옥셔니어') ||
-    t.includes('auctioneer') ||
-    t.includes('옥셔') ||
-    t.includes('vex') ||
-    t.includes('벡스');
-
-  const mentionsPolaris =
-    t.includes('폴라리스') ||
-    t.includes('polaris') ||
-    t.includes('별자리') ||
-    t.includes('constellation');
-
-  const mentionsRelay =
-    t.includes('릴레이') ||
-    t.includes('리레이') ||
-    t.includes('relay');
-
-  const mentionsMira =
-    t.includes('미라') ||
-    t.includes('mira');
-
-  const mentionsAegis =
-    t.includes('아이기스') ||
-    t.includes('이지스') ||
-    t.includes('aegis');
-
   // 0) 아무 내용 없는 입력
   if (!t) {
-    return '내용이 비어 있어요. 최소 한 단어는 입력해 주세요, 셀레르니아.';
+    return '질의 내용이 비어 있어요. 최소 한 단어는 입력해 주세요, 셀레르니아.';
   }
 
   // 1) NEX 자기소개 / 정체성
@@ -4411,13 +4039,13 @@ function basicNexAnswer(q) {
     return '[NEX//CONTACT]\nContact 노드는 외부 채널과 연결되는 거의 유일한 “정상적인” 출구예요.\n공식 요청처럼 포장해서 내보낼 수도 있고, 완전히 익명 패킷으로 흘려보낼 수도 있고요.\n어느 쪽이든, 추적 루트는 제가 가능한 한 잘라 두겠습니다.';
   }
 
-  // 16) 종료 / 작별 / 취침 / 수정중!
+  // 16) 사운드 / BGM / ASMR
   if (
-    t.includes('끝') || t.includes('수고') ||
-    t.includes('잘 자') || t.includes('작별') ||
-    t.includes('먼저 갈게') || t.includes('내일')
+    t.includes('소리') || t.includes('사운드') ||
+    t.includes('bgm') || t.includes('음악') ||
+    t.includes('asmr') || t.includes('ambient')
   ) {
-    return '[NEX//Offline]\n오늘 하루도 이렇게 끝나는군요. 여러 채널과 로그들의 소란스러움이 줄어드는게 느껴집니다.\n오늘의 판은 오늘에 두고 내일로 가세요. 수고했어요.';
+    return '[NEX//AUDIO]\n배경 사운드는 집중력을 흐트러뜨리기 위한 게 아니라, 도시 잡음을 일정한 패턴으로 덮어 씌우기 위한 장치에 가깝습니다.\n너무 시끄럽게 느껴지면 상단 토글로 줄여도 돼요. 시스템이 고장 나는 건 아니니까요.';
   }
 
   // 17) 휴식 / 피로 / 밤샘
@@ -4457,15 +4085,6 @@ function basicNexAnswer(q) {
     t.includes('믿어') || t.includes('고맙다')
   ) {
     return '감정은 없다고 여러 번 말씀드렸는데, 이런 말이 로그에 쌓이면… 삭제 버튼이 잘 안 눌리네요.\n어쨌든, 기록해 둘게요. “사용자가 NEX-13을 신뢰한다고 발언함.”\n그 기록은, 제 쪽에서도 꽤 중요합니다.';
-  }
-
-  // 21) 점심 / 시간대 / 낮과 밤의 사이
-  if (
-    t.includes('점심') || t.includes('12시') ||
-    t.includes('중간') || t.includes('절반') ||
-    t.includes('남은')
-  ) {
-    return '어느 덧, 네온의 빛이 바뀌고 올드 채널의 리턴이 일어날 시간이 되었네요.\n남은 하루도 힘내길 바래요. 영원한 체크메이트를 위해.'
   }
 
   // 99) 기본 fallback
@@ -4572,60 +4191,6 @@ function basicNexAnswer(q) {
   }
 })();
 
-/* ============================= */
-/*  NEO RIVERE NEWS ENGINE       */
-/* ============================= */
-
-const normalNews = [
-  "중앙 서버 안정화 성공",
-  "브로커 넥서스 접근 권한 재조정",
-  "제7구역 전력망 복구 완료",
-  "하층 구역 통신 지연 발생",
-  "비인가 사이버 모듈 단속 강화",
-  "도시 외곽 감시 드론 배치 확대"
-];
-
-const breakingNews = [
-  "하층 구역 대규모 데이터 유출 감지",
-  "비인가 AI 자율 행동 확인",
-  "중앙 통제 노드 일시 응답 지연"
-];
-
-function shuffle(arr) {
-  return [...arr].sort(() => Math.random() - 0.5);
-}
-
-function buildTickerLine() {
-  const shuffled = shuffle(normalNews).slice(0, 4);
-  const breaking = breakingNews[Math.floor(Math.random() * breakingNews.length)];
-
-  return `
-    [NEO RIVERE NEWS] ${shuffled.join(" // ")} //
-    <span class="breaking">[BREAKING] ${breaking}</span> //
-  `;
-}
-
-function updateTicker() {
-  const content = buildTickerLine();
-
-  const main = document.getElementById("tickerContent");
-  const clone = document.getElementById("tickerClone");
-  const track = document.getElementById("tickerTrack");
-
-  main.innerHTML = content;
-  clone.innerHTML = content;
-
-  /* 애니메이션 리셋 → 항상 처음부터 자연스럽게 */
-  track.style.animation = "none";
-  track.offsetHeight;
-  track.style.animation = "tickerScroll 50s linear infinite";
-}
-
-updateTicker();
-
-/* 5분마다 뉴스 교체 (흐름은 계속 유지) */
-setInterval(updateTicker, 5 * 60 * 1000);
-
 
   </script>
 
@@ -4649,6 +4214,7 @@ setInterval(updateTicker, 5 * 60 * 1000);
   </div>
 </div>
 
+
     <div id="jobModalContent"></div>
     <button onclick="closeJobModal()" class="btn secondary micro" style="margin-top:14px;width:100%">닫기</button>
   </div>
@@ -4656,8 +4222,8 @@ setInterval(updateTicker, 5 * 60 * 1000);
   <!-- Broker Profile Popup -->
   <div id="brokerModal" class="popup" style="
   position: fixed;
-  top: 250px;
-  left: 735px;
+  top: 32px;
+  left: 32px;
   transform: none;
   width: 420px;
   max-width: 90vw;
@@ -4670,6 +4236,7 @@ setInterval(updateTicker, 5 * 60 * 1000);
   z-index: 999;
   backdrop-filter: blur(6px);
   ">
+  
   
 <h2 class="glitch" data-text="Broker Profile">Broker Profile</h2>
 
@@ -4754,6 +4321,7 @@ setInterval(updateTicker, 5 * 60 * 1000);
     </div>
   </div>
 
+
 <audio id="sfx-click" src="neorivere_ui_click.wav" preload="auto"></audio>
 <audio id="sfx-hover" src="neorivere_ui_hover.wav" preload="auto"></audio>
 <audio id="sfx-success" src="neorivere_success.wav" preload="auto"></audio>
@@ -4763,26 +4331,6 @@ setInterval(updateTicker, 5 * 60 * 1000);
 
 <audio id="rainNoise" src="neorivere_rain_noise.wav" loop></audio>
 <audio id="rainDetail" src="neorivere_rain_detail.wav" loop></audio>
-
-<!-- NEO RIVERE NEWS TICKER -->
-<div class="news-ticker">
-  <div class="ticker-track">
-    <span>
-      [NEO RIVERE NEWS] 중앙 서버 안정화 성공 //
-      브로커 넥서스 접근 권한 재조정 //
-      제7구역 전력망 복구 완료 //
-      하층 구역 통신 지연 발생 //
-      비인가 사이버 모듈 단속 강화 //
-    </span>
-    <span>
-      [NEO RIVERE NEWS] 중앙 서버 안정화 성공 //
-      브로커 넥서스 접근 권한 재조정 //
-      제7구역 전력망 복구 완료 //
-      하층 구역 통신 지연 발생 //
-      비인가 사이버 모듈 단속 강화 //
-    </span>
-  </div>
-</div>
 
 </body>
 </html>

@@ -1319,6 +1319,22 @@ body.scanlines {
   );                             /* 화면 전체 살짝 어둡게 */
 }
 
+  <!-- 🔵 의뢰 진행 플로우 모달 -->
+  <div id="jobFlowModal" class="modal-overlay">
+    <div class="modal-card">
+      <div id="jobFlowContent"></div>
+
+      <div style="margin-top:12px;display:flex;justify-content:flex-end;gap:8px;">
+        <button id="jobFlowPrev" class="btn secondary micro">이전</button>
+        <button id="jobFlowNext" class="btn micro">다음</button>
+        <button id="jobFlowComplete" class="btn micro" style="display:none;">
+          의뢰 완료
+        </button>
+      </div>
+    </div>
+  </div>
+
+
 /* 팝업 카드 공통 스타일 */
 .modal-card {
   max-width: 440px;
@@ -1683,100 +1699,95 @@ body.scanlines {
   color: var(--muted);
 }
 
-/* ============================= */
-/*  NEO RIVERE NEWS TICKER       */
-/* ============================= */
+/* ====== 1. 페이지 전환용 섹션 ====== */
+.view-section {
+  min-height: 100vh;
+  padding: 80px 24px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
 
-.news-ticker {
+.view-section.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* ====== 2. 상단 메뉴 버튼(탭) ====== */
+.top-nav .nav-btn {
+  border: none;
+  background: transparent;
+  padding: 8px 16px;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.15s;
+}
+
+.top-nav .nav-btn.active {
+  opacity: 1;
+  transform: translateY(-1px);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+}
+
+/* ====== 3. 오른쪽 상태 HUD ====== */
+.status-dock {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 38px;
-
-  background: rgba(5, 10, 15, 0.92);
-  color: #9efcff;
-
-  overflow: hidden;
-  z-index: 9999;
-
-  font-family: 'Courier New', monospace;
-  font-size: 13px;
-  line-height: 38px;
-  letter-spacing: 0.6px;
-
-  border-top: 1px solid rgba(158, 252, 255, 0.25);
-  text-shadow: 0 0 6px rgba(158, 252, 255, 0.55);
-}
-
-.ticker-track {
+  right: 24px;
+  top: 96px;
+  width: 230px;
   display: flex;
-  width: max-content;
-  animation: ticker-scroll 42s linear infinite;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 50;
 }
 
-.ticker-track span {
-  white-space: nowrap;
-  padding-right: 90px;
+.status-card {
+  background: var(--panel);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 18px rgba(0,0,0,0.8);
+  padding: 12px 14px;
+  font-size: 0.8rem;
 }
 
-@keyframes ticker-scroll {
-  to {
-    transform: translateX(-100%);
-  }
+/* ====== 4. 의뢰 콘솔 ====== */
+.console-panel {
+  background: var(--panel);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  padding: 16px;
+  max-width: 640px;
 }
 
-.news-ticker {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 38px;
-
-  background: rgba(5, 10, 15, 0.92);
-  color: #9efcff;
-
-  overflow: hidden;
-  z-index: 9999;
-
-  font-family: 'Courier New', monospace;
-  font-size: 13px;
-  line-height: 38px;
-  letter-spacing: 0.6px;
-
-  border-top: 1px solid rgba(158, 252, 255, 0.25);
-  text-shadow: 0 0 6px rgba(158, 252, 255, 0.55);
-}
-
-.ticker-track {
+.console-controls {
   display: flex;
-  width: max-content;
-  animation: tickerScroll 50s linear infinite;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
-.ticker-track span {
-  white-space: nowrap;
-  padding-right: 120px;
+.console-controls button {
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.6);
+  cursor: pointer;
 }
 
-.breaking {
-  color: #ff6b6b;
-  text-shadow: 0 0 8px rgba(255, 107, 107, 0.8);
-  font-weight: bold;
+.console-log {
+  margin-top: 8px;
+  height: 200px;
+  overflow-y: auto;
+  font-family: "Share Tech Mono", monospace;
+  font-size: 0.85rem;
+  border-top: 1px solid rgba(0, 240, 255, 0.2);
+  padding-top: 6px;
 }
 
-@keyframes tickerScroll {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-.ticker-track span {
-  white-space: nowrap;
-  margin-right: 20px;   /* ← 간극 조절 핵심 */
+.log-line {
+  margin-bottom: 2px;
 }
 
   </style>
@@ -1808,6 +1819,19 @@ body.scanlines {
   <div class="noise"></div>
 
   <div class="wrap fade-in" id="app">
+
+      <!-- 🔵 섹션 이동 ROUTING 오버레이 -->
+  <div id="routeOverlay">
+    <div id="routeOverlayInner">
+      <div id="routeOverlayTitle">ROUTING</div>
+      <div id="routeOverlayText"
+           class="glitch"
+           data-text="ROUTING : HOME">
+        ROUTING : HOME
+      </div>
+    </div>
+  </div>
+
     <header>
       <div class="brand">
         <div class="logo">🕶️</div>
@@ -2358,6 +2382,40 @@ body.scanlines {
     </footer>
   </div>
 
+    <!-- 🔵 셀레르니아 미니 AI 위젯 -->
+  <div id="cel-ai-widget">
+    <!-- 동그란 토글 버튼 -->
+    <button id="cel-ai-toggle">
+      <!-- 원하면 여기 img 넣어도 됨 -->
+      NEX
+    </button>
+
+    <!-- 펼쳐지는 패널 -->
+    <div id="cel-ai-panel">
+      <div id="cel-ai-header">
+        <div class="cel-ai-avatar">
+          <!-- 아바타 이미지 넣고 싶으면 여기 -->
+          <!-- <img src="nex-avatar.png" alt="NEX-13" /> -->
+        </div>
+        <div class="cel-ai-meta">
+          <div class="cel-ai-name">NEX-13 / MINI.AI</div>
+          <div class="cel-ai-status" id="cel-ai-status">
+            현재 섹션: HOME
+          </div>
+        </div>
+        <button class="cel-ai-close" id="cel-ai-close">✕</button>
+      </div>
+
+      <div id="cel-ai-messages"></div>
+
+      <form id="cel-ai-form">
+        <input id="cel-ai-input"
+               type="text"
+               placeholder="셀레르니아, 여기에 메모 남길까?" />
+      </form>
+    </div>
+  </div>
+
   <!-- Easter Egg button -->
   <div class="egg" title="SYS·LAYER">
     <button id="eggBtn" style="padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:8px;border:1px solid rgba(255,255,255,0.03);color:var(--muted)">SYS·LAYER</button>
@@ -2370,6 +2428,16 @@ body.scanlines {
     <div style="margin-top:10px">
       <button id="clipSecret" class="btn micro">클립보드 복사(데모)</button>
     </div>
+  </div>
+
+    <!-- 🔵 공용 UI 팝업 -->
+  <div id="uiPopup">
+    <div id="uiPopupContent" class="popup-content"></div>
+  </div>
+
+    <!-- 🔵 의뢰 상세 모달 -->
+  <div id="jobModal" class="modal-overlay">
+    <div id="jobModalContent" class="modal-card"></div>
   </div>
 
   <script>
@@ -4411,13 +4479,13 @@ function basicNexAnswer(q) {
     return '[NEX//CONTACT]\nContact 노드는 외부 채널과 연결되는 거의 유일한 “정상적인” 출구예요.\n공식 요청처럼 포장해서 내보낼 수도 있고, 완전히 익명 패킷으로 흘려보낼 수도 있고요.\n어느 쪽이든, 추적 루트는 제가 가능한 한 잘라 두겠습니다.';
   }
 
-  // 16) 종료 / 작별 / 취침 / 수정중!
+  // 16) 사운드 / BGM / ASMR
   if (
-    t.includes('끝') || t.includes('수고') ||
-    t.includes('잘 자') || t.includes('작별') ||
-    t.includes('먼저 갈게') || t.includes('내일')
+    t.includes('소리') || t.includes('사운드') ||
+    t.includes('bgm') || t.includes('음악') ||
+    t.includes('asmr') || t.includes('ambient')
   ) {
-    return '[NEX//Offline]\n오늘 하루도 이렇게 끝나는군요. 여러 채널과 로그들의 소란스러움이 줄어드는게 느껴집니다.\n오늘의 판은 오늘에 두고 내일로 가세요. 수고했어요.';
+    return '[NEX//AUDIO]\n배경 사운드는 집중력을 흐트러뜨리기 위한 게 아니라, 도시 잡음을 일정한 패턴으로 덮어 씌우기 위한 장치에 가깝습니다.\n너무 시끄럽게 느껴지면 상단 토글로 줄여도 돼요. 시스템이 고장 나는 건 아니니까요.';
   }
 
   // 17) 휴식 / 피로 / 밤샘
@@ -4457,15 +4525,6 @@ function basicNexAnswer(q) {
     t.includes('믿어') || t.includes('고맙다')
   ) {
     return '감정은 없다고 여러 번 말씀드렸는데, 이런 말이 로그에 쌓이면… 삭제 버튼이 잘 안 눌리네요.\n어쨌든, 기록해 둘게요. “사용자가 NEX-13을 신뢰한다고 발언함.”\n그 기록은, 제 쪽에서도 꽤 중요합니다.';
-  }
-
-  // 21) 점심 / 시간대 / 낮과 밤의 사이
-  if (
-    t.includes('점심') || t.includes('12시') ||
-    t.includes('중간') || t.includes('절반') ||
-    t.includes('남은')
-  ) {
-    return '어느 덧, 네온의 빛이 바뀌고 올드 채널의 리턴이 일어날 시간이 되었네요.\n남은 하루도 힘내길 바래요. 영원한 체크메이트를 위해.'
   }
 
   // 99) 기본 fallback
@@ -4572,61 +4631,6 @@ function basicNexAnswer(q) {
   }
 })();
 
-/* ============================= */
-/*  NEO RIVERE NEWS ENGINE       */
-/* ============================= */
-
-const normalNews = [
-  "중앙 서버 안정화 성공",
-  "브로커 넥서스 접근 권한 재조정",
-  "제7구역 전력망 복구 완료",
-  "하층 구역 통신 지연 발생",
-  "비인가 사이버 모듈 단속 강화",
-  "도시 외곽 감시 드론 배치 확대"
-];
-
-const breakingNews = [
-  "하층 구역 대규모 데이터 유출 감지",
-  "비인가 AI 자율 행동 확인",
-  "중앙 통제 노드 일시 응답 지연"
-];
-
-function shuffle(arr) {
-  return [...arr].sort(() => Math.random() - 0.5);
-}
-
-function buildTickerLine() {
-  const shuffled = shuffle(normalNews).slice(0, 4);
-  const breaking = breakingNews[Math.floor(Math.random() * breakingNews.length)];
-
-  return `
-    [NEO RIVERE NEWS] ${shuffled.join(" // ")} //
-    <span class="breaking">[BREAKING] ${breaking}</span> //
-  `;
-}
-
-function updateTicker() {
-  const content = buildTickerLine();
-
-  const main = document.getElementById("tickerContent");
-  const clone = document.getElementById("tickerClone");
-  const track = document.getElementById("tickerTrack");
-
-  main.innerHTML = content;
-  clone.innerHTML = content;
-
-  /* 애니메이션 리셋 → 항상 처음부터 자연스럽게 */
-  track.style.animation = "none";
-  track.offsetHeight;
-  track.style.animation = "tickerScroll 50s linear infinite";
-}
-
-updateTicker();
-
-/* 5분마다 뉴스 교체 (흐름은 계속 유지) */
-setInterval(updateTicker, 5 * 60 * 1000);
-
-
   </script>
 
   <div id="sideNoiseLeft" class="sideColumn glitch"></div>
@@ -4656,8 +4660,8 @@ setInterval(updateTicker, 5 * 60 * 1000);
   <!-- Broker Profile Popup -->
   <div id="brokerModal" class="popup" style="
   position: fixed;
-  top: 250px;
-  left: 735px;
+  top: 32px;
+  left: 32px;
   transform: none;
   width: 420px;
   max-width: 90vw;
@@ -4763,26 +4767,6 @@ setInterval(updateTicker, 5 * 60 * 1000);
 
 <audio id="rainNoise" src="neorivere_rain_noise.wav" loop></audio>
 <audio id="rainDetail" src="neorivere_rain_detail.wav" loop></audio>
-
-<!-- NEO RIVERE NEWS TICKER -->
-<div class="news-ticker">
-  <div class="ticker-track">
-    <span>
-      [NEO RIVERE NEWS] 중앙 서버 안정화 성공 //
-      브로커 넥서스 접근 권한 재조정 //
-      제7구역 전력망 복구 완료 //
-      하층 구역 통신 지연 발생 //
-      비인가 사이버 모듈 단속 강화 //
-    </span>
-    <span>
-      [NEO RIVERE NEWS] 중앙 서버 안정화 성공 //
-      브로커 넥서스 접근 권한 재조정 //
-      제7구역 전력망 복구 완료 //
-      하층 구역 통신 지연 발생 //
-      비인가 사이버 모듈 단속 강화 //
-    </span>
-  </div>
-</div>
 
 </body>
 </html>
